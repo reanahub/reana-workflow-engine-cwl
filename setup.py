@@ -86,7 +86,7 @@ setup(
     author='REANA',
     author_email='info@reana.io',
     url='https://github.com/reanahub/reana-workflow-engine-cwl',
-    packages=['reana_server'],
+    packages=['reana_workflow_engine_cwl'],
     zip_safe=False,
     extras_require=extras_require,
     install_requires=install_requires,
