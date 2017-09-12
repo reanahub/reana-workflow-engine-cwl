@@ -5,7 +5,6 @@
    :maxdepth: 2
 
    gettingstarted
-   restapi
    contributing
    changes
    license
