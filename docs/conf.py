@@ -122,7 +122,7 @@ html_theme = 'alabaster'
 #
 html_theme_options = {
     'logo': 'logo-reana.png',
-    'description': 'REANA Server',
+    'description': 'REANA Workflow Engine CWL',
     'github_user': 'reanahub',
     'github_repo': 'reana-workflow-engine-cwl',
     'github_button': False,
