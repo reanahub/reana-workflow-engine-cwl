@@ -66,6 +66,10 @@ setup_requires = [
 ]
 
 install_requires = [
+    "cwltool",
+    "celery",
+    "zmq",
+    "librabbitmq"
 ]
 
 packages = find_packages()
