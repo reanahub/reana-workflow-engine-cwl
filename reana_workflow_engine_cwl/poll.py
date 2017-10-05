@@ -9,7 +9,7 @@ class PollThread(threading.Thread):
         super(PollThread, self).__init__()
         self.daemon = True
         self.operation = operation
-        self.id = operation.id
+        self.id = operation['job_id']
         self.poll_interval = poll_interval
         self.poll_retries = poll_retries
 
