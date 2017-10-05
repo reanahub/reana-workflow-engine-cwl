@@ -233,7 +233,7 @@ class ReanaPipelineJob(PipelineJob):
         create_body = {
             "experiment": "default",
             "image": container,
-            "cmd": self.command_line
+            "cmd": " ".join(self.command_line)
         }
 
         return create_body
@@ -376,12 +376,12 @@ class ReanaPipelinePoll(PollThread):
 
     def is_done(self, operation):
         terminal_states = ["succeeded", "failed"]
-        if operation in terminal_states:
+        if operation['status'] in terminal_states:
             log.info(
                 "[job %s] FINAL JOB STATE: %s ------------------" %
                 (self.name, operation.state)
             )
-            if operation != "failed":
+            if operation['status'] != "failed":
                 log.error(
                     "[job %s] task id: %s" % (self.name, self.id)
                 )

@@ -24,6 +24,6 @@
 
 import os
 
-# BROKER = os.getenv("RABBIT_MQ", "amqp://test:1234@message-broker.default.svc.cluster.local//")
-BROKER = os.getenv("RABBIT_MQ", "amqp://reana:reana@localhost:5672/reanahost")
+BROKER = os.getenv("RABBIT_MQ", "amqp://test:1234@message-broker.default.svc.cluster.local//")
+# BROKER = os.getenv("RABBIT_MQ", "amqp://reana:reana@localhost:5672/reanahost")
 JOBCONTROLLER_HOST = os.getenv("JOB_CONTROLLER_HOST", 'job-controller.default.svc.cluster.local')

@@ -39,7 +39,7 @@ def main(ctx, working_dir, **kwargs):
         f.write(ctx['workflow'])
     with open("inputs.json", "w") as f:
         json.dump(ctx["inputs"], f)
-    args = ["workflow.json#main", "inputs.json"]
+    args = ["--debug", "workflow.json#main", "inputs.json"]
     log.error("parsing arguments ...")
     parser = cwltool.main.arg_parser()
     # parser = add_args(parser)
