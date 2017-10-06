@@ -74,8 +74,7 @@ def main(ctx, working_dir, **kwargs):
     # custom
     # if not parsed_args.rm_container:
     #     log.warning("arg: 'leave_container' has no effect in cwl-tes")
-
-    pipeline = ReanaPipeline(vars(parsed_args))
+    pipeline = ReanaPipeline(working_dir, vars(parsed_args))
 
     # setup signal handler
     def signal_handler(*args):
