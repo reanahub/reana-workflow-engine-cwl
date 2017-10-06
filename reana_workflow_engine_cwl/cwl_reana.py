@@ -22,7 +22,7 @@ log = logging.getLogger("cwl-backend")
 
 class ReanaPipeline(Pipeline):
 
-    def __init__(self, kwargs):
+    def __init__(self, working_dir, kwargs):
         super(ReanaPipeline, self).__init__()
         self.kwargs = kwargs
         self.service = HttpClient()
@@ -31,9 +31,10 @@ class ReanaPipeline(Pipeline):
         else:
             self.basedir = os.getcwd()
         self.fs_access = StdFsAccess(self.basedir)
+        self.working_dir = working_dir
 
     def make_exec_tool(self, spec, **kwargs):
-        return ReanaPipelineTool(spec, self, fs_access=self.fs_access, **kwargs)
+        return ReanaPipelineTool(spec, self, fs_access=self.fs_access, working_dir=self.working_dir, **kwargs)
 
     def make_tool(self, spec, **kwargs):
         if "class" in spec and spec["class"] == "CommandLineTool":
@@ -44,14 +45,15 @@ class ReanaPipeline(Pipeline):
 
 class ReanaPipelineTool(CommandLineTool):
 
-    def __init__(self, spec, pipeline, fs_access, **kwargs):
+    def __init__(self, spec, pipeline, fs_access, working_dir, **kwargs):
         super(ReanaPipelineTool, self).__init__(spec, **kwargs)
         self.spec = spec
         self.pipeline = pipeline
         self.fs_access = fs_access
+        self.working_dir = working_dir
 
     def makeJobRunner(self, use_container=True, **kwargs):
-        return ReanaPipelineJob(self.spec, self.pipeline, self.fs_access)
+        return ReanaPipelineJob(self.spec, self.pipeline, self.fs_access, self.working_dir)
 
     def makePathMapper(self, reffiles, stagedir, **kwargs):
         return PathMapper(reffiles, kwargs["basedir"], stagedir)
@@ -59,11 +61,12 @@ class ReanaPipelineTool(CommandLineTool):
 
 class ReanaPipelineJob(PipelineJob):
 
-    def __init__(self, spec, pipeline, fs_access):
+    def __init__(self, spec, pipeline, fs_access, working_dir):
         super(ReanaPipelineJob, self).__init__(spec, pipeline)
         self.outputs = None
         self.docker_workdir = "/var/spool/cwl"
         self.fs_access = fs_access
+        self.working_dir = working_dir
         self.inplace_update = False
 
     # def create_input_parameter(self, name, d):
@@ -233,13 +236,16 @@ class ReanaPipelineJob(PipelineJob):
         create_body = {
             "experiment": "default",
             "image": container,
-            "cmd": " ".join(self.command_line)
+            # "cmd": "cd {0} && ".format(self.working_dir) + " ".join(self.command_line)
+            # "cmd": "/bin/sh -c 'cd {0} && ".format(self.working_dir) + " ".join(self.command_line) + "'"
+            "cmd": "/bin/sh -c 'mkdir {0} && cd {0} && ".format(self.outdir.replace("/reana", "/data")) + " ".join(self.command_line) + "'"
         }
 
         return create_body
 
     def run(self, pull_image=True, rm_container=True, rm_tmpdir=True,
             move_outputs="move", **kwargs):
+        self.outdir = self.outdir.replace("/tmp/", self.working_dir +"/")
         # useful for debugging
         log.debug(
             "[job %s] self.__dict__ in run() ----------------------" %
@@ -379,7 +385,7 @@ class ReanaPipelinePoll(PollThread):
         if operation['status'] in terminal_states:
             log.info(
                 "[job %s] FINAL JOB STATE: %s ------------------" %
-                (self.name, operation.state)
+                (self.name, operation['status'])
             )
             if operation['status'] != "failed":
                 log.error(
@@ -389,7 +395,7 @@ class ReanaPipelinePoll(PollThread):
                     "[job %s] logs: %s" %
                     (
                         self.name,
-                        self.service.get_task(self.id, "FULL").logs
+                        self.service.get_logs(self.id)
                     )
 
                 )
