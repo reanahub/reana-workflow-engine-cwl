@@ -36,7 +36,7 @@ def main(ctx, working_dir, **kwargs):
     os.chdir(working_dir)
     log.error("dumping files...")
     with open("workflow.json", "w") as f:
-        f.write(ctx['workflow'])
+        json.dump(ctx['workflow'], f)
     with open("inputs.json", "w") as f:
         json.dump(ctx["inputs"], f)
     args = ["--debug", "workflow.json#main", "inputs.json"]
