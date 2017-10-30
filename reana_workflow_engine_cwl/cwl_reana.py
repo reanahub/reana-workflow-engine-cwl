@@ -232,13 +232,17 @@ class ReanaPipelineJob(PipelineJob):
         #     ),
         #     tags={"CWLDocumentId": self.spec.get("id")}
         # )
-        # TODO: read experiment from environment variable
+        mounted_outdir = self.outdir.replace("/reana", "/data")
+        cwl_runtime_outdir = '/var/spool/cwl'
+        command_line = " ".join(self.command_line).replace(cwl_runtime_outdir, mounted_outdir).replace('/bin/sh -c ', '')
+        # if command_line.startswith("/bin/sh"):
+        #     command_line
+        # else:
+        cmd = "/bin/sh -c 'mkdir -p {0} && cd {0} && ".format(mounted_outdir) + command_line + "'"
         create_body = {
             "experiment": "default",
             "image": container,
-            # "cmd": "cd {0} && ".format(self.working_dir) + " ".join(self.command_line)
-            # "cmd": "/bin/sh -c 'cd {0} && ".format(self.working_dir) + " ".join(self.command_line) + "'"
-            "cmd": "/bin/sh -c 'mkdir {0} && cd {0} && ".format(self.outdir.replace("/reana", "/data")) + " ".join(self.command_line) + "'"
+            "cmd": cmd
         }
 
         return create_body
