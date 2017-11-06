@@ -2,6 +2,8 @@ from __future__ import absolute_import, print_function, unicode_literals
 
 import logging
 import os
+import json
+import pipes
 import shutil
 import time
 
@@ -158,8 +160,6 @@ class ReanaPipelineJob(PipelineJob):
         return inputs
 
     def create_task_msg(self):
-        input_parameters = self.collect_input_parameters()
-        output_parameters = []
 
         # if self.stdout is not None:
         #     parameter = tes.TaskParameter(
@@ -235,14 +235,12 @@ class ReanaPipelineJob(PipelineJob):
         mounted_outdir = self.outdir.replace("/reana", "/data")
         cwl_runtime_outdir = '/var/spool/cwl'
         command_line = " ".join(self.command_line).replace(cwl_runtime_outdir, mounted_outdir).replace('/bin/sh -c ', '')
-        # if command_line.startswith("/bin/sh"):
-        #     command_line
-        # else:
-        cmd = "/bin/sh -c 'mkdir -p {0} && cd {0} && ".format(mounted_outdir) + command_line + "'"
+        wf_space_cmd = "mkdir -p {0} && cd {0} && ".format(mounted_outdir) + command_line
+        wrapped_cmd = "/bin/sh -c {} ".format(pipes.quote(wf_space_cmd))
         create_body = {
             "experiment": "default",
             "image": container,
-            "cmd": cmd
+            "cmd": wrapped_cmd
         }
 
         return create_body
