@@ -4,6 +4,7 @@ import logging
 import os
 import json
 import pipes
+import re
 import shutil
 import time
 
@@ -232,9 +233,20 @@ class ReanaPipelineJob(PipelineJob):
         #     ),
         #     tags={"CWLDocumentId": self.spec.get("id")}
         # )
-        mounted_outdir = self.outdir.replace("/reana", "/data")
+        # mounted_outdir = self.outdir.replace("/reana", "/data")
+        mounted_outdir = self.outdir
         cwl_runtime_outdir = '/var/spool/cwl'
         command_line = " ".join(self.command_line).replace(cwl_runtime_outdir, mounted_outdir).replace('/bin/sh -c ', '')
+        command_line = re.sub("/var/lib/cwl/.*/", "/".join(self.working_dir.split("/")[:-1]) + "/workspace/", command_line)
+        if self.stdin:
+            path = self.stdin.split("/")
+            if len(path) > 1:
+                parent_dir = "/".join(mounted_outdir.split("/")[:-1])
+                command_line = command_line + " < {0}".format(os.path.join(parent_dir, path[-1]))
+            else:
+                command_line = command_line + " < {0}".format(os.path.join(mounted_outdir, path))
+        if self.stdout:
+            command_line = command_line + " > {0}".format(os.path.join(mounted_outdir, self.stdout))
         wf_space_cmd = "mkdir -p {0} && cd {0} && ".format(mounted_outdir) + command_line
         wrapped_cmd = "/bin/sh -c {} ".format(pipes.quote(wf_space_cmd))
         create_body = {

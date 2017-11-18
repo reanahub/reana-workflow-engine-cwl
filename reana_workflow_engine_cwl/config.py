@@ -27,3 +27,18 @@ import os
 BROKER = os.getenv("RABBIT_MQ", "amqp://test:1234@message-broker.default.svc.cluster.local//")
 # BROKER = os.getenv("RABBIT_MQ", "amqp://reana:reana@localhost:5672/reanahost")
 JOBCONTROLLER_HOST = os.getenv("JOB_CONTROLLER_HOST", 'job-controller.default.svc.cluster.local')
+
+INPUTS_DIRECTORY_RELATIVE_PATH = 'inputs'
+"""Represents the relative path to the inputs directory (populated by RWC)"""
+
+SHARED_VOLUME = os.getenv('SHARED_VOLUME', '/reana/default')
+"""Path to the mounted REANA shared volume."""
+
+REANA_DB_FILE = './reana.db'
+"""REANA SQLite db file."""
+
+SQLALCHEMY_DATABASE_URI = \
+    'sqlite:///{SHARED_VOLUME}/{REANA_DB_FILE}'.format(
+        SHARED_VOLUME=SHARED_VOLUME,
+        REANA_DB_FILE=REANA_DB_FILE)
+"""SQL database URI."""
