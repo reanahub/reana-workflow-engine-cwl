@@ -31,10 +31,18 @@ import zmq
 from reana_workflow_engine_cwl import celery_zeromq
 from reana_workflow_engine_cwl.celeryapp import app
 from reana_workflow_engine_cwl import main
+from reana_workflow_engine_cwl.database import load_session
+from reana_workflow_engine_cwl.models import Workflow, WorkflowStatus
+
 log = logging.getLogger(__name__)
+outputs_dir_name = 'outputs'
+known_dirs = ['inputs', 'logs', outputs_dir_name]
 
 
-def run_cwl_workflow_standalone(workflow_uuid, ctx):
+@app.task(name='tasks.run_cwl_workflow', ignore_result=True)
+def run_cwl_workflow(workflow_uuid, workflow_workspace,
+                        workflow_json=None,
+                        parameters=None):
     # log.info('getting socket..')
     #
     # zmqctx = celery_zeromq.get_context()
@@ -42,48 +50,39 @@ def run_cwl_workflow_standalone(workflow_uuid, ctx):
     # socket.connect(os.environ['ZMQ_PROXY_CONNECT'])
     #
     # log.info('running recast workflow on context: {ctx}'.format(ctx=ctx))
+    db_session = load_session()
 
-    analysis_directory = os.path.join(
-        os.getenv('SHARED_VOLUME', '/data'),
-        '00000000-0000-0000-0000-000000000000',  # FIXME parameter from RWC
-        'analyses',
-        workflow_uuid)
-
-    analysis_workspace = os.path.join(analysis_directory, 'workspace')
-
-    if not os.path.exists(analysis_workspace):
-        os.makedirs(analysis_workspace)
-
-
-    main.main(ctx, analysis_workspace)
+    # if workflow_json:
+        # When `cwl` is launched using an already validated workflow file.
+        # workflow_kwargs = dict(workflow_json=workflow_json)
+    # analysis_directory = os.path.join(
+    #     os.getenv('SHARED_VOLUME', '/data'),
+    #     '00000000-0000-0000-0000-000000000000',  # FIXME parameter from RWC
+    #     'analyses',
+    #     workflow_uuid)
     #
-    # with steering_ctx(workdir=analysis_workspace,
-    #                   workflow=ctx['workflow'],
-    #                   loadtoplevel=ctx['toplevel'],
-    #                   initdata=ctx['preset_pars'],
-    #                   updateinterval=5,
-    #                   loginterval=5,
-    #                   backend=cap_backend) as ys:
+    # analysis_workspace = os.path.join(analysis_directory, 'workspace')
     #
-    #     for status_file in glob(os.path.join(analysis_directory, '.status.*')):
-    #         os.remove(status_file)
-    #
-    #     open(os.path.join(analysis_directory, '.status.running'), 'a').close()
-    #
-    #     ys.adage_argument(additional_trackers=[
-    #         ZeroMQTracker(socket=socket, identifier=workflow_uuid)])
-    #     log.info('added zmq tracker.. ready to go..')
-    #     log.info('zmq publishing under: %s', workflow_uuid)
-    #
-    # for status_file in glob(os.path.join(analysis_directory, '.status.*')):
-    #     os.remove(status_file)
-    #
-    # open(os.path.join(analysis_directory, '.status.finished'), 'a').close()
+    # if not os.path.exists(analysis_workspace):
+    #     os.makedirs(analysis_workspace)
 
-    log.info('workflow done')
-
-
-@app.task(name='tasks.run_cwl_workflow', ignore_result=True)
-def run_cwl_workflow(ctx):
-    workflow_uuid = run_cwl_workflow.request.id
-    run_cwl_workflow_standalone(str(workflow_uuid), ctx)
+    log.info('running workflow on context: {0}'.format(locals()))
+    Workflow.update_workflow_status(
+        db_session,
+        workflow_uuid,
+        WorkflowStatus.running, log)
+    try:
+        main.main(workflow_json, parameters, workflow_workspace)
+        Workflow.update_workflow_status(
+            db_session,
+            workflow_uuid,
+            WorkflowStatus.finished, log)
+        log.info('workflow done')
+    except Exception as e:
+        log.error('workflow failed: {0}'.format(e))
+        Workflow.update_workflow_status(
+            db_session,
+            workflow_uuid,
+            WorkflowStatus.failed,
+            log,
+            message=str(e))

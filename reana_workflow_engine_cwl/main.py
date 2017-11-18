@@ -9,6 +9,7 @@ import signal
 import sys
 import logging
 
+from reana_workflow_engine_cwl.config import SHARED_VOLUME
 from reana_workflow_engine_cwl.cwl_reana import ReanaPipeline
 from reana_workflow_engine_cwl.__init__ import __version__
 
@@ -30,15 +31,19 @@ def versionstring():
     return "%s %s with cwltool %s" % (sys.argv[0], __version__, cwltool_ver)
 
 
-def main(ctx, working_dir, **kwargs):
+def main(workflow_spec, workflow_inputs, working_dir, **kwargs):
     # if args is None:
     #     args = sys.argv[1:]
+    ORGANIZATIONS = {"default", "alice"}
+    first_arg = working_dir.split("/")[0]
+    if first_arg in ORGANIZATIONS:
+        working_dir = working_dir.replace(first_arg, SHARED_VOLUME)
     os.chdir(working_dir)
     log.error("dumping files...")
     with open("workflow.json", "w") as f:
-        json.dump(ctx['workflow'], f)
+        json.dump(workflow_spec, f)
     with open("inputs.json", "w") as f:
-        json.dump(ctx["inputs"], f)
+        json.dump(workflow_inputs, f)
     args = ["--debug", "workflow.json#main", "inputs.json"]
     log.error("parsing arguments ...")
     parser = cwltool.main.arg_parser()
