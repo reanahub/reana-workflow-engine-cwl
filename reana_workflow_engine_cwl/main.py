@@ -12,7 +12,8 @@ import logging
 from reana_workflow_engine_cwl.config import SHARED_VOLUME
 from reana_workflow_engine_cwl.cwl_reana import ReanaPipeline
 from reana_workflow_engine_cwl.__init__ import __version__
-
+from reana_workflow_engine_cwl.database import SQLiteHandler
+from reana_workflow_engine_cwl.models import Workflow
 
 log = logging.getLogger("reana-backend")
 log.setLevel(logging.INFO)
@@ -31,7 +32,7 @@ def versionstring():
     return "%s %s with cwltool %s" % (sys.argv[0], __version__, cwltool_ver)
 
 
-def main(workflow_spec, workflow_inputs, working_dir, **kwargs):
+def main(db_session, workflow_uuid, workflow_spec, workflow_inputs, working_dir, **kwargs):
     # if args is None:
     #     args = sys.argv[1:]
     ORGANIZATIONS = {"default", "alice"}
@@ -96,13 +97,33 @@ def main(workflow_spec, workflow_inputs, working_dir, **kwargs):
         sys.exit(1)
     signal.signal(signal.SIGINT, signal_handler)
     log.error("starting the run..")
-    return cwltool.main.main(
+    db_log_writer = SQLiteHandler(db_session, workflow_uuid)
+
+    from io import StringIO, BytesIO
+    import sys
+
+    class Capturing(list):
+        def __enter__(self):
+            self._stdout = sys.stdout
+            sys.stdout = self._stringio = StringIO()
+            return self
+
+        def __exit__(self, *args):
+            self.extend(self._stringio.getvalue().splitlines())
+            del self._stringio  # free up some memory
+            sys.stdout = self._stdout
+
+    f = BytesIO()
+    result = cwltool.main.main(
         args=parsed_args,
         executor=pipeline.executor,
         makeTool=pipeline.make_tool,
         versionfunc=versionstring,
-        logger_handler=console
+        logger_handler=db_log_writer,
+        stdout=f
     )
+    Workflow.append_workflow_logs(db_session, workflow_uuid, f.getvalue().decode("utf-8"))
+    return result
 
 
 if __name__ == "__main__":

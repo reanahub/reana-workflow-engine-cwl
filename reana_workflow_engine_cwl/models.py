@@ -72,6 +72,7 @@ class Workflow(Base):
     specification = Column(JSONType)
     parameters = Column(JSONType)
     type_ = Column(String(30))
+    logs = Column(String)
 
     def __repr__(self):
         """Workflow string represetantion."""
@@ -99,4 +100,28 @@ class Workflow(Base):
         except Exception as e:
             log.info(
                 'An error occurred while updating workflow: {0}'.format(str(e)))
+            raise e
+
+    @staticmethod
+    def append_workflow_logs(db_session, workflow_uuid, new_logs, message=None):
+        """Update database workflow status.
+
+        :param workflow_uuid: UUID which represents the workflow.
+        :param status: String that represents the analysis status.
+        :param status_message: String that represents the message related with the
+           status, if there is any.
+        """
+        try:
+            workflow = \
+                db_session.query(Workflow).filter_by(id_=workflow_uuid).first()
+
+            if not workflow:
+                raise Exception('Workflow {0} doesn\'t exist in database.'.format(
+                    workflow_uuid))
+
+            workflow.logs = (workflow.logs or "") + new_logs
+            db_session.commit()
+        except Exception as e:
+            # log.info(
+            #     'An error occurred while updating workflow: {0}'.format(str(e)))
             raise e

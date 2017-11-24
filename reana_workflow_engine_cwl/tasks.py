@@ -72,7 +72,7 @@ def run_cwl_workflow(workflow_uuid, workflow_workspace,
         workflow_uuid,
         WorkflowStatus.running, log)
     try:
-        main.main(workflow_json, parameters, workflow_workspace)
+        main.main(db_session, workflow_uuid, workflow_json, parameters, workflow_workspace)
         Workflow.update_workflow_status(
             db_session,
             workflow_uuid,
