@@ -235,9 +235,12 @@ class ReanaPipelineJob(PipelineJob):
         # )
         # mounted_outdir = self.outdir.replace("/reana", "/data")
         mounted_outdir = self.outdir
+        if mounted_outdir.startswith("/tmp"):
+            mounted_outdir = re.sub("/tmp/.*?/.*?/", self.working_dir + "/", mounted_outdir)
         cwl_runtime_outdir = '/var/spool/cwl'
         command_line = " ".join(self.command_line).replace(cwl_runtime_outdir, mounted_outdir).replace('/bin/sh -c ', '')
-        command_line = re.sub("/var/lib/cwl/.*/", "/".join(self.working_dir.split("/")[:-1]) + "/workspace/", command_line)
+        command_line = re.sub("/var/lib/cwl/.*?/", "/".join(self.working_dir.split("/")[:-1]) + "/workspace/", command_line)
+        command_line = re.sub("/tmp/.*?/.*?/", self.working_dir + "/", command_line)
         if self.stdin:
             path = self.stdin.split("/")
             if len(path) > 1:
