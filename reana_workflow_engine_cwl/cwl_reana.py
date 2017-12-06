@@ -61,7 +61,6 @@ class ReanaPipelineTool(CommandLineTool):
     def makePathMapper(self, reffiles, stagedir, **kwargs):
         return PathMapper(reffiles, kwargs["basedir"], stagedir)
 
-
 class ReanaPipelineJob(PipelineJob):
 
     def __init__(self, spec, pipeline, fs_access, working_dir):
@@ -234,6 +233,11 @@ class ReanaPipelineJob(PipelineJob):
         #     tags={"CWLDocumentId": self.spec.get("id")}
         # )
         # mounted_outdir = self.outdir.replace("/reana", "/data")
+
+        requirements_command_line = ""
+        for var in self.environment:
+                requirements_command_line += "export {0}=\"{1}\";".format(var, self.environment[var])
+
         mounted_outdir = self.outdir
         if mounted_outdir.startswith("/tmp"):
             mounted_outdir = re.sub("/tmp/.*?/.*?/", self.working_dir + "/", mounted_outdir)
@@ -250,7 +254,13 @@ class ReanaPipelineJob(PipelineJob):
                 command_line = command_line + " < {0}".format(os.path.join(mounted_outdir, path))
         if self.stdout:
             command_line = command_line + " > {0}".format(os.path.join(mounted_outdir, self.stdout))
+        bash_line = "/bin/bash -c"
+        if command_line.startswith(bash_line):
+            command_line = command_line.replace(bash_line, "")
+            # command_line = bash_line + " '{0}'".format(pipes.quote(requirements_command_line + command_line))
+        # else:
         wf_space_cmd = "mkdir -p {0} && cd {0} && ".format(mounted_outdir) + command_line
+        wf_space_cmd = requirements_command_line + wf_space_cmd
         wrapped_cmd = "/bin/sh -c {} ".format(pipes.quote(wf_space_cmd))
         create_body = {
             "experiment": "default",
