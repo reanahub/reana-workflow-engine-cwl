@@ -12,54 +12,48 @@ To run CWL conformance tests on REANA follow the next steps:
 
 
 
-* reana-server
-
 ```
-    1. git clone https://github.com/reanahub/reana-server
-    2. git checkout reana-cwl-runner
-    3. eval $(minikube docker-env)
-    4. docker build . -t reana-server:v0.0.1
-    5. kubectl get pods
-    6. kubectl delete pods <reana-server-container-id>
-
- ```
-
-* reana-workflow-controller
-
+# reana-server
+git clone https://github.com/reanahub/reana-server -b reana-cwl-runner
+cd reana-cwl-runner
+eval $(minikube docker-env)
+docker build . -t reana-server:v0.0.1
+kubectl get pods
+kubectl delete pods <reana-server-container-id>
+cd ..
 ```
 
-    1. git clone https://github.com/anton-khodak/reana-workflow-controller
-    2. git checkout reana-cwl-runner
-    3. eval $(minikube docker-env)
-    4. docker build . -t reana-workflow-controller:v0.0.1
-    5. minikube ssh
-    6. cd /reana/default
-    7. curl https://transfer.sh/x0OfE/reana.db --output reana.db
-    8. kubectl get pods
-    9. kubectl delete pods <reana-workflow-controller-container-id
-
+```
+# reana-workflow-controller
+git clone https://github.com/anton-khodak/reana-workflow-controller -b reana-cwl-runner
+cd reana-workflow-controller 
+eval $(minikube docker-env)
+docker build . -t reana-workflow-controller:v0.0.1
+minikube ssh
+cd /reana/default
+curl https://transfer.sh/x0OfE/reana.db --output reana.db
+<ctrl-d>
+kubectl get pods
+kubectl delete pods <reana-workflow-controller-container-id
+cd ..
 ```
 
-* reana-workflow-engine-cwl
+```
+# reana-workflow-engine-cwl
+git clone https://github.com/anton-khodak/reana-workflow-engine-cwl -b reana-cwl-runner
+cd reana-workflow-engine-cwl
+eval $(minikube docker-env)
+docker build . -t reana-workflow-engine-cwl:v0.0.1
+cd ..
+```
 
 ```
-    1. git clone https://github.com/anton-khodak/reana-workflow-engine-cwl
-    2. git checkout reana-cwl-runner
-    3. eval $(minikube docker-env)
-    4. docker build . -t reana-workflow-engine-cwl:v0.0.1
+# reana-resources-k8s
+git clone https://github.com/anton-khodak/reana-resources-k8s -b cwl-support
+rm -r configuration-manifests
+cp -r reana-resources-k8s/configuration-manifests ./
+kubectl create -Rf configuration-manifest
 ```
-
-
-* reana-resources-k8s
-
-   ```
-    1. git clone https://github.com/anton-khodak/reana-resources-k8s
-    2. git checkout cwl-support
-    3. cd /path/to/reana-installation
-    4. rm -r configuration-manifests
-    5. cp /path/to/anton-khodak/reana-resources-k8s/configuration-manifests .
-    6. kubectl create -Rf configuration-manifests
-    ```
 
  After these steps cwl-default-worker must be visible in `kubectl get pods`
 
@@ -67,17 +61,18 @@ To run CWL conformance tests on REANA follow the next steps:
 3) Checkout reana-client with reana-cwl-runner interface and start tests
 
 
-    * reana-client
+
 
 ```
-    1. git clone https://github.com/anton-khodak/reana-client
-    2. git checkout reana-cwl-runner
-    3. source /path/to/reana-virtualenv/bin/activate
-    4. reana get reana-server // here you get reana-server URL
-    5. export REANA_SERVER_URL=server_url_from_previous_step
-    6. python setup.py install
-    7. cd /path/to/cwltool/cwltool/schemas
-    8. ./run_test.sh RUNNER=reana-cwl-runner
+# reana-client
+git clone https://github.com/anton-khodak/reana-client -b reana-cwl-runner
+source reana-virtualenv/bin/activate
+cd reana-client
+reana get reana-server // here you get reana-server URL
+export REANA_SERVER_URL=server_url_from_previous_step
+pip install .
+cd /path/to/cwltool/cwltool/schemas
+./run_test.sh RUNNER=reana-cwl-runner
 ```
 
 ## Warnings:
