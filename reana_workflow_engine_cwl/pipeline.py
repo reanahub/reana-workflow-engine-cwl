@@ -7,6 +7,7 @@ import time
 
 # from builtins import str
 from cwltool.errors import WorkflowException
+from cwltool.job import JobBase
 from cwltool.process import cleanIntermediate, relocateOutputs
 from cwltool.mutation import MutationManager
 
@@ -61,6 +62,9 @@ class Pipeline(object):
                 "class": "DockerRequirement",
                 "dockerPull": kwargs["default_container"]
             })
+        kwargs['docker_outdir'] = os.path.join(self.working_dir, "cwl/docker_outdir")
+        kwargs['docker_tmpdir'] = os.path.join(self.working_dir, "cwl/docker_tmpdir")
+        kwargs["docker_stagedir"] = os.path.join(self.working_dir, "cwl/docker_stagedir")
 
         jobs = tool.job(job_order, output_callback, **kwargs)
         try:
@@ -119,9 +123,10 @@ class Pipeline(object):
             t.join()
 
 
-class PipelineJob(object):
+class PipelineJob(JobBase):
 
     def __init__(self, spec, pipeline):
+        super(JobBase, self).__init__()
         self.spec = spec
         self.pipeline = pipeline
         self.running = False

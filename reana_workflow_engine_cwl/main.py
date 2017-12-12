@@ -45,7 +45,14 @@ def main(db_session, workflow_uuid, workflow_spec, workflow_inputs, working_dir,
         json.dump(workflow_spec, f)
     with open("inputs.json", "w") as f:
         json.dump(workflow_inputs, f)
-    args = ["--debug", "workflow.json#main", "inputs.json"]
+    tmpdir = os.path.join(working_dir, "cwl/tmpdir")
+    tmp_outdir = os.path.join(working_dir, "cwl/outdir")
+    os.makedirs(tmpdir)
+    os.makedirs(tmp_outdir)
+    args = ["--debug",
+            "--tmpdir-prefix", tmpdir + "/",
+            "--tmp-outdir-prefix",tmp_outdir + "/",
+            "workflow.json#main", "inputs.json"]
     log.error("parsing arguments ...")
     parser = cwltool.main.arg_parser()
     # parser = add_args(parser)

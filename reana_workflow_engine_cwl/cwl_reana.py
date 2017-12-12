@@ -13,6 +13,8 @@ from cwltool.errors import WorkflowException, UnsupportedRequirement
 from cwltool.pathmapper import PathMapper
 from cwltool.stdfsaccess import StdFsAccess
 from cwltool.workflow import defaultMakeTool
+from cwltool.job import relink_initialworkdir
+from cwltool.job import stageFiles
 from pprint import pformat
 from schema_salad.ref_resolver import file_uri
 
@@ -273,6 +275,32 @@ class ReanaPipelineJob(PipelineJob):
     def run(self, pull_image=True, rm_container=True, rm_tmpdir=True,
             move_outputs="move", **kwargs):
         self.outdir = self.outdir.replace("/tmp/", self.working_dir +"/")
+
+        self._setup(kwargs)
+
+        env = self.environment
+        if not os.path.exists(self.tmpdir):
+            os.makedirs(self.tmpdir)
+        vars_to_preserve = kwargs.get("preserve_environment")
+        if kwargs.get("preserve_entire_environment"):
+            vars_to_preserve = os.environ
+        if vars_to_preserve is not None:
+            for key, value in os.environ.items():
+                if key in vars_to_preserve and key not in env:
+                    env[key] = value
+        env["HOME"] = self.outdir
+        env["TMPDIR"] = self.tmpdir
+        if "PATH" not in env:
+            env["PATH"] = os.environ["PATH"]
+        if "SYSTEMROOT" not in env and "SYSTEMROOT" in os.environ:
+            env["SYSTEMROOT"] = os.environ["SYSTEMROOT"]
+
+        stageFiles(self.pathmapper, ignoreWritable=True, symLink=True)
+        if self.generatemapper:
+            stageFiles(self.generatemapper, ignoreWritable=self.inplace_update, symLink=True)
+            relink_initialworkdir(self.generatemapper, self.outdir, self.builder.outdir,
+                                  inplace_update=self.inplace_update)
+
         # useful for debugging
         log.debug(
             "[job %s] self.__dict__ in run() ----------------------" %
