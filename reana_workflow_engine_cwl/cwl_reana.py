@@ -60,8 +60,6 @@ class ReanaPipelineTool(CommandLineTool):
     def makeJobRunner(self, use_container=True, **kwargs):
         return ReanaPipelineJob(self.spec, self.pipeline, self.fs_access, self.working_dir)
 
-    def makePathMapper(self, reffiles, stagedir, **kwargs):
-        return PathMapper(reffiles, kwargs["basedir"], stagedir)
 
 class ReanaPipelineJob(PipelineJob):
 
@@ -296,7 +294,7 @@ class ReanaPipelineJob(PipelineJob):
             env["SYSTEMROOT"] = os.environ["SYSTEMROOT"]
 
         stageFiles(self.pathmapper, ignoreWritable=True, symLink=True)
-        if self.generatemapper:
+        if getattr(self, "generatemapper", ""):
             stageFiles(self.generatemapper, ignoreWritable=self.inplace_update, symLink=True)
             relink_initialworkdir(self.generatemapper, self.outdir, self.builder.outdir,
                                   inplace_update=self.inplace_update)
