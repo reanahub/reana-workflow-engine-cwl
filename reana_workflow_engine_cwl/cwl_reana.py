@@ -254,6 +254,8 @@ class ReanaPipelineJob(PipelineJob):
                 command_line = command_line + " < {0}".format(os.path.join(mounted_outdir, path))
         if self.stdout:
             command_line = command_line + " > {0}".format(os.path.join(mounted_outdir, self.stdout))
+        if self.stderr:
+            command_line = command_line.replace("&2", os.path.join(mounted_outdir, self.stderr))
         bash_line = "/bin/bash -c"
         if command_line.startswith(bash_line):
             command_line = command_line.replace(bash_line, "")
@@ -294,7 +296,7 @@ class ReanaPipelineJob(PipelineJob):
             env["SYSTEMROOT"] = os.environ["SYSTEMROOT"]
 
         stageFiles(self.pathmapper, ignoreWritable=True, symLink=True)
-        if getattr(self, "generatemapper", ""):
+        if getattr(self, "generatemapper",""):
             stageFiles(self.generatemapper, ignoreWritable=self.inplace_update, symLink=True)
             relink_initialworkdir(self.generatemapper, self.outdir, self.builder.outdir,
                                   inplace_update=self.inplace_update)
