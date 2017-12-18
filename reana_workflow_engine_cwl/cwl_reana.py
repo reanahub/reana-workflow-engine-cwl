@@ -8,12 +8,13 @@ import re
 import shutil
 import time
 
+import shellescape
 from cwltool.draft2tool import CommandLineTool
 from cwltool.errors import WorkflowException, UnsupportedRequirement
-from cwltool.pathmapper import PathMapper
 from cwltool.stdfsaccess import StdFsAccess
+from cwltool.utils import get_feature
 from cwltool.workflow import defaultMakeTool
-from cwltool.job import relink_initialworkdir
+from cwltool.job import relink_initialworkdir, needs_shell_quoting_re
 from cwltool.job import stageFiles
 from pprint import pformat
 from schema_salad.ref_resolver import file_uri
@@ -242,7 +243,16 @@ class ReanaPipelineJob(PipelineJob):
         if mounted_outdir.startswith("/tmp"):
             mounted_outdir = re.sub("/tmp/.*?/.*?/", self.working_dir + "/", mounted_outdir)
         cwl_runtime_outdir = '/var/spool/cwl'
-        command_line = " ".join(self.command_line).replace(cwl_runtime_outdir, mounted_outdir).replace('/bin/sh -c ', '')
+        scr, _ = get_feature(self, "ShellCommandRequirement")
+
+        if scr:
+            shouldquote = lambda x: False
+        else:
+            shouldquote = needs_shell_quoting_re.search
+
+        command_line = " ".join([shellescape.quote(arg) if shouldquote(arg) else  arg for arg in
+                                       self.command_line])
+        command_line = command_line.replace(cwl_runtime_outdir, mounted_outdir).replace('/bin/sh -c ', '')
         command_line = re.sub("/var/lib/cwl/.*?/", "/".join(self.working_dir.split("/")[:-1]) + "/workspace/", command_line)
         command_line = re.sub("/tmp/.*?/.*?/", self.working_dir + "/", command_line)
         if self.stdin:
@@ -255,7 +265,8 @@ class ReanaPipelineJob(PipelineJob):
         if self.stdout:
             command_line = command_line + " > {0}".format(os.path.join(mounted_outdir, self.stdout))
         if self.stderr:
-            command_line = command_line.replace("&2", os.path.join(mounted_outdir, self.stderr))
+            # command_line = command_line.replace("&2", os.path.join(mounted_outdir, self.stderr))
+            command_line += " 2> " + os.path.join(mounted_outdir, self.stderr)
         bash_line = "/bin/bash -c"
         if command_line.startswith(bash_line):
             command_line = command_line.replace(bash_line, "")
