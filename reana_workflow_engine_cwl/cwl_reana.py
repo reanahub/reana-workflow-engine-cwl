@@ -272,8 +272,14 @@ class ReanaPipelineJob(PipelineJob):
             command_line = command_line.replace(bash_line, "")
             # command_line = bash_line + " '{0}'".format(pipes.quote(requirements_command_line + command_line))
         # else:
-        wf_space_cmd = "mkdir -p {0} && cd {0} && ".format(mounted_outdir) + command_line
+        wf_space_cmd = "cd {0} && ".format(self.environment["HOME"]) + command_line
         wf_space_cmd = requirements_command_line + wf_space_cmd
+        docker_output_dir = None
+        docker_req, _ = get_feature(self, "DockerRequirement")
+        if docker_req:
+            docker_output_dir = docker_req.get("dockerOutputDirectory", None)
+        if docker_output_dir:
+            wf_space_cmd = "mkdir -p {0} && {1} ; cp -r {0} {2}".format(docker_output_dir, wf_space_cmd, mounted_outdir)
         wrapped_cmd = "/bin/sh -c {} ".format(pipes.quote(wf_space_cmd))
         create_body = {
             "experiment": "default",
