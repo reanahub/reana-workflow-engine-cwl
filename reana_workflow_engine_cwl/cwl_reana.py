@@ -6,11 +6,13 @@ import json
 import pipes
 import re
 import shutil
+import tempfile
 import time
 
 import shellescape
 from cwltool.draft2tool import CommandLineTool
 from cwltool.errors import WorkflowException, UnsupportedRequirement
+from cwltool.pathmapper import ensure_writable
 from cwltool.stdfsaccess import StdFsAccess
 from cwltool.utils import get_feature
 from cwltool.workflow import defaultMakeTool
@@ -81,6 +83,37 @@ class ReanaPipelineJob(PipelineJob):
         self.fs_access = fs_access
         self.working_dir = working_dir
         self.inplace_update = False
+
+    def add_volumes(self, pathmapper):
+
+        host_outdir = self.outdir
+        container_outdir = self.builder.outdir
+        for src, vol in pathmapper.items():
+            if not vol.staged:
+                continue
+            if vol.target.startswith(container_outdir + "/"):
+                host_outdir_tgt = os.path.join(
+                    host_outdir, vol.target[len(container_outdir) + 1:])
+            else:
+                host_outdir_tgt = None
+            if vol.type == "WritableDirectory":
+                if vol.resolved.startswith("_:"):
+                    os.makedirs(vol.target, 0o0755)
+                else:
+                    if self.inplace_update:
+                        pass
+                    else:
+                        shutil.copytree(vol.resolved, host_outdir_tgt)
+                        ensure_writable(host_outdir_tgt)
+            elif vol.type == "CreateFile":
+                if host_outdir_tgt:
+                    with open(host_outdir_tgt, "wb") as f:
+                        f.write(vol.resolved.encode("utf-8"))
+                else:
+                    fd, createtmp = tempfile.mkstemp(dir=self.tmpdir)
+                    with os.fdopen(fd, "wb") as f:
+                        f.write(vol.resolved.encode("utf-8"))
+
 
     # def create_input_parameter(self, name, d):
     #     if "contents" in d:
@@ -326,6 +359,9 @@ class ReanaPipelineJob(PipelineJob):
             stageFiles(self.generatemapper, ignoreWritable=self.inplace_update, symLink=True)
             relink_initialworkdir(self.generatemapper, self.outdir, self.builder.outdir,
                                   inplace_update=self.inplace_update)
+        self.add_volumes(self.pathmapper)
+        if self.generatemapper:
+            self.add_volumes(self.generatemapper)
 
         # useful for debugging
         log.debug(
