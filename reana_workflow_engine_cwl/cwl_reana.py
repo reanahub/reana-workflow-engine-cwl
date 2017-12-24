@@ -59,6 +59,16 @@ class ReanaPipelineTool(CommandLineTool):
         self.working_dir = working_dir
 
     def makeJobRunner(self, use_container=True, **kwargs):
+        dockerReq, _ = self.get_requirement("DockerRequirement")
+        if not dockerReq and use_container:
+            if self.find_default_container:
+                default_container = self.find_default_container(self)
+                if default_container:
+                    self.requirements.insert(0, {
+                        "class": "DockerRequirement",
+                        "dockerPull": default_container
+                    })
+
         return ReanaPipelineJob(self.spec, self.pipeline, self.fs_access, self.working_dir)
 
 
@@ -272,7 +282,7 @@ class ReanaPipelineJob(PipelineJob):
             command_line = command_line.replace(bash_line, "")
             # command_line = bash_line + " '{0}'".format(pipes.quote(requirements_command_line + command_line))
         # else:
-        wf_space_cmd = "cd {0} && ".format(self.environment["HOME"]) + command_line
+        wf_space_cmd = "mkdir -p {0} && cd {0} && ".format(self.environment["HOME"]) + command_line
         wf_space_cmd = requirements_command_line + wf_space_cmd
         docker_output_dir = None
         docker_req, _ = get_feature(self, "DockerRequirement")
@@ -291,7 +301,6 @@ class ReanaPipelineJob(PipelineJob):
 
     def run(self, pull_image=True, rm_container=True, rm_tmpdir=True,
             move_outputs="move", **kwargs):
-        self.outdir = self.outdir.replace("/tmp/", self.working_dir +"/")
 
         self._setup(kwargs)
 
@@ -305,7 +314,7 @@ class ReanaPipelineJob(PipelineJob):
             for key, value in os.environ.items():
                 if key in vars_to_preserve and key not in env:
                     env[key] = value
-        env["HOME"] = self.outdir
+        env["HOME"] = self.builder.outdir
         env["TMPDIR"] = self.tmpdir
         if "PATH" not in env:
             env["PATH"] = os.environ["PATH"]
