@@ -52,6 +52,7 @@ def main(db_session, workflow_uuid, workflow_spec, workflow_inputs, working_dir,
     args = ["--debug",
             "--tmpdir-prefix", tmpdir + "/",
             "--tmp-outdir-prefix",tmp_outdir + "/",
+            "--default-container", "frolvlad/alpine-bash",
             "workflow.json#main", "inputs.json"]
     log.error("parsing arguments ...")
     parser = cwltool.main.arg_parser()
