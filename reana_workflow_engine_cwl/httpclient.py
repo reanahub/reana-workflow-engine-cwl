@@ -37,6 +37,7 @@ class ReanaJobControllerHTTPClient:
             'experiment': experiment,
             'docker_img': image,
             'cmd': cmd,
+            'max_restart_count': 0,
             'env_vars': {}
         }
 

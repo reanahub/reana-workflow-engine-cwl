@@ -22,10 +22,17 @@ FROM python:2.7
 ADD . /code
 WORKDIR /code
 RUN apt update && \
+    apt install -y vim emacs-nox && \
     apt install nodejs -y && \
     pip install --upgrade pip && \
-    pip install -e .[all]
+    pip install -e .[all] && \
+    pip install wdb
+
 ARG QUEUE_ENV=default
 ENV QUEUE_ENV ${QUEUE_ENV}
+ENV WDB_SOCKET_SERVER=wdb
+ENV WDB_NO_BROWSER_AUTO_OPEN=True
+ENV TERM=xterm
+ENV FLASK_DEBUG=1
 ENV PYTHONPATH=/workdir
 CMD celery -A reana_workflow_engine_cwl.celeryapp worker -l info -Q ${QUEUE_ENV}
