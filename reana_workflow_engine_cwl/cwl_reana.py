@@ -285,7 +285,6 @@ class ReanaPipelineJob(PipelineJob):
         mounted_outdir = self.outdir
         if mounted_outdir.startswith("/tmp"):
             mounted_outdir = re.sub("/tmp/.*?/.*?/", self.working_dir + "/", mounted_outdir)
-        cwl_runtime_outdir = '/var/spool/cwl'
         scr, _ = get_feature(self, "ShellCommandRequirement")
 
         if scr:
@@ -295,7 +294,7 @@ class ReanaPipelineJob(PipelineJob):
 
         command_line = " ".join([shellescape.quote(arg) if shouldquote(arg) else  arg for arg in
                                        self.command_line])
-        command_line = command_line.replace(cwl_runtime_outdir, mounted_outdir).replace('/bin/sh -c ', '')
+        command_line = command_line.replace('/bin/sh -c ', '')
         command_line = re.sub("/var/lib/cwl/.*?/", "/".join(self.working_dir.split("/")[:-1]) + "/workspace/", command_line)
         command_line = re.sub("/tmp/.*?/.*?/", self.working_dir + "/", command_line)
         if self.stdin:
@@ -323,6 +322,7 @@ class ReanaPipelineJob(PipelineJob):
             docker_output_dir = docker_req.get("dockerOutputDirectory", None)
         if docker_output_dir:
             wf_space_cmd = "mkdir -p {0} && {1} ; cp -r {0} {2}".format(docker_output_dir, wf_space_cmd, mounted_outdir)
+        wf_space_cmd += "; cp -r {0}/* {1}".format(self.environment['HOME'], mounted_outdir)
         wrapped_cmd = "/bin/sh -c {} ".format(pipes.quote(wf_space_cmd))
         create_body = {
             "experiment": "default",
@@ -360,7 +360,8 @@ class ReanaPipelineJob(PipelineJob):
             relink_initialworkdir(self.generatemapper, self.outdir, self.builder.outdir,
                                   inplace_update=self.inplace_update)
         self.add_volumes(self.pathmapper)
-        if self.generatemapper:
+        # if self.generatemapper:
+        if getattr(self, "generatemapper",""):
             self.add_volumes(self.generatemapper)
 
         # useful for debugging

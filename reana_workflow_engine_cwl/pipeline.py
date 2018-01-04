@@ -36,7 +36,6 @@ class Pipeline(object):
             finaloutdir = os.path.abspath(kwargs.get("outdir"))
         else:
             finaloutdir = None
-
         if kwargs.get("tmp_outdir_prefix"):
             kwargs["outdir"] = tempfile.mkdtemp(
                 prefix=kwargs["tmp_outdir_prefix"]
