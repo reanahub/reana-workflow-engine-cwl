@@ -10,6 +10,7 @@ from cwltool.errors import WorkflowException
 from cwltool.job import JobBase
 from cwltool.process import cleanIntermediate, relocateOutputs
 from cwltool.mutation import MutationManager
+import traceback
 
 log = logging.getLogger("tes-backend")
 
@@ -85,9 +86,10 @@ class Pipeline(object):
                     time.sleep(1)
 
         except WorkflowException as e:
+            traceback.print_exc()
             raise e
         except Exception as e:
-            log.error("Got exception")
+            traceback.print_exc()
             raise WorkflowException(str(e))
 
         # wait for all processes to finish

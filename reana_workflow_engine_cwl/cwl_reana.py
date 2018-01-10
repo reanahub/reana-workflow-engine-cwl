@@ -98,7 +98,8 @@ class ReanaPipelineJob(PipelineJob):
                 host_outdir_tgt = None
             if vol.type == "WritableDirectory":
                 if vol.resolved.startswith("_:"):
-                    os.makedirs(vol.target, 0o0755)
+                    if not os.path.exists(vol.target):
+                        os.makedirs(vol.target, mode=0o0755)
                 else:
                     if self.inplace_update:
                         pass
@@ -337,15 +338,15 @@ class ReanaPipelineJob(PipelineJob):
         # else:
         wf_space_cmd = "mkdir -p {0} && cd {0} && ".format(self.environment["HOME"]) + command_line
         wf_space_cmd = requirements_command_line + wf_space_cmd
-        wrapped_cmd = "/bin/sh -c {} ".format(pipes.quote(wf_space_cmd))
 
         docker_output_dir = None
         docker_req, _ = get_feature(self, "DockerRequirement")
         if docker_req:
             docker_output_dir = docker_req.get("dockerOutputDirectory", None)
         if docker_output_dir:
-            wrapped_cmd = "mkdir -p {0} && {1} ; cp -r {0} {2}".format(docker_output_dir, wrapped_cmd, mounted_outdir)
-        wrapped_cmd += "; cp -r {0}/* {1}".format(self.environment['HOME'], mounted_outdir)
+            wf_space_cmd = "mkdir -p {0} && {1} ; cp -r {0} {2}".format(docker_output_dir, wf_space_cmd, mounted_outdir)
+        wf_space_cmd += "; cp -r {0}/* {1}".format(self.environment['HOME'], mounted_outdir)
+        wrapped_cmd = "/bin/sh -c {} ".format(pipes.quote(wf_space_cmd))
 
         create_body = {
             "experiment": "default",
@@ -379,7 +380,7 @@ class ReanaPipelineJob(PipelineJob):
 
         stageFiles(self.pathmapper, ignoreWritable=True, symLink=True)
         if getattr(self, "generatemapper",""):
-            stageFiles(self.generatemapper, ignoreWritable=self.inplace_update, symLink=True)
+            stageFiles(self.generatemapper, ignoreWritable=self.inplace_update, symLink=False)
             relink_initialworkdir(self.generatemapper, self.outdir, self.builder.outdir,
                                   inplace_update=self.inplace_update)
         self.add_volumes(self.pathmapper)
