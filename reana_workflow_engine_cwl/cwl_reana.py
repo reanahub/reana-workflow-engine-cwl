@@ -287,10 +287,19 @@ class ReanaPipelineJob(PipelineJob):
             mounted_outdir = re.sub("/tmp/.*?/.*?/", self.working_dir + "/", mounted_outdir)
         scr, _ = get_feature(self, "ShellCommandRequirement")
 
-        if scr:
+        shebang_lines = {"/bin/bash", "/bin/sh"}
+        if scr or self.command_line[0] in shebang_lines:
             shouldquote = lambda x: False
+            self.command_line = self.command_line[2:]
         else:
             shouldquote = needs_shell_quoting_re.search
+        shellQuote = True
+        for b in self.builder.bindings:
+            if "shellQuote" in b:
+                shellQuote = b.get("shellQuote")
+                break
+
+
 
         command_line = " ".join([shellescape.quote(arg) if shouldquote(arg) else  arg for arg in
                                        self.command_line])
@@ -299,31 +308,45 @@ class ReanaPipelineJob(PipelineJob):
         command_line = re.sub("/tmp/.*?/.*?/", self.working_dir + "/", command_line)
         if self.stdin:
             path = self.stdin.split("/")
-            if len(path) > 1:
-                parent_dir = "/".join(mounted_outdir.split("/")[:-1])
-                command_line = command_line + " < {0}".format(os.path.join(parent_dir, path[-1]))
+            if os.path.isabs(self.stdin):
+                command_line = command_line + " < {0}".format(self.stdin)
             else:
-                command_line = command_line + " < {0}".format(os.path.join(mounted_outdir, path))
+                if len(path) > 1:
+                    parent_dir = "/".join(mounted_outdir.split("/")[:-1])
+                    command_line = command_line + " < {0}".format(os.path.join(parent_dir, path[-1]))
+                else:
+                    command_line = command_line + " < {0}".format(os.path.join(mounted_outdir, path))
         if self.stdout:
-            command_line = command_line + " > {0}".format(os.path.join(mounted_outdir, self.stdout))
+            if os.path.isabs(self.stdout):
+                command_line = command_line + " > {0}".format(self.stdout)
+            else:
+                command_line = command_line + " > {0}".format(os.path.join(mounted_outdir, self.stdout))
         if self.stderr:
-            # command_line = command_line.replace("&2", os.path.join(mounted_outdir, self.stderr))
-            command_line += " 2> " + os.path.join(mounted_outdir, self.stderr)
-        bash_line = "/bin/bash -c"
-        if command_line.startswith(bash_line):
-            command_line = command_line.replace(bash_line, "")
+            if os.path.isabs(self.stderr):
+                stderr = self.stderr
+            else:
+                stderr = os.path.join(mounted_outdir, self.stderr)
+            command_line += " 2> " + stderr
+            if scr and not shellQuote:
+                command_line = command_line.replace("&2", stderr)
+
+        # bash_line = "/bin/bash -c"
+        # if command_line.startswith(bash_line):
+        #     command_line = command_line.replace(bash_line, "")
             # command_line = bash_line + " '{0}'".format(pipes.quote(requirements_command_line + command_line))
         # else:
         wf_space_cmd = "mkdir -p {0} && cd {0} && ".format(self.environment["HOME"]) + command_line
         wf_space_cmd = requirements_command_line + wf_space_cmd
+        wrapped_cmd = "/bin/sh -c {} ".format(pipes.quote(wf_space_cmd))
+
         docker_output_dir = None
         docker_req, _ = get_feature(self, "DockerRequirement")
         if docker_req:
             docker_output_dir = docker_req.get("dockerOutputDirectory", None)
         if docker_output_dir:
-            wf_space_cmd = "mkdir -p {0} && {1} ; cp -r {0} {2}".format(docker_output_dir, wf_space_cmd, mounted_outdir)
-        wf_space_cmd += "; cp -r {0}/* {1}".format(self.environment['HOME'], mounted_outdir)
-        wrapped_cmd = "/bin/sh -c {} ".format(pipes.quote(wf_space_cmd))
+            wrapped_cmd = "mkdir -p {0} && {1} ; cp -r {0} {2}".format(docker_output_dir, wrapped_cmd, mounted_outdir)
+        wrapped_cmd += "; cp -r {0}/* {1}".format(self.environment['HOME'], mounted_outdir)
+
         create_body = {
             "experiment": "default",
             "image": container,
