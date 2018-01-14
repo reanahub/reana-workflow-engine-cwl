@@ -79,10 +79,10 @@ class ReanaPipelineJob(PipelineJob):
     def __init__(self, spec, pipeline, fs_access, working_dir):
         super(ReanaPipelineJob, self).__init__(spec, pipeline)
         self.outputs = None
-        self.docker_workdir = "/var/spool/cwl"
         self.fs_access = fs_access
         self.working_dir = working_dir
         self.inplace_update = False
+        self.volumes = []
 
     def add_volumes(self, pathmapper):
 
@@ -96,6 +96,15 @@ class ReanaPipelineJob(PipelineJob):
                     host_outdir, vol.target[len(container_outdir) + 1:])
             else:
                 host_outdir_tgt = None
+            if vol.type in ("File", "Directory"):
+                if not vol.resolved.startswith("_:"):
+                    self.volumes.append((vol.resolved, vol.target))
+            elif vol.type == "WritableFile":
+                if self.inplace_update:
+                    self.volumes.append((vol.resolved, vol.target))
+                else:
+                    shutil.copy(vol.resolved, host_outdir_tgt)
+                    ensure_writable(host_outdir_tgt)
             if vol.type == "WritableDirectory":
                 if vol.resolved.startswith("_:"):
                     if not os.path.exists(vol.target):
@@ -114,25 +123,6 @@ class ReanaPipelineJob(PipelineJob):
                     fd, createtmp = tempfile.mkstemp(dir=self.tmpdir)
                     with os.fdopen(fd, "wb") as f:
                         f.write(vol.resolved.encode("utf-8"))
-
-
-    # def create_input_parameter(self, name, d):
-    #     if "contents" in d:
-    #         return tes.TaskParameter(
-    #             name=name,
-    #             description="cwl_input:%s" % (name),
-    #             path=d["path"],
-    #             contents=d["contents"],
-    #             type=d["class"].upper()
-    #         )
-    #     else:
-    #         return tes.TaskParameter(
-    #             name=name,
-    #             description="cwl_input:%s" % (name),
-    #             url=d["location"],
-    #             path=d["path"],
-    #             type=d["class"].upper()
-    #         )
 
     def parse_job_order(self, k, v, inputs):
         if isinstance(v, dict):
@@ -177,19 +167,6 @@ class ReanaPipelineJob(PipelineJob):
             else:
                 loc = item["location"]
 
-            # parameter = tes.TaskParameter(
-            #     name=item["basename"],
-            #     description="InitialWorkDirRequirement:cwl_input:%s" % (
-            #         item["basename"]
-            #     ),
-            #     url=file_uri(loc),
-            #     path=self.fs_access.join(
-            #         self.docker_workdir, item["basename"]
-            #     ),
-            #     type=item["class"].upper()
-            #     )
-            # inputs.append(parameter)
-
         return inputs
 
     def collect_input_parameters(self):
@@ -206,82 +183,14 @@ class ReanaPipelineJob(PipelineJob):
 
     def create_task_msg(self):
 
-        # if self.stdout is not None:
-        #     parameter = tes.TaskParameter(
-        #         name="stdout",
-        #         url=self.output2url(self.stdout),
-        #         path=self.output2path(self.stdout)
-        #     )
-        #     output_parameters.append(parameter)
-        #
-        # if self.stderr is not None:
-        #     parameter = tes.TaskParameter(
-        #        name="stderr",
-        #        url=self.output2url(self.stderr),
-        #        path=self.output2path(self.stderr)
-        #     )
-        #     output_parameters.append(parameter)
-        #
-        # output_parameters.append(
-        #     tes.TaskParameter(
-        #         name="workdir",
-        #         url=self.output2url(""),
-        #         path=self.docker_workdir,
-        #         type="DIRECTORY"
-        #     )
-        # )
-
         container = self.find_docker_requirement()
-
-        # cpus = None
-        # ram = None
-        # disk = None
-        # for i in self.requirements:
-        #     if i.get("class", "NA") == "ResourceRequirement":
-        #         cpus = i.get("coresMin", i.get("coresMax", None))
-        #         ram = i.get("ramMin", i.get("ramMax", None))
-        #         ram = ram / 953.674 if ram is not None else None
-        #         disk = i.get("outdirMin", i.get("outdirMax", None))
-        #         disk = disk / 953.674 if disk is not None else None
-        #     elif i.get("class", "NA") == "DockerRequirement":
-        #         if i.get("dockerOutputDirectory", None) is not None:
-        #             output_parameters.append(
-        #                 tes.TaskParameter(
-        #                     name="dockerOutputDirectory",
-        #                     url=self.output2url(""),
-        #                     path=i.get("dockerOutputDirectory"),
-        #                     type="DIRECTORY"
-        #                 )
-        #             )
-
-        # create_body = tes.Task(
-        #     name=self.name,
-        #     description=self.spec.get("doc", ""),
-        #     executors=[
-        #         tes.Executor(
-        #             cmd=self.command_line,
-        #             image_name=container,
-        #             workdir=self.docker_workdir,
-        #             stdout=self.output2path(self.stdout),
-        #             stderr=self.output2path(self.stderr),
-        #             stdin=self.stdin,
-        #             environ=self.environment
-        #         )
-        #     ],
-        #     inputs=input_parameters,
-        #     outputs=output_parameters,
-        #     resources=tes.Resources(
-        #         cpu_cores=cpus,
-        #         ram_gb=ram,
-        #         size_gb=disk
-        #     ),
-        #     tags={"CWLDocumentId": self.spec.get("id")}
-        # )
-        # mounted_outdir = self.outdir.replace("/reana", "/data")
-
         requirements_command_line = ""
         for var in self.environment:
                 requirements_command_line += "export {0}=\"{1}\";".format(var, self.environment[var])
+
+        if self.volumes:
+            for filepair in self.volumes:
+                requirements_command_line += "ln -s {0} {1} ;".format(filepair[0], filepair[1])
 
         mounted_outdir = self.outdir
         if mounted_outdir.startswith("/tmp"):
@@ -321,7 +230,7 @@ class ReanaPipelineJob(PipelineJob):
             if os.path.isabs(self.stdout):
                 command_line = command_line + " > {0}".format(self.stdout)
             else:
-                command_line = command_line + " > {0}".format(os.path.join(mounted_outdir, self.stdout))
+                command_line = command_line + " > {0}".format(os.path.join(self.environment["HOME"], self.stdout))
         if self.stderr:
             if os.path.isabs(self.stderr):
                 stderr = self.stderr
@@ -331,11 +240,6 @@ class ReanaPipelineJob(PipelineJob):
             if scr and not shellQuote:
                 command_line = command_line.replace("&2", stderr)
 
-        # bash_line = "/bin/bash -c"
-        # if command_line.startswith(bash_line):
-        #     command_line = command_line.replace(bash_line, "")
-            # command_line = bash_line + " '{0}'".format(pipes.quote(requirements_command_line + command_line))
-        # else:
         wf_space_cmd = "mkdir -p {0} && cd {0} && ".format(self.environment["HOME"]) + command_line
         wf_space_cmd = requirements_command_line + wf_space_cmd
 
