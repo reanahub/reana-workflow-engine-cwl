@@ -2,28 +2,25 @@ from __future__ import absolute_import, print_function, unicode_literals
 
 import logging
 import os
-import json
 import pipes
 import re
 import shutil
 import tempfile
 import time
+from pprint import pformat
 
 import shellescape
 from cwltool.draft2tool import CommandLineTool
-from cwltool.errors import WorkflowException, UnsupportedRequirement
-from cwltool.pathmapper import ensure_writable
-from cwltool.stdfsaccess import StdFsAccess
-from cwltool.utils import get_feature
-from cwltool.workflow import defaultMakeTool
+from cwltool.errors import WorkflowException
 from cwltool.job import relink_initialworkdir, needs_shell_quoting_re
 from cwltool.job import stageFiles
-from pprint import pformat
-from schema_salad.ref_resolver import file_uri
+from cwltool.pathmapper import ensure_writable
+from cwltool.utils import get_feature
+from cwltool.workflow import defaultMakeTool
 
+from reana_workflow_engine_cwl.httpclient import ReanaJobControllerHTTPClient as HttpClient
 from reana_workflow_engine_cwl.pipeline import Pipeline, PipelineJob
 from reana_workflow_engine_cwl.poll import PollThread
-from reana_workflow_engine_cwl.httpclient import ReanaJobControllerHTTPClient as HttpClient
 
 log = logging.getLogger("cwl-backend")
 
@@ -38,11 +35,10 @@ class ReanaPipeline(Pipeline):
             self.basedir = kwargs.get("basedir")
         else:
             self.basedir = os.getcwd()
-        self.fs_access = StdFsAccess(self.basedir)
         self.working_dir = working_dir
 
     def make_exec_tool(self, spec, **kwargs):
-        return ReanaPipelineTool(spec, self, fs_access=self.fs_access, working_dir=self.working_dir, **kwargs)
+        return ReanaPipelineTool(spec, self, working_dir=self.working_dir, **kwargs)
 
     def make_tool(self, spec, **kwargs):
         if "class" in spec and spec["class"] == "CommandLineTool":
@@ -53,11 +49,10 @@ class ReanaPipeline(Pipeline):
 
 class ReanaPipelineTool(CommandLineTool):
 
-    def __init__(self, spec, pipeline, fs_access, working_dir, **kwargs):
+    def __init__(self, spec, pipeline, working_dir, **kwargs):
         super(ReanaPipelineTool, self).__init__(spec, **kwargs)
         self.spec = spec
         self.pipeline = pipeline
-        self.fs_access = fs_access
         self.working_dir = working_dir
 
     def makeJobRunner(self, use_container=True, **kwargs):
@@ -71,15 +66,14 @@ class ReanaPipelineTool(CommandLineTool):
                         "dockerPull": default_container
                     })
 
-        return ReanaPipelineJob(self.spec, self.pipeline, self.fs_access, self.working_dir)
+        return ReanaPipelineJob(self.spec, self.pipeline, self.working_dir)
 
 
 class ReanaPipelineJob(PipelineJob):
 
-    def __init__(self, spec, pipeline, fs_access, working_dir):
+    def __init__(self, spec, pipeline, working_dir):
         super(ReanaPipelineJob, self).__init__(spec, pipeline)
         self.outputs = None
-        self.fs_access = fs_access
         self.working_dir = working_dir
         self.inplace_update = False
         self.volumes = []
@@ -124,63 +118,6 @@ class ReanaPipelineJob(PipelineJob):
                     with os.fdopen(fd, "wb") as f:
                         f.write(vol.resolved.encode("utf-8"))
 
-    def parse_job_order(self, k, v, inputs):
-        if isinstance(v, dict):
-            if all([i in v for i in ["location", "path", "class"]]):
-                inputs.append(self.create_input_parameter(k, v))
-
-                if "secondaryFiles" in v:
-                    for f in v["secondaryFiles"]:
-                        self.parse_job_order(f["basename"], f, inputs)
-
-            else:
-                for sk, sv in v.items():
-                    if isinstance(sv, dict):
-                        self.parse_job_order(sk, sv, inputs)
-
-                    else:
-                        break
-
-        elif isinstance(v, list):
-            for i in range(len(v)):
-                if isinstance(v[i], dict):
-                    self.parse_job_order("%s[%s]" % (k, i), v[i], inputs)
-
-                else:
-                    break
-
-        return inputs
-
-    def parse_listing(self, listing, inputs):
-        for item in listing:
-
-            # TODO:
-            if "writable" in item:
-                raise UnsupportedRequirement(
-                    "The TES spec does not allow for writable inputs"
-                    )
-
-            if "contents" in item:
-                loc = self.fs_access.join(self.tmpdir, item["basename"])
-                with self.fs_access.open(loc, "wb") as gen:
-                    gen.write(item["contents"])
-            else:
-                loc = item["location"]
-
-        return inputs
-
-    def collect_input_parameters(self):
-        inputs = []
-
-        # find all primary and secondary input files
-        for k, v in self.joborder.items():
-            self.parse_job_order(k, v, inputs)
-
-        # manage InitialWorkDirRequirement
-        self.parse_listing(self.generatefiles["listing"], inputs)
-
-        return inputs
-
     def create_task_msg(self):
 
         container = self.find_docker_requirement()
@@ -193,8 +130,8 @@ class ReanaPipelineJob(PipelineJob):
                 requirements_command_line += "ln -s {0} {1} ;".format(filepair[0], filepair[1])
 
         mounted_outdir = self.outdir
-        if mounted_outdir.startswith("/tmp"):
-            mounted_outdir = re.sub("/tmp/.*?/.*?/", self.working_dir + "/", mounted_outdir)
+        # if mounted_outdir.startswith("/tmp"):
+        #     mounted_outdir = re.sub("/tmp/.*?/.*?/", self.working_dir + "/", mounted_outdir)
         scr, _ = get_feature(self, "ShellCommandRequirement")
 
         shebang_lines = {"/bin/bash", "/bin/sh"}
@@ -208,8 +145,6 @@ class ReanaPipelineJob(PipelineJob):
             if "shellQuote" in b:
                 shellQuote = b.get("shellQuote")
                 break
-
-
 
         command_line = " ".join([shellescape.quote(arg) if shouldquote(arg) else  arg for arg in
                                        self.command_line])
@@ -288,7 +223,6 @@ class ReanaPipelineJob(PipelineJob):
             relink_initialworkdir(self.generatemapper, self.outdir, self.builder.outdir,
                                   inplace_update=self.inplace_update)
         self.add_volumes(self.pathmapper)
-        # if self.generatemapper:
         if getattr(self, "generatemapper",""):
             self.add_volumes(self.generatemapper)
 
@@ -377,18 +311,6 @@ class ReanaPipelineJob(PipelineJob):
                 (self.name, self.tmpdir)
             )
             shutil.rmtree(self.tmpdir, True)
-
-    def output2url(self, path):
-        if path is not None:
-            return file_uri(
-                self.fs_access.join(self.outdir, os.path.basename(path))
-            )
-        return None
-
-    def output2path(self, path):
-        if path is not None:
-            return self.fs_access.join(self.docker_workdir, path)
-        return None
 
 
 class ReanaPipelinePoll(PollThread):

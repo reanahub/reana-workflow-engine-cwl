@@ -55,7 +55,6 @@ class ReanaJobControllerHTTPClient:
         job_id = str(response.json()['job_id'])
         return job_id
 
-
     def check_status(self, job_id):
         response = requests.get(
             'http://{host}/{resource}/{id}'.format(
