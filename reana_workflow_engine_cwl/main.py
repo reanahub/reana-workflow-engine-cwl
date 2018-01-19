@@ -1,25 +1,23 @@
 from __future__ import absolute_import, print_function, unicode_literals
 
 import json
+import logging
+import os
+import sys
+from io import BytesIO
 
 import cwltool.main
-import os
 import pkg_resources
-import signal
-import sys
-import logging
 
+from reana_workflow_engine_cwl.__init__ import __version__
 from reana_workflow_engine_cwl.config import SHARED_VOLUME
 from reana_workflow_engine_cwl.cwl_reana import ReanaPipeline
-from reana_workflow_engine_cwl.__init__ import __version__
 from reana_workflow_engine_cwl.database import SQLiteHandler
 from reana_workflow_engine_cwl.models import Workflow
 
-log = logging.getLogger("reana-backend")
+log = logging.getLogger("reana-workflow-engine-cwl")
 log.setLevel(logging.INFO)
 console = logging.StreamHandler()
-# formatter = logging.Formatter("[%(asctime)s]\t[%(levelname)s]\t%(message)s")
-# console.setFormatter(formatter)
 log.addHandler(console)
 
 
@@ -33,8 +31,6 @@ def versionstring():
 
 
 def main(db_session, workflow_uuid, workflow_spec, workflow_inputs, working_dir, **kwargs):
-    # if args is None:
-    #     args = sys.argv[1:]
     ORGANIZATIONS = {"default", "alice"}
     first_arg = working_dir.split("/")[0]
     if first_arg in ORGANIZATIONS:
@@ -56,7 +52,6 @@ def main(db_session, workflow_uuid, workflow_spec, workflow_inputs, working_dir,
             "workflow.json#main", "inputs.json"]
     log.error("parsing arguments ...")
     parser = cwltool.main.arg_parser()
-    # parser = add_args(parser)
     parsed_args = parser.parse_args(args)
 
     if not len(args) >= 1:
@@ -74,52 +69,9 @@ def main(db_session, workflow_uuid, workflow_spec, workflow_inputs, working_dir,
     if parsed_args.debug:
         log.setLevel(logging.DEBUG)
 
-    # blacklist_false = ["no_container", "disable_pull", "disable_net",
-    #                    "custom_net", "no_match_user"]
-    # for f in blacklist_false:
-    #     if vars(parsed_args).get(f):
-    #         log.warning("arg: '%s' has no effect in cwl-tes" % (f))
-    #
-    # blacklist_true = ["enable_pull"]
-    # for f in blacklist_true:
-    #     if not vars(parsed_args).get(f):
-    #         log.warning("arg: '%s' has no effect in cwl-tes" % (f))
-
-    # custom
-    # if not parsed_args.rm_container:
-    #     log.warning("arg: 'leave_container' has no effect in cwl-tes")
     pipeline = ReanaPipeline(working_dir, vars(parsed_args))
-
-    # setup signal handler
-    def signal_handler(*args):
-        log.info(
-            "recieved control-c signal"
-        )
-        log.info(
-            "terminating thread(s)..."
-        )
-        log.warning(
-            "remote REANA processes %s may keep running" %
-            ([t.id for t in pipeline.threads])
-        )
-        sys.exit(1)
-    signal.signal(signal.SIGINT, signal_handler)
     log.error("starting the run..")
     db_log_writer = SQLiteHandler(db_session, workflow_uuid)
-
-    from io import StringIO, BytesIO
-    import sys
-
-    class Capturing(list):
-        def __enter__(self):
-            self._stdout = sys.stdout
-            sys.stdout = self._stringio = StringIO()
-            return self
-
-        def __exit__(self, *args):
-            self.extend(self._stringio.getvalue().splitlines())
-            del self._stringio  # free up some memory
-            sys.stdout = self._stdout
 
     f = BytesIO()
     result = cwltool.main.main(
@@ -132,8 +84,3 @@ def main(db_session, workflow_uuid, workflow_spec, workflow_inputs, working_dir,
     )
     Workflow.append_workflow_logs(db_session, workflow_uuid, f.getvalue().decode("utf-8"))
     return result
-
-
-if __name__ == "__main__":
-    pass
-    # sys.exit(main())

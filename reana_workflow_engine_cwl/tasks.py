@@ -50,21 +50,8 @@ def run_cwl_workflow(workflow_uuid, workflow_workspace,
     # socket.connect(os.environ['ZMQ_PROXY_CONNECT'])
     #
     # log.info('running recast workflow on context: {ctx}'.format(ctx=ctx))
-    db_session = load_session()
 
-    # if workflow_json:
-        # When `cwl` is launched using an already validated workflow file.
-        # workflow_kwargs = dict(workflow_json=workflow_json)
-    # analysis_directory = os.path.join(
-    #     os.getenv('SHARED_VOLUME', '/data'),
-    #     '00000000-0000-0000-0000-000000000000',  # FIXME parameter from RWC
-    #     'analyses',
-    #     workflow_uuid)
-    #
-    # analysis_workspace = os.path.join(analysis_directory, 'workspace')
-    #
-    # if not os.path.exists(analysis_workspace):
-    #     os.makedirs(analysis_workspace)
+    db_session = load_session()
 
     log.info('running workflow on context: {0}'.format(locals()))
     Workflow.update_workflow_status(
