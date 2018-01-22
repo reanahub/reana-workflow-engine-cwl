@@ -73,6 +73,9 @@ install_requires = [
     "schema-salad==2.6.20180214144209",
     "celery==4.1.0",
     "zmq",
+    'enum34>=1.1.6',
+    'SQLAlchemy>=1.1.14',
+    'SQLAlchemy-Utils>=0.32.18',
 ]
 
 packages = find_packages()

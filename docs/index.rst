@@ -9,6 +9,8 @@
    :numbered:
 
    introduction
+   overview
+   developerguide
    contributing
    changes
    license
