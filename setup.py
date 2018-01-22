@@ -72,6 +72,9 @@ install_requires = [
     "cwltool",
     "celery",
     "zmq",
+    'enum34>=1.1.6',
+    'SQLAlchemy>=1.1.14',
+    'SQLAlchemy-Utils>=0.32.18',
 ]
 
 packages = find_packages()
