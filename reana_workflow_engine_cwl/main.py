@@ -35,7 +35,7 @@ def main(db_session, workflow_uuid, workflow_spec, workflow_inputs, working_dir,
     first_arg = working_dir.split("/")[0]
     if first_arg in ORGANIZATIONS:
         working_dir = working_dir.replace(first_arg, SHARED_VOLUME)
-    os.chdir(working_dir)
+    os.chdir(os.path.join(os.path.dirname(working_dir), "inputs"))
     log.error("dumping files...")
     with open("workflow.json", "w") as f:
         json.dump(workflow_spec, f)
@@ -49,6 +49,7 @@ def main(db_session, workflow_uuid, workflow_spec, workflow_inputs, working_dir,
             "--tmpdir-prefix", tmpdir + "/",
             "--tmp-outdir-prefix",tmp_outdir + "/",
             "--default-container", "frolvlad/alpine-bash",
+            "--outdir", os.path.join(os.path.dirname(working_dir), "outputs"),
             "workflow.json#main", "inputs.json"]
     log.error("parsing arguments ...")
     parser = cwltool.main.arg_parser()
