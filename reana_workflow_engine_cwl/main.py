@@ -8,6 +8,7 @@ from io import BytesIO
 
 import cwltool.main
 import pkg_resources
+import shutil
 
 from reana_workflow_engine_cwl.__init__ import __version__
 from reana_workflow_engine_cwl.config import SHARED_VOLUME
@@ -35,7 +36,14 @@ def main(db_session, workflow_uuid, workflow_spec, workflow_inputs, working_dir,
     first_arg = working_dir.split("/")[0]
     if first_arg in ORGANIZATIONS:
         working_dir = working_dir.replace(first_arg, SHARED_VOLUME)
-    os.chdir(os.path.join(os.path.dirname(working_dir), "inputs"))
+    src = os.path.join(os.path.dirname(working_dir), "code")
+    inputs_dir = os.path.join(os.path.dirname(working_dir), "inputs")
+    src_files = os.listdir(src)
+    for file_name in src_files:
+        full_file_name = os.path.join(src, file_name)
+        if os.path.isfile(full_file_name):
+            shutil.copy(full_file_name, inputs_dir)
+    os.chdir(inputs_dir)
     log.error("dumping files...")
     with open("workflow.json", "w") as f:
         json.dump(workflow_spec, f)
