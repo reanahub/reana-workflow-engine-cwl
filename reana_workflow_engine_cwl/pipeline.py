@@ -99,7 +99,8 @@ class Pipeline(object):
             final_output[0] = relocateOutputs(
                 final_output[0], finaloutdir,
                 output_dirs, kwargs.get("move_outputs"),
-                kwargs["make_fs_access"](""))
+                kwargs["make_fs_access"](""),
+                kwargs["compute_checksum"])
 
         if kwargs.get("rm_tmpdir"):
             cleanIntermediate(output_dirs)
