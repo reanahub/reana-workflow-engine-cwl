@@ -19,20 +19,22 @@
 # submit itself to any jurisdiction.
 
 FROM python:2.7
-ADD . /code
-WORKDIR /code
+
+ENV TERM=xterm
 RUN apt update && \
     apt install -y vim emacs-nox && \
     apt install nodejs -y && \
-    pip install --upgrade pip && \
-    pip install -e .[all] && \
-    pip install wdb
+    pip install --upgrade pip
+
+ADD . /code
+WORKDIR /code
+
+# Debug off by default
+ARG DEBUG=false
+RUN if [ "${DEBUG}" = "true" ]; then pip install -r requirements-dev.txt; pip install -e .[all]; else pip install .[all]; fi;
 
 ARG QUEUE_ENV=default
 ENV QUEUE_ENV ${QUEUE_ENV}
-ENV WDB_SOCKET_SERVER=wdb
-ENV WDB_NO_BROWSER_AUTO_OPEN=True
-ENV TERM=xterm
-ENV FLASK_DEBUG=1
 ENV PYTHONPATH=/workdir
+
 CMD celery -A reana_workflow_engine_cwl.celeryapp worker -l info -Q ${QUEUE_ENV}

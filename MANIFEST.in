@@ -21,6 +21,7 @@ include COPYING
 include *.rst
 include *.md
 include *.sh
+include *.txt
 include pytest.ini
 include docs/*.json
 include scripts/*.py
