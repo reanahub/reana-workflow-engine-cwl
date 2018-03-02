@@ -55,3 +55,37 @@ and set environmental variables (use your own values for ``SHARED_VOLUME`` and `
 
    $ python reana_workflow_engine_cwl/celeryapp.py worker -l debug -Q cwl-default-queue
 
+
+Running CWL conformance tests
+------------------------------------
+
+To run CWL conformance tests on REANA:
+
+1. Install ``reana-client`` according to `instructions <https://reana-client.readthedocs.io/en/latest/installation.html>`_
+2. Get the URL of ``reana-server`` component with `reana-cluster <http://reana-cluster.readthedocs.io/en/latest/cliapi.html#reana-cluster-get>`__ (if REANA is installed locally on minikube, otherwise use the remote URL)
+
+.. code-block:: console
+
+   $ source /path/to/reana-cluster-virtual-environment/bin/activate
+   $ reana-cluster get reana-server
+
+     internal_ip: None
+     ports: ['30026']
+     external_ip_s: ['192.168.99.100']
+     external_name: None
+
+and set ``REANA_SERVER_URL`` environment variable (use your own value)
+
+.. code-block:: console
+
+   $ export REANA_SERVER_URL=http://192.168.99.100:30026
+
+3. Download and run the conformance tests
+
+.. code-block:: console
+
+   $ git clone https://github.com/common-workflow-language/common-workflow-language
+   $ cd common-workflow-language
+   $ source /path/to/reana-client-virtual-environment/bin/activate
+   $ pip install cwltest
+   $ ./run_test.sh RUNNER=reana-cwl-runner
