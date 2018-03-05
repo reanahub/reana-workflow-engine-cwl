@@ -92,7 +92,10 @@ class ReanaPipelineJob(PipelineJob):
                 host_outdir_tgt = None
             if vol.type in ("File", "Directory"):
                 if not vol.resolved.startswith("_:"):
-                    self.volumes.append((vol.resolved, vol.target))
+                    resolved = vol.resolved
+                    if not os.path.exists(resolved):
+                        resolved = "/".join(vol.resolved.split("/")[:-1]) + "/" + vol.target.split("/")[-1]
+                    self.volumes.append((resolved, vol.target))
             elif vol.type == "WritableFile":
                 if self.inplace_update:
                     self.volumes.append((vol.resolved, vol.target))
@@ -127,11 +130,12 @@ class ReanaPipelineJob(PipelineJob):
 
         if self.volumes:
             for filepair in self.volumes:
-                requirements_command_line += "ln -s {0} {1} ;".format(filepair[0], filepair[1])
+                if os.path.isdir(filepair[0]):
+                    requirements_command_line += "cp -a {0} {1} ;".format(filepair[0], "/".join(filepair[1].split("/")[:-1]))
+                else:
+                    requirements_command_line += "cp -a {0} {1} ;".format(filepair[0], filepair[1])
 
         mounted_outdir = self.outdir
-        # if mounted_outdir.startswith("/tmp"):
-        #     mounted_outdir = re.sub("/tmp/.*?/.*?/", self.working_dir + "/", mounted_outdir)
         scr, _ = get_feature(self, "ShellCommandRequirement")
 
         shebang_lines = {"/bin/bash", "/bin/sh"}
@@ -217,11 +221,16 @@ class ReanaPipelineJob(PipelineJob):
         if "SYSTEMROOT" not in env and "SYSTEMROOT" in os.environ:
             env["SYSTEMROOT"] = os.environ["SYSTEMROOT"]
 
-        stageFiles(self.pathmapper, ignoreWritable=True, symLink=True)
-        if getattr(self, "generatemapper",""):
-            stageFiles(self.generatemapper, ignoreWritable=self.inplace_update, symLink=False)
-            relink_initialworkdir(self.generatemapper, self.outdir, self.builder.outdir,
-                                  inplace_update=self.inplace_update)
+        try:
+            stageFiles(self.pathmapper, ignoreWritable=True, symLink=False)
+            if getattr(self, "generatemapper",""):
+                stageFiles(self.generatemapper, ignoreWritable=self.inplace_update, symLink=False)
+                relink_initialworkdir(self.generatemapper, self.outdir, self.builder.outdir,
+                                      inplace_update=self.inplace_update)
+        except OSError:
+            # cwltool/process.py, line 239, in stageFiles
+            # shutil.copytree(p.resolved, p.target)
+            pass
         self.add_volumes(self.pathmapper)
         if getattr(self, "generatemapper",""):
             self.add_volumes(self.generatemapper)
