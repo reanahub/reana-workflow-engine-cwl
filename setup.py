@@ -69,8 +69,9 @@ setup_requires = [
 ]
 
 install_requires = [
-    "cwltool",
-    "celery",
+    "cwltool==1.0.20180326152342",
+    "schema-salad==2.6.20180214144209",
+    "celery==4.1.0",
     "zmq",
 ]
 
