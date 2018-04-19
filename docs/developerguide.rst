@@ -4,7 +4,7 @@ Developer guide
 ===============
 
 Running locally
--------------------------------------
+---------------
 
 1. Create Python virtual environment and install ``reana-workflow-engine-cwl``
 
@@ -57,35 +57,31 @@ and set environmental variables (use your own values for ``SHARED_VOLUME`` and `
 
 
 Running CWL conformance tests
-------------------------------------
+-----------------------------
 
-To run CWL conformance tests on REANA:
+To run CWL conformance tests on a locally-installed REANA cluster:
 
-1. Install ``reana-client`` according to `instructions <https://reana-client.readthedocs.io/en/latest/installation.html>`_
-2. Get the URL of ``reana-server`` component with `reana-cluster <http://reana-cluster.readthedocs.io/en/latest/cliapi.html#reana-cluster-get>`__ (if REANA is installed locally on minikube, otherwise use the remote URL)
+1. Install REANA cluster (version v0.2.0 or later) on Minikube. See
+   `REANA-Cluster's Getting started guide
+   <http://reana-cluster.readthedocs.io/en/latest/gettingstarted.html>`_ for
+   more information.
 
-.. code-block:: console
+2. Install REANA client (version v0.2.0 or later) locally. See `REANA-Client's
+   Getting started guide
+   <https://reana-client.readthedocs.io/en/latest/gettingstarted.html>`_ for
+   more information.
 
-   $ source /path/to/reana-cluster-virtual-environment/bin/activate
-   $ reana-cluster get reana-server
-
-     internal_ip: None
-     ports: ['30026']
-     external_ip_s: ['192.168.99.100']
-     external_name: None
-
-and set ``REANA_SERVER_URL`` environment variable (use your own value)
+3. Set your environment variables:
 
 .. code-block:: console
 
-   $ export REANA_SERVER_URL=http://192.168.99.100:30026
+   $ eval $(reana-cluster env)
 
-3. Download and run the conformance tests
+4. Download and run the CWL conformance tests:
 
 .. code-block:: console
 
    $ git clone https://github.com/common-workflow-language/common-workflow-language
    $ cd common-workflow-language
-   $ source /path/to/reana-client-virtual-environment/bin/activate
    $ pip install cwltest
    $ ./run_test.sh RUNNER=reana-cwl-runner
