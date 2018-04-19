@@ -1,13 +1,13 @@
 Changes
 =======
 
-Version 0.0.1 (YYYY-MM-DD)
+Version 0.2.0 (2018-04-19)
 --------------------------
 
 - Initial public release.
 
+.. admonition:: Please beware
 
-.. admonition:: CAVEAT LECTOR
-
-   Please note that REANA Workflow Engine CWL is in an early developer preview alpha stage.
-   No detailed changelog is provided yet.
+   Please note that REANA is in an early alpha stage of its development. The
+   developer preview releases are meant for early adopters and testers. Please
+   don't rely on released versions for any production purposes yet.
