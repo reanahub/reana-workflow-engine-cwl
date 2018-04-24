@@ -65,7 +65,7 @@ class ReanaJobControllerHTTPClient:
             headers={'cache-control': 'no-cache'}
         )
 
-        job_info = response.json()['job']
+        job_info = response.json()
         return job_info
 
     def get_logs(self, job_id):
