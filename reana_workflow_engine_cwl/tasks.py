@@ -31,8 +31,8 @@ import zmq
 from reana_workflow_engine_cwl import celery_zeromq
 from reana_workflow_engine_cwl.celeryapp import app
 from reana_workflow_engine_cwl import main
-from reana_workflow_engine_cwl.database import load_session
-from reana_workflow_engine_cwl.models import Workflow, WorkflowStatus
+from reana_commons.database import Session as db_session
+from reana_commons.models import Workflow, WorkflowStatus
 
 log = logging.getLogger(__name__)
 outputs_dir_name = 'outputs'
@@ -50,8 +50,6 @@ def run_cwl_workflow(workflow_uuid, workflow_workspace,
     # socket.connect(os.environ['ZMQ_PROXY_CONNECT'])
     #
     # log.info('running recast workflow on context: {ctx}'.format(ctx=ctx))
-
-    db_session = load_session()
 
     log.info('running workflow on context: {0}'.format(locals()))
     Workflow.update_workflow_status(

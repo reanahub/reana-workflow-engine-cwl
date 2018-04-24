@@ -27,9 +27,9 @@ from __future__ import absolute_import
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from reana_workflow_engine_cwl.config import SQLALCHEMY_DATABASE_URI
+from reana_commons.config import SQLALCHEMY_DATABASE_URI
 
-from reana_workflow_engine_cwl.models import User, Workflow  # isort:skip  # noqa
+from reana_commons.models import User, Workflow  # isort:skip  # noqa
 
 from logging import StreamHandler
 

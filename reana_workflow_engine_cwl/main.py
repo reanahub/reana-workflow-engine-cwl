@@ -14,7 +14,7 @@ from reana_workflow_engine_cwl.__init__ import __version__
 from reana_workflow_engine_cwl.config import SHARED_VOLUME
 from reana_workflow_engine_cwl.cwl_reana import ReanaPipeline
 from reana_workflow_engine_cwl.database import SQLiteHandler
-from reana_workflow_engine_cwl.models import Workflow
+from reana_commons.models import Workflow
 
 log = logging.getLogger("reana-workflow-engine-cwl")
 log.setLevel(logging.INFO)
