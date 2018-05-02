@@ -55,10 +55,6 @@ configuration variables for ``engine-cwl``
 
 ``ReanaPipeline(Pipeline)`` and ``ReanaPipelinePoll(PollThread)`` classes
 
-* *database.py*
-
-Functions for writing ``cwltool``'s output to the workflow database.
-
 * *httpclient.py*
 
 An http client for `reana-job-controller <http://reana-job-controller.readthedocs.io/>`_ API.
@@ -66,10 +62,6 @@ An http client for `reana-job-controller <http://reana-job-controller.readthedoc
 * *main.py*
 
 Launching CWL workflow
-
-* *models.py*
-
-``User`` and ``Workflow`` database models
 
 * *pipeline.py*
 
