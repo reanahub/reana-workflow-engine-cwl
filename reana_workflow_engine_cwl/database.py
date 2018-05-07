@@ -24,25 +24,13 @@
 
 from __future__ import absolute_import
 
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+import logging
+import time
+from logging import StreamHandler
 
 from reana_commons.config import SQLALCHEMY_DATABASE_URI
 
 from reana_commons.models import User, Workflow  # isort:skip  # noqa
-
-from logging import StreamHandler
-
-def load_session():
-    """Load SQLAlchemy database session."""
-    engine = create_engine(SQLALCHEMY_DATABASE_URI)
-    Session = sessionmaker(bind=engine)
-    session = Session()
-    return session
-
-
-import logging
-import time
 
 
 class SQLiteHandler(StreamHandler):

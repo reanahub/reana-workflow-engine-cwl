@@ -40,13 +40,13 @@ Running locally
    external_ip_s: ['192.168.99.100']
    external_name: None
 
-and set environmental variables (use your own values for ``SHARED_VOLUME`` and ``JOB_CONTROLLER_HOST``).
+and set environmental variables (use your own values for ``SHARED_VOLUME_PATH`` and ``JOB_CONTROLLER_HOST``).
 
 .. code-block:: console
 
    $ export QUEUE_ENV=cwl-default-queue
    $ export JOB_CONTROLLER_HOST=http://192.168.99.100:31060
-   $ export SHARED_VOLUME=/reana/default
+   $ export SHARED_VOLUME_PATH=/reana/default
    $ export RABBIT_MQ=amqp://reana:reana@localhost:5672/reanahost
 
 4. Start ``reana-workflow-engine-cwl``

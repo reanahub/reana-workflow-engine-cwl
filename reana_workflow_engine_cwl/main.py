@@ -11,7 +11,7 @@ import pkg_resources
 import shutil
 
 from reana_workflow_engine_cwl.__init__ import __version__
-from reana_workflow_engine_cwl.config import SHARED_VOLUME
+from reana_workflow_engine_cwl.config import SHARED_VOLUME_PATH
 from reana_workflow_engine_cwl.cwl_reana import ReanaPipeline
 from reana_workflow_engine_cwl.database import SQLiteHandler
 from reana_commons.models import Workflow
@@ -35,7 +35,7 @@ def main(db_session, workflow_uuid, workflow_spec, workflow_inputs, working_dir,
     ORGANIZATIONS = {"default", "alice"}
     first_arg = working_dir.split("/")[0]
     if first_arg in ORGANIZATIONS:
-        working_dir = working_dir.replace(first_arg, SHARED_VOLUME)
+        working_dir = working_dir.replace(first_arg, SHARED_VOLUME_PATH)
     src = os.path.join(os.path.dirname(working_dir), "code")
     inputs_dir = os.path.join(os.path.dirname(working_dir), "inputs")
     src_files = os.listdir(src)

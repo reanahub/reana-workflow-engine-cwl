@@ -27,7 +27,7 @@ RUN apt update && \
     pip install --upgrade pip
 
 
-RUN pip install -e git://github.com/reanahub/reana-commons.git@master#egg=reana-commons
+RUN pip install git+git://github.com/reanahub/reana-commons.git@master#egg=reana-commons
 
 ADD . /code
 WORKDIR /code
