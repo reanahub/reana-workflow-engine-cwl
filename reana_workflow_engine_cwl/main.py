@@ -92,4 +92,5 @@ def main(db_session, workflow_uuid, workflow_spec, workflow_inputs, working_dir,
         stdout=f
     )
     Workflow.append_workflow_logs(db_session, workflow_uuid, f.getvalue().decode("utf-8"))
+    db_session.remove()
     return result
