@@ -18,17 +18,20 @@ from cwltool.pathmapper import ensure_writable
 from cwltool.utils import get_feature
 from cwltool.workflow import defaultMakeTool
 
-from reana_workflow_engine_cwl.httpclient import ReanaJobControllerHTTPClient as HttpClient
+from reana_workflow_engine_cwl.httpclient import ReanaJobControllerHTTPClient \
+    as HttpClient
 from reana_workflow_engine_cwl.pipeline import Pipeline, PipelineJob
 from reana_workflow_engine_cwl.poll import PollThread
+from reana_workflow_engine_cwl.utils import publish_workflow_status
 
 log = logging.getLogger("cwl-backend")
 
 
 class ReanaPipeline(Pipeline):
 
-    def __init__(self, working_dir, kwargs):
+    def __init__(self, workflow_uuid, working_dir, kwargs):
         super(ReanaPipeline, self).__init__()
+        self.workflow_uuid = workflow_uuid
         self.kwargs = kwargs
         self.service = HttpClient()
         if kwargs.get("basedir") is not None:
@@ -38,7 +41,9 @@ class ReanaPipeline(Pipeline):
         self.working_dir = working_dir
 
     def make_exec_tool(self, spec, **kwargs):
-        return ReanaPipelineTool(spec, self, working_dir=self.working_dir, **kwargs)
+        return ReanaPipelineTool(self.workflow_uuid, spec, self,
+                                 working_dir=self.working_dir,
+                                 **kwargs)
 
     def make_tool(self, spec, **kwargs):
         if "class" in spec and spec["class"] == "CommandLineTool":
@@ -49,8 +54,9 @@ class ReanaPipeline(Pipeline):
 
 class ReanaPipelineTool(CommandLineTool):
 
-    def __init__(self, spec, pipeline, working_dir, **kwargs):
+    def __init__(self, workflow_uuid, spec, pipeline, working_dir, **kwargs):
         super(ReanaPipelineTool, self).__init__(spec, **kwargs)
+        self.workflow_uuid = workflow_uuid
         self.spec = spec
         self.pipeline = pipeline
         self.working_dir = working_dir
@@ -66,17 +72,20 @@ class ReanaPipelineTool(CommandLineTool):
                         "dockerPull": default_container
                     })
 
-        return ReanaPipelineJob(self.spec, self.pipeline, self.working_dir)
+        return ReanaPipelineJob(self.workflow_uuid, self.spec,
+                                self.pipeline, self.working_dir)
 
 
 class ReanaPipelineJob(PipelineJob):
 
-    def __init__(self, spec, pipeline, working_dir):
+    def __init__(self, workflow_uuid, spec, pipeline, working_dir):
         super(ReanaPipelineJob, self).__init__(spec, pipeline)
+        self.workflow_uuid = workflow_uuid
         self.outputs = None
         self.working_dir = working_dir
         self.inplace_update = False
         self.volumes = []
+        self.task_name_map = {}
 
     def add_volumes(self, pathmapper):
 
@@ -94,7 +103,9 @@ class ReanaPipelineJob(PipelineJob):
                 if not vol.resolved.startswith("_:"):
                     resolved = vol.resolved
                     if not os.path.exists(resolved):
-                        resolved = "/".join(vol.resolved.split("/")[:-1]) + "/" + vol.target.split("/")[-1]
+                        resolved = "/".join(
+                            vol.resolved.split("/")[:-1]) + "/" + \
+                            vol.target.split("/")[-1]
                     self.volumes.append((resolved, vol.target))
             elif vol.type == "WritableFile":
                 if self.inplace_update:
@@ -126,21 +137,25 @@ class ReanaPipelineJob(PipelineJob):
         container = self.find_docker_requirement()
         requirements_command_line = ""
         for var in self.environment:
-                requirements_command_line += "export {0}=\"{1}\";".format(var, self.environment[var])
+            requirements_command_line += "export {0}=\"{1}\";".format(
+                var, self.environment[var])
 
         if self.volumes:
             for filepair in self.volumes:
                 if os.path.isdir(filepair[0]):
-                    requirements_command_line += "cp -a {0} {1} ;".format(filepair[0], "/".join(filepair[1].split("/")[:-1]))
+                    requirements_command_line += "cp -a {0} {1} ;".format(
+                        filepair[0], "/".join(filepair[1].split("/")[:-1]))
                 else:
-                    requirements_command_line += "cp -a {0} {1} ;".format(filepair[0], filepair[1])
+                    requirements_command_line += "cp -a {0} {1} ;".format(
+                        filepair[0], filepair[1])
 
         mounted_outdir = self.outdir
         scr, _ = get_feature(self, "ShellCommandRequirement")
 
         shebang_lines = {"/bin/bash", "/bin/sh"}
         if scr or self.command_line[0] in shebang_lines:
-            shouldquote = lambda x: False
+            def shouldquote(x):
+                return False
             self.command_line = self.command_line[2:]
         else:
             shouldquote = needs_shell_quoting_re.search
@@ -150,11 +165,15 @@ class ReanaPipelineJob(PipelineJob):
                 shellQuote = b.get("shellQuote")
                 break
 
-        command_line = " ".join([shellescape.quote(arg) if shouldquote(arg) else  arg for arg in
-                                       self.command_line])
+        command_line = " ".join([shellescape.quote(arg) if shouldquote(arg)
+                                 else arg for arg in
+                                 self.command_line])
         command_line = command_line.replace('/bin/sh -c ', '')
-        command_line = re.sub("/var/lib/cwl/.*?/", "/".join(self.working_dir.split("/")[:-1]) + "/workspace/", command_line)
-        command_line = re.sub("/tmp/.*?/.*?/", self.working_dir + "/", command_line)
+        command_line = re.sub(
+            "/var/lib/cwl/.*?/", "/".join(self.working_dir.split("/")[:-1]) +
+            "/workspace/", command_line)
+        command_line = re.sub(
+            "/tmp/.*?/.*?/", self.working_dir + "/", command_line)
         if self.stdin:
             path = self.stdin.split("/")
             if os.path.isabs(self.stdin):
@@ -162,14 +181,18 @@ class ReanaPipelineJob(PipelineJob):
             else:
                 if len(path) > 1:
                     parent_dir = "/".join(mounted_outdir.split("/")[:-1])
-                    command_line = command_line + " < {0}".format(os.path.join(parent_dir, path[-1]))
+                    command_line = command_line + \
+                        " < {0}".format(os.path.join(parent_dir, path[-1]))
                 else:
-                    command_line = command_line + " < {0}".format(os.path.join(mounted_outdir, path))
+                    command_line = command_line + \
+                        " < {0}".format(os.path.join(mounted_outdir, path))
         if self.stdout:
             if os.path.isabs(self.stdout):
                 command_line = command_line + " > {0}".format(self.stdout)
             else:
-                command_line = command_line + " > {0}".format(os.path.join(self.environment["HOME"], self.stdout))
+                command_line = command_line + \
+                    " > {0}".format(os.path.join(
+                        self.environment["HOME"], self.stdout))
         if self.stderr:
             if os.path.isabs(self.stderr):
                 stderr = self.stderr
@@ -179,7 +202,8 @@ class ReanaPipelineJob(PipelineJob):
             if scr and not shellQuote:
                 command_line = command_line.replace("&2", stderr)
 
-        wf_space_cmd = "mkdir -p {0} && cd {0} && ".format(self.environment["HOME"]) + command_line
+        wf_space_cmd = "mkdir -p {0} && cd {0} && ".format(
+            self.environment["HOME"]) + command_line
         wf_space_cmd = requirements_command_line + wf_space_cmd
 
         docker_output_dir = None
@@ -187,8 +211,10 @@ class ReanaPipelineJob(PipelineJob):
         if docker_req:
             docker_output_dir = docker_req.get("dockerOutputDirectory", None)
         if docker_output_dir:
-            wf_space_cmd = "mkdir -p {0} && {1} ; cp -r {0} {2}".format(docker_output_dir, wf_space_cmd, mounted_outdir)
-        wf_space_cmd += "; cp -r {0}/* {1}".format(self.environment['HOME'], mounted_outdir)
+            wf_space_cmd = "mkdir -p {0} && {1} ; cp -r {0} {2}".format(
+                docker_output_dir, wf_space_cmd, mounted_outdir)
+        wf_space_cmd += "; cp -r {0}/* {1}".format(
+            self.environment['HOME'], mounted_outdir)
         wrapped_cmd = "/bin/sh -c {} ".format(pipes.quote(wf_space_cmd))
 
         create_body = {
@@ -223,16 +249,19 @@ class ReanaPipelineJob(PipelineJob):
 
         try:
             stageFiles(self.pathmapper, ignoreWritable=True, symLink=False)
-            if getattr(self, "generatemapper",""):
-                stageFiles(self.generatemapper, ignoreWritable=self.inplace_update, symLink=False)
-                relink_initialworkdir(self.generatemapper, self.outdir, self.builder.outdir,
+            if getattr(self, "generatemapper", ""):
+                stageFiles(self.generatemapper,
+                           ignoreWritable=self.inplace_update, symLink=False)
+                relink_initialworkdir(self.generatemapper,
+                                      self.outdir,
+                                      self.builder.outdir,
                                       inplace_update=self.inplace_update)
         except OSError:
             # cwltool/process.py, line 239, in stageFiles
             # shutil.copytree(p.resolved, p.target)
             pass
         self.add_volumes(self.pathmapper)
-        if getattr(self, "generatemapper",""):
+        if getattr(self, "generatemapper", ""):
             self.add_volumes(self.generatemapper)
 
         # useful for debugging
@@ -251,12 +280,21 @@ class ReanaPipelineJob(PipelineJob):
         log.info(pformat(task))
 
         try:
+            # task_id = job_id received from job-controller
             task_id = self.pipeline.service.submit(**task)
+            submitted_jobs = {"total": 1, "job_ids": [task_id]}
+            publish_workflow_status(self.workflow_uuid, 1,
+                                    message={
+                                        "progress": {
+                                            "submitted":
+                                            submitted_jobs,
+                                        }})
             log.info(
                 "[job %s] SUBMITTED TASK ----------------------" %
                 (self.name)
             )
             log.info("[job %s] task id: %s " % (self.name, task_id))
+            self.task_name_map[self.name] = task_id
             operation = self.pipeline.service.check_status(task_id)
         except Exception as e:
             log.error(
@@ -293,6 +331,8 @@ class ReanaPipelineJob(PipelineJob):
                 self.cleanup(rm_tmpdir)
 
         poll = ReanaPipelinePoll(
+            workflow_uuid=self.workflow_uuid,
+            task_id=self.task_name_map.get(self.name),
             jobname=self.name,
             service=self.pipeline.service,
             operation=operation,
@@ -324,8 +364,11 @@ class ReanaPipelineJob(PipelineJob):
 
 class ReanaPipelinePoll(PollThread):
 
-    def __init__(self, jobname, service, operation, callback):
+    def __init__(self, workflow_uuid, task_id, jobname,
+                 service, operation, callback):
         super(ReanaPipelinePoll, self).__init__(operation)
+        self.workflow_uuid = workflow_uuid
+        self.task_id = task_id
         self.name = jobname
         self.service = service
         self.callback = callback
@@ -365,6 +408,15 @@ class ReanaPipelinePoll(PollThread):
                 (self.name, operation['status'])
             )
             if operation['status'] != "failed":
+                # here we could publish that the job with id: self.task_id
+                # succeeded or failed.
+                publish_workflow_status(self.workflow_uuid, 1, logs='',
+                                        message={
+                                            'progress': {
+                                                'succeeded':
+                                                {'total': 1, 'job_ids': [
+                                                    self.task_id]},
+                                            }})
                 log.error(
                     "[job %s] task id: %s" % (self.name, self.id)
                 )
@@ -376,6 +428,14 @@ class ReanaPipelinePoll(PollThread):
                     )
 
                 )
+            else:
+                publish_workflow_status(self.workflow_uuid, 1, logs='',
+                                        message={
+                                            'progress': {
+                                                'failed':
+                                                {'total': 1, 'job_ids': [
+                                                    self.task_id]},
+                                            }})
             return True
         return False
 

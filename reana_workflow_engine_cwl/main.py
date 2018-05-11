@@ -14,7 +14,7 @@ from reana_workflow_engine_cwl.__init__ import __version__
 from reana_workflow_engine_cwl.config import SHARED_VOLUME_PATH
 from reana_workflow_engine_cwl.cwl_reana import ReanaPipeline
 from reana_workflow_engine_cwl.database import SQLiteHandler
-from reana_commons.models import Workflow
+from reana_workflow_engine_cwl.utils import publish_workflow_status
 
 log = logging.getLogger("reana-workflow-engine-cwl")
 log.setLevel(logging.INFO)
@@ -31,7 +31,8 @@ def versionstring():
     return "%s %s with cwltool %s" % (sys.argv[0], __version__, cwltool_ver)
 
 
-def main(db_session, workflow_uuid, workflow_spec, workflow_inputs, working_dir, **kwargs):
+def main(workflow_uuid, workflow_spec,
+         workflow_inputs, working_dir, **kwargs):
     ORGANIZATIONS = {"default", "alice"}
     first_arg = working_dir.split("/")[0]
     if first_arg in ORGANIZATIONS:
@@ -49,13 +50,32 @@ def main(db_session, workflow_uuid, workflow_spec, workflow_inputs, working_dir,
         json.dump(workflow_spec, f)
     with open("inputs.json", "w") as f:
         json.dump(workflow_inputs, f)
+    total_commands = 0
+    print('workflow_spec:', workflow_spec)
+    if '$graph' in workflow_spec:
+        total_commands = len(workflow_spec['$graph'])
+    planned_jobs = {"total": total_commands - 1, "job_ids": []}
+    submitted_jobs = {"total": 0, "job_ids": []}
+    succeeded_jobs = submitted_jobs
+    failed_jobs = submitted_jobs
+    publish_workflow_status(workflow_uuid, 1,
+                            logs='',
+                            message={
+                                "progress": {
+                                    "planned": planned_jobs,
+                                    "submitted":
+                                    submitted_jobs,
+                                    "succeeded":
+                                    succeeded_jobs,
+                                    "failed": failed_jobs
+                                }})
     tmpdir = os.path.join(working_dir, "cwl/tmpdir")
     tmp_outdir = os.path.join(working_dir, "cwl/outdir")
     os.makedirs(tmpdir)
     os.makedirs(tmp_outdir)
     args = ["--debug",
             "--tmpdir-prefix", tmpdir + "/",
-            "--tmp-outdir-prefix",tmp_outdir + "/",
+            "--tmp-outdir-prefix", tmp_outdir + "/",
             "--default-container", "frolvlad/alpine-bash",
             "--outdir", os.path.join(os.path.dirname(working_dir), "outputs"),
             "workflow.json#main", "inputs.json"]
@@ -78,9 +98,9 @@ def main(db_session, workflow_uuid, workflow_spec, workflow_inputs, working_dir,
     if parsed_args.debug:
         log.setLevel(logging.DEBUG)
 
-    pipeline = ReanaPipeline(working_dir, vars(parsed_args))
+    pipeline = ReanaPipeline(workflow_uuid, working_dir, vars(parsed_args))
     log.error("starting the run..")
-    db_log_writer = SQLiteHandler(db_session, workflow_uuid)
+    db_log_writer = SQLiteHandler(workflow_uuid)
 
     f = BytesIO()
     result = cwltool.main.main(
@@ -91,6 +111,5 @@ def main(db_session, workflow_uuid, workflow_spec, workflow_inputs, working_dir,
         logger_handler=db_log_writer,
         stdout=f
     )
-    Workflow.append_workflow_logs(db_session, workflow_uuid, f.getvalue().decode("utf-8"))
-    db_session.remove()
+    publish_workflow_status(workflow_uuid, 2, f.getvalue().decode("utf-8"))
     return result

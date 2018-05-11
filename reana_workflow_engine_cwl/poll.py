@@ -5,7 +5,7 @@ import threading
 
 class PollThread(threading.Thread):
 
-    def __init__(self, operation, poll_interval=1, poll_retries=10):
+    def __init__(self, operation, poll_interval=5, poll_retries=10):
         super(PollThread, self).__init__()
         self.daemon = True
         self.operation = operation

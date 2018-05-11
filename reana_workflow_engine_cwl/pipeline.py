@@ -64,9 +64,12 @@ class Pipeline(object):
             })
         else:
             kwargs['default_container'] = 'frolvlad/alpine-bash'
-        kwargs['docker_outdir'] = os.path.join(self.working_dir, "cwl/docker_outdir")
-        kwargs['docker_tmpdir'] = os.path.join(self.working_dir, "cwl/docker_tmpdir")
-        kwargs["docker_stagedir"] = os.path.join(self.working_dir, "cwl/docker_stagedir")
+        kwargs['docker_outdir'] = os.path.join(
+            self.working_dir, "cwl/docker_outdir")
+        kwargs['docker_tmpdir'] = os.path.join(
+            self.working_dir, "cwl/docker_tmpdir")
+        kwargs["docker_stagedir"] = os.path.join(
+            self.working_dir, "cwl/docker_stagedir")
 
         jobs = tool.job(job_order, output_callback, **kwargs)
         try:

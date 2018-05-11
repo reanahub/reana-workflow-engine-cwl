@@ -22,17 +22,15 @@
 
 from __future__ import absolute_import, print_function
 
+import json
 import logging
-import os
-from glob import glob
 
-import zmq
-
-from reana_workflow_engine_cwl import celery_zeromq
-from reana_workflow_engine_cwl.celeryapp import app
+import pika
 from reana_workflow_engine_cwl import main
-from reana_commons.database import Session as db_session
-from reana_commons.models import Workflow, WorkflowStatus
+from reana_workflow_engine_cwl.celeryapp import app
+from reana_workflow_engine_cwl.config import (BROKER_PASS, BROKER_PORT,
+                                              BROKER_URL, BROKER_USER)
+from reana_workflow_engine_cwl.utils import publish_workflow_status
 
 log = logging.getLogger(__name__)
 outputs_dir_name = 'outputs'
@@ -41,8 +39,8 @@ known_dirs = ['inputs', 'logs', outputs_dir_name]
 
 @app.task(name='tasks.run_cwl_workflow', ignore_result=True)
 def run_cwl_workflow(workflow_uuid, workflow_workspace,
-                        workflow_json=None,
-                        parameters=None):
+                     workflow_json=None,
+                     parameters=None):
     # log.info('getting socket..')
     #
     # zmqctx = celery_zeromq.get_context()
@@ -52,22 +50,11 @@ def run_cwl_workflow(workflow_uuid, workflow_workspace,
     # log.info('running recast workflow on context: {ctx}'.format(ctx=ctx))
 
     log.info('running workflow on context: {0}'.format(locals()))
-    Workflow.update_workflow_status(
-        db_session,
-        workflow_uuid,
-        WorkflowStatus.running, log)
     try:
-        main.main(db_session, workflow_uuid, workflow_json, parameters, workflow_workspace)
-        Workflow.update_workflow_status(
-            db_session,
-            workflow_uuid,
-            WorkflowStatus.finished, log)
+        main.main(workflow_uuid, workflow_json,
+                  parameters, workflow_workspace)
         log.info('workflow done')
+        publish_workflow_status(workflow_uuid, 2)
     except Exception as e:
         log.error('workflow failed: {0}'.format(e))
-        Workflow.update_workflow_status(
-            db_session,
-            workflow_uuid,
-            WorkflowStatus.failed,
-            log,
-            message=str(e))
+        publish_workflow_status(workflow_uuid, 3, message=str(e))

@@ -28,25 +28,24 @@ import logging
 import time
 from logging import StreamHandler
 
-from reana_commons.config import SQLALCHEMY_DATABASE_URI
-
-from reana_commons.models import User, Workflow  # isort:skip  # noqa
+from reana_workflow_engine_cwl.utils import publish_workflow_status
 
 
 class SQLiteHandler(StreamHandler):
     """
     Logging handler for SQLite.
-    Based on Vinay Sajip's DBHandler class (http://www.red-dove.com/python_logging.html)
+    Based on Vinay Sajip's DBHandler class
+    (http://www.red-dove.com/python_logging.html)
 
     This version sacrifices performance for thread-safety:
-    Instead of using a persistent cursor, we open/close connections for each entry.
+    Instead of using a persistent cursor, we open/close
+    connections for each entry.
 
     AFAIK this is necessary in multi-threaded applications,
     because SQLite doesn't allow access to objects across threads.
     """
 
-
-    def __init__(self, db_session, workflow_uuid, stream=None):
+    def __init__(self, workflow_uuid, stream=None):
         """
         Initialize the handler.
 
@@ -54,11 +53,10 @@ class SQLiteHandler(StreamHandler):
         """
         StreamHandler.__init__(self, stream)
         self.workflow_uuid = workflow_uuid
-        self.db_session = db_session
-
 
     def formatDBTime(self, record):
-        record.dbtime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(record.created))
+        record.dbtime = time.strftime(
+            "%Y-%m-%d %H:%M:%S", time.localtime(record.created))
 
     def emit(self, record):
         """
@@ -72,40 +70,47 @@ class SQLiteHandler(StreamHandler):
         output to the stream.
         """
         try:
-            msg = self.format(record)
+            logs = self.format(record)
             stream = self.stream
             fs = "%s\n"
             if not logging._unicode:  # if no unicode support...
-                stream.write(fs % msg)
-                Workflow.append_workflow_logs(self.db_session, self.workflow_uuid, "/n" + msg)
+                stream.write(fs % logs)
+                publish_workflow_status(self.workflow_uuid, 1, logs)
             else:
                 try:
-                    if (isinstance(msg, unicode) and
+                    if (isinstance(logs, unicode) and
                             getattr(stream, 'encoding', None)):
                         ufs = u'%s\n'
                         try:
-                            stream.write(ufs % msg)
-                            Workflow.append_workflow_logs(self.db_session, self.workflow_uuid, msg)
+                            stream.write(ufs % logs)
+                            publish_workflow_status(self.workflow_uuid,
+                                                    1,
+                                                    logs)
 
                         except UnicodeEncodeError:
-                            # Printing to terminals sometimes fails. For example,
-                            # with an encoding of 'cp1251', the above write will
-                            # work if written to a stream opened or wrapped by
-                            # the codecs module, but fail when writing to a
-                            # terminal even when the codepage is set to cp1251.
-                            # An extra encoding step seems to be needed.
-                            stream.write((ufs % msg).encode(stream.encoding))
-                            Workflow.append_workflow_logs(self.db_session, self.workflow_uuid, msg)
+                            # Printing to terminals sometimes fails.
+                            # For example,
+                            # with an encoding of 'cp1251', the above write
+                            # will work if written to a stream opened or
+                            # wrapped by the codecs module, but fail when
+                            # writing to a terminal even when the codepage
+                            # is set to cp1251. An extra encoding step seems
+                            # to be needed.
+                            stream.write((ufs % logs).encode(stream.encoding))
+                            publish_workflow_status(
+                                self.workflow_uuid, 1, logs)
 
                     else:
-                        stream.write(fs % msg)
-                        Workflow.append_workflow_logs(self.db_session, self.workflow_uuid, msg)
+                        stream.write(fs % logs)
+                        publish_workflow_status(
+                            self.workflow_uuid, 1, logs)
 
                 except UnicodeError:
-                    stream.write(fs % msg.encode("UTF-8"))
-                    Workflow.append_workflow_logs(self.db_session, self.workflow_uuid, msg.encode("UTF-8"))
+                    stream.write(fs % logs.encode("UTF-8"))
+                    publish_workflow_status(
+                        self.workflow_uuid, 1, logs.encode("UTF-8"))
             self.flush()
         except (KeyboardInterrupt, SystemExit):
             raise
-        except:
+        except Exception:
             self.handleError(record)
