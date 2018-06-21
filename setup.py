@@ -69,10 +69,11 @@ setup_requires = [
 ]
 
 install_requires = [
-    "cwltool==1.0.20180326152342",
-    "schema-salad==2.6.20180214144209",
-    "celery==4.1.0",
-    "zmq",
+    'cwltool==1.0.20180326152342',
+    'schema-salad==2.6.20180214144209',
+    'kombu==4.1.0',
+    'celery==4.1.0',
+    'zmq',
     'enum34>=1.1.6',
     'SQLAlchemy>=1.1.14',
     'SQLAlchemy-Utils>=0.32.18',
