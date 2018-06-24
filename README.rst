@@ -1,5 +1,5 @@
 ===========================
- REANA Workflow Engine CWL
+ REANA-Workflow-Engine-CWL
 ===========================
 
 .. image:: https://img.shields.io/travis/reanahub/reana-workflow-engine-cwl.svg
@@ -23,10 +23,10 @@
 About
 -----
 
-REANA-Workflow-Engine-CWL is a component of the `REANA <http://reanahub.io/>`_
-reusable analysis platform. It takes care of instantiating, executing and
-managing `Common Workflow Language (CWL) <http://www.commonwl.org/>`_ based
-computational workflows.
+REANA-Workflow-Engine-CWL is a component of the `REANA <http://www.reana.io/>`_
+reusable and reproducible research data analysis platform. It takes care of
+instantiating, executing and managing `Common Workflow Language (CWL)
+<http://www.commonwl.org/>`_ based computational workflows.
 
 Features
 --------
@@ -43,4 +43,5 @@ Useful links
 - `source code <https://github.com/reanahub/reana-workflow-engine-cwl>`_
 
 For more information about the REANA reusable analysis platform, please see the
-general `REANA documentation <http://reana.readthedocs.io/>`_.
+`REANA project <http://www.reana.io>`_ home page and the general `REANA
+documentation <http://reana.readthedocs.io/>`_ pages.

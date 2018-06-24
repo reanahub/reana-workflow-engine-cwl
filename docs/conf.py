@@ -122,15 +122,23 @@ html_theme = 'alabaster'
 #
 html_theme_options = {
     'logo': 'logo-reana.png',
-    'description': 'REANA-Workflow-Engine-CWL',
+    'description': """<p>REANA-Workflow-Engine-CWL is a component of the <a
+                      href="http://www.reana.io">REANA</a> reusable and
+                      reproducible research data analysis
+                      platform.</p><p>REANA-Workflow-Engine-CWL takes care of
+                      instantiating, executing and managing <a
+                      href="http://www.commonwl.org/">Common Workflow Language
+                      (CWL)</a> based computational workflows.</p>""",
     'github_user': 'reanahub',
     'github_repo': 'reana-workflow-engine-cwl',
     'github_button': False,
     'github_banner': True,
     'show_powered_by': False,
     'extra_nav_links': {
-        'REANA@GitHub': 'https://github.com/reanahub',
         'REANA@DockerHub': 'https://hub.docker.com/u/reanahub/',
+        'REANA@GitHub': 'https://github.com/reanahub',
+        'REANA@Twitter': 'https://twitter.com/reanahub',
+        'REANA@Web': 'http://www.reana.io',
     }
 }
 
