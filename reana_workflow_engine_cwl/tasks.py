@@ -26,11 +26,10 @@ import json
 import logging
 
 import pika
+from reana_workflow_commons.publisher import Publisher
+
 from reana_workflow_engine_cwl import main
 from reana_workflow_engine_cwl.celeryapp import app
-from reana_workflow_engine_cwl.config import (BROKER_PASS, BROKER_PORT,
-                                              BROKER_URL, BROKER_USER)
-from reana_workflow_engine_cwl.utils import publish_workflow_status
 
 log = logging.getLogger(__name__)
 outputs_dir_name = 'outputs'
@@ -51,10 +50,14 @@ def run_cwl_workflow(workflow_uuid, workflow_workspace,
 
     log.info('running workflow on context: {0}'.format(locals()))
     try:
+        publisher = Publisher()
+        publisher.connect()
         main.main(workflow_uuid, workflow_json,
-                  parameters, workflow_workspace)
+                  parameters, workflow_workspace, publisher)
         log.info('workflow done')
-        publish_workflow_status(workflow_uuid, 2)
+        publisher.publish_workflow_status(workflow_uuid, 2)
     except Exception as e:
         log.error('workflow failed: {0}'.format(e))
-        publish_workflow_status(workflow_uuid, 3, message=str(e))
+        publisher.publish_workflow_status(workflow_uuid, 3, message=str(e))
+    finally:
+        publisher.close()

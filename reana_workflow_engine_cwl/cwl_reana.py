@@ -22,14 +22,13 @@ from reana_workflow_engine_cwl.httpclient import ReanaJobControllerHTTPClient \
     as HttpClient
 from reana_workflow_engine_cwl.pipeline import Pipeline, PipelineJob
 from reana_workflow_engine_cwl.poll import PollThread
-from reana_workflow_engine_cwl.utils import publish_workflow_status
 
 log = logging.getLogger("cwl-backend")
 
 
 class ReanaPipeline(Pipeline):
 
-    def __init__(self, workflow_uuid, working_dir, kwargs):
+    def __init__(self, workflow_uuid, working_dir, publisher, kwargs):
         super(ReanaPipeline, self).__init__()
         self.workflow_uuid = workflow_uuid
         self.kwargs = kwargs
@@ -39,10 +38,12 @@ class ReanaPipeline(Pipeline):
         else:
             self.basedir = os.getcwd()
         self.working_dir = working_dir
+        self.publisher = publisher
 
     def make_exec_tool(self, spec, **kwargs):
         return ReanaPipelineTool(self.workflow_uuid, spec, self,
                                  working_dir=self.working_dir,
+                                 publisher=self.publisher,
                                  **kwargs)
 
     def make_tool(self, spec, **kwargs):
@@ -54,12 +55,14 @@ class ReanaPipeline(Pipeline):
 
 class ReanaPipelineTool(CommandLineTool):
 
-    def __init__(self, workflow_uuid, spec, pipeline, working_dir, **kwargs):
+    def __init__(self, workflow_uuid, spec, pipeline,
+                 working_dir, publisher, **kwargs):
         super(ReanaPipelineTool, self).__init__(spec, **kwargs)
         self.workflow_uuid = workflow_uuid
         self.spec = spec
         self.pipeline = pipeline
         self.working_dir = working_dir
+        self.publisher = publisher
 
     def makeJobRunner(self, use_container=True, **kwargs):
         dockerReq, _ = self.get_requirement("DockerRequirement")
@@ -73,12 +76,13 @@ class ReanaPipelineTool(CommandLineTool):
                     })
 
         return ReanaPipelineJob(self.workflow_uuid, self.spec,
-                                self.pipeline, self.working_dir)
+                                self.pipeline, self.working_dir,
+                                self.publisher)
 
 
 class ReanaPipelineJob(PipelineJob):
 
-    def __init__(self, workflow_uuid, spec, pipeline, working_dir):
+    def __init__(self, workflow_uuid, spec, pipeline, working_dir, publisher):
         super(ReanaPipelineJob, self).__init__(spec, pipeline)
         self.workflow_uuid = workflow_uuid
         self.outputs = None
@@ -86,6 +90,7 @@ class ReanaPipelineJob(PipelineJob):
         self.inplace_update = False
         self.volumes = []
         self.task_name_map = {}
+        self.publisher = publisher
 
     def add_volumes(self, pathmapper):
 
@@ -283,12 +288,13 @@ class ReanaPipelineJob(PipelineJob):
             # task_id = job_id received from job-controller
             task_id = self.pipeline.service.submit(**task)
             submitted_jobs = {"total": 1, "job_ids": [task_id]}
-            publish_workflow_status(self.workflow_uuid, 1,
-                                    message={
-                                        "progress": {
-                                            "submitted":
-                                            submitted_jobs,
-                                        }})
+            self.publisher.publish_workflow_status(
+                self.workflow_uuid, 1,
+                message={
+                    "progress": {
+                        "submitted":
+                        submitted_jobs,
+                    }})
             log.info(
                 "[job %s] SUBMITTED TASK ----------------------" %
                 (self.name)
@@ -336,7 +342,8 @@ class ReanaPipelineJob(PipelineJob):
             jobname=self.name,
             service=self.pipeline.service,
             operation=operation,
-            callback=callback
+            callback=callback,
+            publisher=self.publisher
         )
 
         self.pipeline.add_thread(poll)
@@ -365,13 +372,14 @@ class ReanaPipelineJob(PipelineJob):
 class ReanaPipelinePoll(PollThread):
 
     def __init__(self, workflow_uuid, task_id, jobname,
-                 service, operation, callback):
+                 service, operation, callback, publisher):
         super(ReanaPipelinePoll, self).__init__(operation)
         self.workflow_uuid = workflow_uuid
         self.task_id = task_id
         self.name = jobname
         self.service = service
         self.callback = callback
+        self.publisher = publisher
 
     def run(self):
         while not self.is_done(self.operation):
@@ -410,13 +418,14 @@ class ReanaPipelinePoll(PollThread):
             if operation['status'] != "failed":
                 # here we could publish that the job with id: self.task_id
                 # succeeded or failed.
-                publish_workflow_status(self.workflow_uuid, 1, logs='',
-                                        message={
-                                            'progress': {
-                                                'succeeded':
-                                                {'total': 1, 'job_ids': [
-                                                    self.task_id]},
-                                            }})
+                self.publisher.publish_workflow_status(
+                    self.workflow_uuid, 1, logs='',
+                    message={
+                        'progress': {
+                            'succeeded':
+                            {'total': 1, 'job_ids': [
+                                self.task_id]},
+                        }})
                 log.error(
                     "[job %s] task id: %s" % (self.name, self.id)
                 )
@@ -429,13 +438,14 @@ class ReanaPipelinePoll(PollThread):
 
                 )
             else:
-                publish_workflow_status(self.workflow_uuid, 1, logs='',
-                                        message={
-                                            'progress': {
-                                                'failed':
-                                                {'total': 1, 'job_ids': [
-                                                    self.task_id]},
-                                            }})
+                self.publisher.publish_workflow_status(
+                    self.workflow_uuid, 1, logs='',
+                    message={
+                        'progress': {
+                            'failed':
+                            {'total': 1, 'job_ids': [
+                                self.task_id]},
+                        }})
             return True
         return False
 

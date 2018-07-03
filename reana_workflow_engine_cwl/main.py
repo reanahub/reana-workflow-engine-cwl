@@ -14,7 +14,6 @@ from reana_workflow_engine_cwl.__init__ import __version__
 from reana_workflow_engine_cwl.config import SHARED_VOLUME_PATH
 from reana_workflow_engine_cwl.cwl_reana import ReanaPipeline
 from reana_workflow_engine_cwl.database import SQLiteHandler
-from reana_workflow_engine_cwl.utils import publish_workflow_status
 
 log = logging.getLogger("reana-workflow-engine-cwl")
 log.setLevel(logging.INFO)
@@ -32,7 +31,7 @@ def versionstring():
 
 
 def main(workflow_uuid, workflow_spec,
-         workflow_inputs, working_dir, **kwargs):
+         workflow_inputs, working_dir, publisher, **kwargs):
     ORGANIZATIONS = {"default", "alice"}
     first_arg = working_dir.split("/")[0]
     if first_arg in ORGANIZATIONS:
@@ -58,17 +57,18 @@ def main(workflow_uuid, workflow_spec,
     submitted_jobs = {"total": 0, "job_ids": []}
     succeeded_jobs = submitted_jobs
     failed_jobs = submitted_jobs
-    publish_workflow_status(workflow_uuid, 1,
-                            logs='',
-                            message={
-                                "progress": {
-                                    "planned": planned_jobs,
-                                    "submitted":
-                                    submitted_jobs,
-                                    "succeeded":
-                                    succeeded_jobs,
-                                    "failed": failed_jobs
-                                }})
+    publisher.publish_workflow_status(
+        workflow_uuid, 1,
+        logs='',
+        message={
+            "progress": {
+                "planned": planned_jobs,
+                "submitted":
+                submitted_jobs,
+                "succeeded":
+                succeeded_jobs,
+                "failed": failed_jobs
+            }})
     tmpdir = os.path.join(working_dir, "cwl/tmpdir")
     tmp_outdir = os.path.join(working_dir, "cwl/outdir")
     os.makedirs(tmpdir)
@@ -98,9 +98,10 @@ def main(workflow_uuid, workflow_spec,
     if parsed_args.debug:
         log.setLevel(logging.DEBUG)
 
-    pipeline = ReanaPipeline(workflow_uuid, working_dir, vars(parsed_args))
+    pipeline = ReanaPipeline(workflow_uuid, working_dir, publisher,
+                             vars(parsed_args))
     log.error("starting the run..")
-    db_log_writer = SQLiteHandler(workflow_uuid)
+    db_log_writer = SQLiteHandler(workflow_uuid, publisher)
 
     f = BytesIO()
     result = cwltool.main.main(
@@ -111,5 +112,6 @@ def main(workflow_uuid, workflow_spec,
         logger_handler=db_log_writer,
         stdout=f
     )
-    publish_workflow_status(workflow_uuid, 2, f.getvalue().decode("utf-8"))
+    publisher.publish_workflow_status(workflow_uuid, 2,
+                                      f.getvalue().decode("utf-8"))
     return result

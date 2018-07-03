@@ -28,8 +28,6 @@ import logging
 import time
 from logging import StreamHandler
 
-from reana_workflow_engine_cwl.utils import publish_workflow_status
-
 
 class SQLiteHandler(StreamHandler):
     """
@@ -45,7 +43,7 @@ class SQLiteHandler(StreamHandler):
     because SQLite doesn't allow access to objects across threads.
     """
 
-    def __init__(self, workflow_uuid, stream=None):
+    def __init__(self, workflow_uuid, publisher, stream=None):
         """
         Initialize the handler.
 
@@ -53,6 +51,7 @@ class SQLiteHandler(StreamHandler):
         """
         StreamHandler.__init__(self, stream)
         self.workflow_uuid = workflow_uuid
+        self.publisher = publisher
 
     def formatDBTime(self, record):
         record.dbtime = time.strftime(
@@ -75,7 +74,8 @@ class SQLiteHandler(StreamHandler):
             fs = "%s\n"
             if not logging._unicode:  # if no unicode support...
                 stream.write(fs % logs)
-                publish_workflow_status(self.workflow_uuid, 1, logs)
+                self.publcisher.publish_workflow_status(
+                    self.workflow_uuid, 1, logs)
             else:
                 try:
                     if (isinstance(logs, unicode) and
@@ -83,9 +83,8 @@ class SQLiteHandler(StreamHandler):
                         ufs = u'%s\n'
                         try:
                             stream.write(ufs % logs)
-                            publish_workflow_status(self.workflow_uuid,
-                                                    1,
-                                                    logs)
+                            self.publisher.publish_workflow_status(
+                                self.workflow_uuid, 1, logs)
 
                         except UnicodeEncodeError:
                             # Printing to terminals sometimes fails.
@@ -97,17 +96,17 @@ class SQLiteHandler(StreamHandler):
                             # is set to cp1251. An extra encoding step seems
                             # to be needed.
                             stream.write((ufs % logs).encode(stream.encoding))
-                            publish_workflow_status(
+                            self.publisher.publish_workflow_status(
                                 self.workflow_uuid, 1, logs)
 
                     else:
                         stream.write(fs % logs)
-                        publish_workflow_status(
+                        self.publisher.publish_workflow_status(
                             self.workflow_uuid, 1, logs)
 
                 except UnicodeError:
                     stream.write(fs % logs.encode("UTF-8"))
-                    publish_workflow_status(
+                    self.publisher.publish_workflow_status(
                         self.workflow_uuid, 1, logs.encode("UTF-8"))
             self.flush()
         except (KeyboardInterrupt, SystemExit):
