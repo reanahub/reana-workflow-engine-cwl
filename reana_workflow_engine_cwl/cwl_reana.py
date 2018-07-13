@@ -225,7 +225,8 @@ class ReanaPipelineJob(PipelineJob):
         create_body = {
             "experiment": "default",
             "image": container,
-            "cmd": wrapped_cmd
+            "cmd": wrapped_cmd,
+            "workflow_workspace": self.working_dir
         }
 
         return create_body
