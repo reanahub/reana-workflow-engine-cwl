@@ -32,19 +32,9 @@ def versionstring():
 
 def main(workflow_uuid, workflow_spec,
          workflow_inputs, working_dir, publisher, **kwargs):
-    ORGANIZATIONS = {"default", "alice"}
-    first_arg = working_dir.split("/")[0]
-    if first_arg in ORGANIZATIONS:
-        working_dir = working_dir.replace(first_arg, SHARED_VOLUME_PATH)
-    src = os.path.join(os.path.dirname(working_dir), "code")
-    inputs_dir = os.path.join(os.path.dirname(working_dir), "inputs")
-    src_files = os.listdir(src)
-    for file_name in src_files:
-        full_file_name = os.path.join(src, file_name)
-        if os.path.isfile(full_file_name):
-            shutil.copy(full_file_name, inputs_dir)
-    os.chdir(inputs_dir)
-    log.error("dumping files...")
+    working_dir = os.path.join(SHARED_VOLUME_PATH, working_dir)
+    os.chdir(working_dir)
+    log.error("Dumping workflow specification and input parameter files...")
     with open("workflow.json", "w") as f:
         json.dump(workflow_spec, f)
     with open("inputs.json", "w") as f:

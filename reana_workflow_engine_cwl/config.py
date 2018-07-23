@@ -27,9 +27,6 @@ import os
 JOBCONTROLLER_HOST = os.getenv('JOB_CONTROLLER_HOST',
                                'job-controller.default.svc.cluster.local')
 
-INPUTS_DIRECTORY_RELATIVE_PATH = 'inputs'
-"""Represents the relative path to the inputs directory (populated by RWC)"""
-
 SHARED_VOLUME_PATH = os.getenv('SHARED_VOLUME_PATH', '/reana/default')
 """Path to the mounted REANA shared volume."""
 
