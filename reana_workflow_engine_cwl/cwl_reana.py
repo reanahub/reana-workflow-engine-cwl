@@ -138,7 +138,8 @@ class ReanaPipelineJob(PipelineJob):
                         f.write(vol.resolved.encode("utf-8"))
 
     def create_task_msg(self):
-
+        prettified_cmd = self.command_line[2]
+        job_name = self.name
         container = self.find_docker_requirement()
         requirements_command_line = ""
         for var in self.environment:
@@ -226,7 +227,9 @@ class ReanaPipelineJob(PipelineJob):
             "experiment": "default",
             "image": container,
             "cmd": wrapped_cmd,
-            "workflow_workspace": self.working_dir
+            "workflow_workspace": self.working_dir,
+            "prettified_cmd": prettified_cmd,
+            "job_name": job_name
         }
 
         return create_body
