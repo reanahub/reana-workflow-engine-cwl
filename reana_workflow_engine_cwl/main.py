@@ -43,20 +43,19 @@ def main(workflow_uuid, workflow_spec,
     print('workflow_spec:', workflow_spec)
     if '$graph' in workflow_spec:
         total_commands = len(workflow_spec['$graph'])
-    planned_jobs = {"total": total_commands - 1, "job_ids": []}
-    submitted_jobs = {"total": 0, "job_ids": []}
-    succeeded_jobs = submitted_jobs
-    failed_jobs = submitted_jobs
+    total_jobs = {"total": total_commands - 1, "job_ids": []}
+    initial_job_state = {"total": 0, "job_ids": []}
+    running_jobs = initial_job_state
+    finished_jobs = initial_job_state
+    failed_jobs = initial_job_state
     publisher.publish_workflow_status(
         workflow_uuid, 1,
         logs='',
         message={
             "progress": {
-                "planned": planned_jobs,
-                "submitted":
-                submitted_jobs,
-                "succeeded":
-                succeeded_jobs,
+                "total": total_jobs,
+                "running": running_jobs,
+                "finisned": finished_jobs,
                 "failed": failed_jobs
             }})
     tmpdir = os.path.join(working_dir, "cwl/tmpdir")

@@ -291,13 +291,13 @@ class ReanaPipelineJob(PipelineJob):
         try:
             # task_id = job_id received from job-controller
             task_id = self.pipeline.service.submit(**task)
-            submitted_jobs = {"total": 1, "job_ids": [task_id]}
+            running_jobs = {"total": 1, "job_ids": [task_id]}
             self.publisher.publish_workflow_status(
                 self.workflow_uuid, 1,
                 message={
                     "progress": {
-                        "submitted":
-                        submitted_jobs,
+                        "running":
+                        running_jobs,
                     }})
             log.info(
                 "[job %s] SUBMITTED TASK ----------------------" %
@@ -426,7 +426,7 @@ class ReanaPipelinePoll(PollThread):
                     self.workflow_uuid, 1, logs='',
                     message={
                         'progress': {
-                            'succeeded':
+                            'finished':
                             {'total': 1, 'job_ids': [
                                 self.task_id]},
                         }})
