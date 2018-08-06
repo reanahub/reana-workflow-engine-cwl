@@ -35,7 +35,7 @@ RUN pip install --no-cache-dir requirements-builder && \
 
 COPY . /code
 
-RUN pip install git+git://github.com/reanahub/reana-workflow-commons.git@master#egg=reana-workflow-commons
+RUN pip install git+git://github.com/reanahub/reana-commons.git@master#egg=reana-commons
 
 # Debug off by default
 ARG DEBUG=false

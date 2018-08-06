@@ -26,7 +26,7 @@ import json
 import logging
 
 import pika
-from reana_workflow_commons.publisher import Publisher
+from reana_commons.publisher import Publisher
 
 from reana_workflow_engine_cwl import main
 from reana_workflow_engine_cwl.celeryapp import app
