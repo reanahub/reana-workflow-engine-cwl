@@ -78,6 +78,7 @@ install_requires = [
     'SQLAlchemy>=1.1.14',
     'SQLAlchemy-Utils>=0.32.18',
     'pika>=0.11.2',
+    'reana-commons>=0.3.0.dev20180418',
 ]
 
 packages = find_packages()
