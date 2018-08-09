@@ -1,6 +1,11 @@
 Changes
 =======
 
+Version 0.3.0 (2018-08-10)
+--------------------------
+
+- Tracks progress of workflow runs.
+
 Version 0.2.0 (2018-04-19)
 --------------------------
 
