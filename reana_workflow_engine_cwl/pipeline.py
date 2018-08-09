@@ -1,26 +1,52 @@
+# -*- coding: utf-8 -*-
+#
+# This file is part of REANA.
+# Copyright (C) 2017, 2018 CERN.
+#
+# REANA is free software; you can redistribute it and/or modify it under the
+# terms of the GNU General Public License as published by the Free Software
+# Foundation; either version 2 of the License, or (at your option) any later
+# version.
+#
+# REANA is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with
+# REANA; if not, write to the Free Software Foundation, Inc., 59 Temple Place,
+# Suite 330, Boston, MA 02111-1307, USA.
+#
+# In applying this license, CERN does not waive the privileges and immunities
+# granted to it by virtue of its status as an Intergovernmental Organization or
+# submit itself to any jurisdiction.
+
+"""REANA Workflow Engine CWL pipeline."""
+
 from __future__ import absolute_import, print_function, unicode_literals
 
 import logging
 import os
 import tempfile
 import time
+import traceback
 
-# from builtins import str
 from cwltool.errors import WorkflowException
 from cwltool.job import JobBase
-from cwltool.process import cleanIntermediate, relocateOutputs
 from cwltool.mutation import MutationManager
-import traceback
+from cwltool.process import cleanIntermediate, relocateOutputs
 
 log = logging.getLogger("tes-backend")
 
 
 class Pipeline(object):
+    """Pipeline class."""
 
     def __init__(self):
+        """Constructor."""
         self.threads = []
 
     def executor(self, tool, job_order, **kwargs):
+        """Executor method."""
         final_output = []
         final_status = []
 
@@ -113,15 +139,19 @@ class Pipeline(object):
             return (None, "permanentFail")
 
     def make_exec_tool(self, spec, **kwargs):
+        """Make execution tool."""
         raise Exception("Pipeline.make_exec_tool() not implemented")
 
     def make_tool(self, spec, **kwargs):
+        """Make tool."""
         raise Exception("Pipeline.make_tool() not implemented")
 
     def add_thread(self, thread):
+        """Add thread to self.threads."""
         self.threads.append(thread)
 
     def wait(self):
+        """Wait."""
         while True:
             if all([not t.is_alive() for t in self.threads]):
                 break
@@ -130,14 +160,17 @@ class Pipeline(object):
 
 
 class PipelineJob(JobBase):
+    """Pipeline Job class."""
 
     def __init__(self, spec, pipeline):
+        """Constructor."""
         super(JobBase, self).__init__()
         self.spec = spec
         self.pipeline = pipeline
         self.running = False
 
     def find_docker_requirement(self):
+        """Find docker from pipeline."""
         default = "python:2.7"
         container = default
         if self.pipeline.kwargs["default_container"]:
@@ -154,4 +187,5 @@ class PipelineJob(JobBase):
 
     def run(self, pull_image=True, rm_container=True, rm_tmpdir=True,
             move_outputs="move", **kwargs):
+        """Run pipeline job."""
         raise Exception("PipelineJob.run() not implemented")

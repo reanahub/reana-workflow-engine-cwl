@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of REANA.
-# Copyright (C) 2017 CERN.
+# Copyright (C) 2017, 2018 CERN.
 #
 # REANA is free software; you can redistribute it and/or modify it under the
 # terms of the GNU General Public License as published by the Free Software
@@ -20,13 +20,14 @@
 # granted to it by virtue of its status as an Intergovernmental Organization or
 # submit itself to any jurisdiction.
 
+"""REANA Workflow Engine CWL tasks."""
+
 from __future__ import absolute_import, print_function
 
 import json
 import logging
 
 from reana_commons.publisher import Publisher
-
 from reana_workflow_engine_cwl import main
 from reana_workflow_engine_cwl.celeryapp import app
 
@@ -39,14 +40,7 @@ known_dirs = ['inputs', 'logs', outputs_dir_name]
 def run_cwl_workflow(workflow_uuid, workflow_workspace,
                      workflow_json=None,
                      parameters=None):
-    # log.info('getting socket..')
-    #
-    # zmqctx = celery_zeromq.get_context()
-    # socket = zmqctx.socket(zmq.PUB)
-    # socket.connect(os.environ['ZMQ_PROXY_CONNECT'])
-    #
-    # log.info('running recast workflow on context: {ctx}'.format(ctx=ctx))
-
+    """Run cwl workflow."""
     log.info('running workflow on context: {0}'.format(locals()))
     try:
         publisher = Publisher()

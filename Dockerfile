@@ -26,8 +26,6 @@ RUN apt update && \
     apt install nodejs -y && \
     pip install --upgrade pip
 
-RUN pip install -e git+git://github.com/reanahub/reana-commons.git@master#egg=reana-commons
-
 COPY CHANGES.rst README.rst setup.py /code/
 COPY reana_workflow_engine_cwl/version.py /code/reana_workflow_engine_cwl/
 WORKDIR /code

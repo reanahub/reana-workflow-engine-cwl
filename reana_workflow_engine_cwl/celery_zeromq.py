@@ -20,6 +20,8 @@
 # granted to it by virtue of its status as an Intergovernmental Organization or
 # submit itself to any jurisdiction.
 
+"""ZeroMQ utilities."""
+
 import logging
 
 import zmq
@@ -33,6 +35,7 @@ log = logging.getLogger(__name__)
 
 
 def reset_zmq_context(**kwargs):
+    """Reset ZeroMQ context."""
     log.debug("Resetting ZMQ Context")
     reset_context()
 
@@ -41,6 +44,7 @@ signals.worker_process_init.connect(reset_zmq_context)
 
 
 def get_context():
+    """Get context."""
     global context
     if context.closed:
         context = zmq.Context()
@@ -49,6 +53,7 @@ def get_context():
 
 
 def reset_context():
+    """Reset context."""
     global context
     context.term()
     context = zmq.Context()

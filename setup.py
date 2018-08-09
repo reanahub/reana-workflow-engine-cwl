@@ -78,7 +78,7 @@ install_requires = [
     'SQLAlchemy>=1.1.14',
     'SQLAlchemy-Utils>=0.32.18',
     'pika>=0.11.2',
-    'reana-commons>=0.3.0.dev20180418',
+    'reana-commons>=0.3.0',
 ]
 
 packages = find_packages()
@@ -106,13 +106,16 @@ setup(
     setup_requires=setup_requires,
     tests_require=tests_require,
     classifiers=[
+        'Development Status :: 3 - Alpha',
         'Environment :: Web Environment',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: GNU General Public License v2 (GPLv2)',
         'Operating System :: OS Independent',
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: Implementation :: CPython',
         'Programming Language :: Python',
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
         'Topic :: Software Development :: Libraries :: Python Modules',
-        'Development Status :: 3 - Alpha',
     ],
 )

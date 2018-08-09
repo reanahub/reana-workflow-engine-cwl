@@ -1,3 +1,27 @@
+# -*- coding: utf-8 -*-
+#
+# This file is part of REANA.
+# Copyright (C) 2017, 2018 CERN.
+#
+# REANA is free software; you can redistribute it and/or modify it under the
+# terms of the GNU General Public License as published by the Free Software
+# Foundation; either version 2 of the License, or (at your option) any later
+# version.
+#
+# REANA is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with
+# REANA; if not, write to the Free Software Foundation, Inc., 59 Temple Place,
+# Suite 330, Boston, MA 02111-1307, USA.
+#
+# In applying this license, CERN does not waive the privileges and immunities
+# granted to it by virtue of its status as an Intergovernmental Organization or
+# submit itself to any jurisdiction.
+
+"""REANA Workflow Engine CWL reana pipeline."""
+
 from __future__ import absolute_import, print_function, unicode_literals
 
 import logging
@@ -12,14 +36,14 @@ from pprint import pformat
 import shellescape
 from cwltool.draft2tool import CommandLineTool
 from cwltool.errors import WorkflowException
-from cwltool.job import relink_initialworkdir, needs_shell_quoting_re
-from cwltool.job import stageFiles
+from cwltool.job import (needs_shell_quoting_re, relink_initialworkdir,
+                         stageFiles)
 from cwltool.pathmapper import ensure_writable
 from cwltool.utils import get_feature
 from cwltool.workflow import defaultMakeTool
 
-from reana_workflow_engine_cwl.httpclient import ReanaJobControllerHTTPClient \
-    as HttpClient
+from reana_workflow_engine_cwl.httpclient import \
+    ReanaJobControllerHTTPClient as HttpClient
 from reana_workflow_engine_cwl.pipeline import Pipeline, PipelineJob
 from reana_workflow_engine_cwl.poll import PollThread
 
@@ -27,8 +51,10 @@ log = logging.getLogger("cwl-backend")
 
 
 class ReanaPipeline(Pipeline):
+    """REANA Pipeline class."""
 
     def __init__(self, workflow_uuid, working_dir, publisher, kwargs):
+        """Constructor."""
         super(ReanaPipeline, self).__init__()
         self.workflow_uuid = workflow_uuid
         self.kwargs = kwargs
@@ -41,12 +67,14 @@ class ReanaPipeline(Pipeline):
         self.publisher = publisher
 
     def make_exec_tool(self, spec, **kwargs):
+        """Make execution tool."""
         return ReanaPipelineTool(self.workflow_uuid, spec, self,
                                  working_dir=self.working_dir,
                                  publisher=self.publisher,
                                  **kwargs)
 
     def make_tool(self, spec, **kwargs):
+        """Make tool."""
         if "class" in spec and spec["class"] == "CommandLineTool":
             return self.make_exec_tool(spec, **kwargs)
         else:
@@ -54,9 +82,11 @@ class ReanaPipeline(Pipeline):
 
 
 class ReanaPipelineTool(CommandLineTool):
+    """REANA Pipeline Tool class."""
 
     def __init__(self, workflow_uuid, spec, pipeline,
                  working_dir, publisher, **kwargs):
+        """Constructor."""
         super(ReanaPipelineTool, self).__init__(spec, **kwargs)
         self.workflow_uuid = workflow_uuid
         self.spec = spec
@@ -65,6 +95,7 @@ class ReanaPipelineTool(CommandLineTool):
         self.publisher = publisher
 
     def makeJobRunner(self, use_container=True, **kwargs):
+        """Make job runner."""
         dockerReq, _ = self.get_requirement("DockerRequirement")
         if not dockerReq and use_container:
             if self.find_default_container:
@@ -81,8 +112,10 @@ class ReanaPipelineTool(CommandLineTool):
 
 
 class ReanaPipelineJob(PipelineJob):
+    """REANA Pipeline Job."""
 
     def __init__(self, workflow_uuid, spec, pipeline, working_dir, publisher):
+        """Constructor."""
         super(ReanaPipelineJob, self).__init__(spec, pipeline)
         self.workflow_uuid = workflow_uuid
         self.outputs = None
@@ -93,7 +126,7 @@ class ReanaPipelineJob(PipelineJob):
         self.publisher = publisher
 
     def add_volumes(self, pathmapper):
-
+        """Add volumes."""
         host_outdir = self.outdir
         container_outdir = self.builder.outdir
         for src, vol in pathmapper.items():
@@ -138,6 +171,7 @@ class ReanaPipelineJob(PipelineJob):
                         f.write(vol.resolved.encode("utf-8"))
 
     def create_task_msg(self):
+        """Create task message."""
         prettified_cmd = self.command_line[2]
         job_name = self.name
         container = self.find_docker_requirement()
@@ -236,7 +270,7 @@ class ReanaPipelineJob(PipelineJob):
 
     def run(self, pull_image=True, rm_container=True, rm_tmpdir=True,
             move_outputs="move", **kwargs):
-
+        """Run a job."""
         self._setup(kwargs)
 
         env = self.environment
@@ -354,6 +388,7 @@ class ReanaPipelineJob(PipelineJob):
         poll.start()
 
     def cleanup(self, rm_tmpdir):
+        """Clean up procedure."""
         log.debug(
             "[job %s] STARTING CLEAN UP ------------------" %
             (self.name)
@@ -374,9 +409,11 @@ class ReanaPipelineJob(PipelineJob):
 
 
 class ReanaPipelinePoll(PollThread):
+    """REANA Pipeline Poll class."""
 
     def __init__(self, workflow_uuid, task_id, jobname,
                  service, operation, callback, publisher):
+        """Constructor."""
         super(ReanaPipelinePoll, self).__init__(operation)
         self.workflow_uuid = workflow_uuid
         self.task_id = task_id
@@ -386,6 +423,7 @@ class ReanaPipelinePoll(PollThread):
         self.publisher = publisher
 
     def run(self):
+        """Start polling."""
         while not self.is_done(self.operation):
             time.sleep(self.poll_interval)
             # slow down polling over time till it hits a max
@@ -410,9 +448,11 @@ class ReanaPipelinePoll(PollThread):
         self.complete(self.operation)
 
     def poll(self):
+        """Poll procedure."""
         return self.service.check_status(self.id)
 
     def is_done(self, operation):
+        """Check if operation is done."""
         terminal_states = ["succeeded", "failed"]
         if operation['status'] in terminal_states:
             log.info(
@@ -454,4 +494,5 @@ class ReanaPipelinePoll(PollThread):
         return False
 
     def complete(self, operation):
+        """Complete."""
         self.callback()

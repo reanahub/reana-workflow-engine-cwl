@@ -20,6 +20,8 @@
 # granted to it by virtue of its status as an Intergovernmental Organization or
 # submit itself to any jurisdiction.
 
+"""REANA Workflow Engine CWL http client of REANA Job Controller."""
+
 import json
 import logging
 
@@ -31,8 +33,10 @@ log = logging.getLogger('yadage.cap.submit')
 
 
 class ReanaJobControllerHTTPClient:
+    """REANA-Job-Controller http client class."""
 
     def submit(self, experiment, image, cmd, workflow_workspace, prettified_cmd, job_name):
+        """Submit a new job."""
         job_spec = {
             'experiment': experiment,
             'docker_img': image,
@@ -59,6 +63,7 @@ class ReanaJobControllerHTTPClient:
         return job_id
 
     def check_status(self, job_id):
+        """Check status of a job."""
         response = requests.get(
             'http://{host}/{resource}/{id}'.format(
                 host=JOBCONTROLLER_HOST,
@@ -72,6 +77,7 @@ class ReanaJobControllerHTTPClient:
         return job_info
 
     def get_logs(self, job_id):
+        """Get logs of a job."""
         response = requests.get(
             'http://{host}/{resource}/{id}/logs'.format(
                 host=JOBCONTROLLER_HOST,

@@ -32,6 +32,7 @@ from logging import StreamHandler
 class SQLiteHandler(StreamHandler):
     """
     Logging handler for SQLite.
+
     Based on Vinay Sajip's DBHandler class
     (http://www.red-dove.com/python_logging.html)
 
@@ -54,6 +55,7 @@ class SQLiteHandler(StreamHandler):
         self.publisher = publisher
 
     def formatDBTime(self, record):
+        """Format DB time."""
         record.dbtime = time.strftime(
             "%Y-%m-%d %H:%M:%S", time.localtime(record.created))
 
@@ -74,7 +76,7 @@ class SQLiteHandler(StreamHandler):
             fs = "%s\n"
             if not logging._unicode:  # if no unicode support...
                 stream.write(fs % logs)
-                self.publcisher.publish_workflow_status(
+                self.publisher.publish_workflow_status(
                     self.workflow_uuid, 1, logs)
             else:
                 try:

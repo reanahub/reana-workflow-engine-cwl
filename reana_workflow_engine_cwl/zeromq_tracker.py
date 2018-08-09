@@ -20,25 +20,15 @@
 # granted to it by virtue of its status as an Intergovernmental Organization or
 # submit itself to any jurisdiction.
 
+"""ZeroMQ tracker class."""
+
 import json
 
 
 class ZeroMQTracker(object):
+    """ZeroMQ Tracker class."""
 
     def __init__(self, socket=None, connect_string=None, identifier='cwl'):
+        """Constructor."""
         self.identifier = identifier
         self.socket = socket
-
-    # def initialize(self, adageobj):
-    #     self.socket.send_json({'cwl_ctrl': 'clear',
-    #                            'identifier': self.identifier})
-    #     self.track(adageobj)
-    #
-    # def track(self, adageobj):
-    #     serialized = json.dumps(adageobj.json(), cls=WithJsonRefEncoder,
-    #                             sort_keys=True)
-    #     self.socket.send_json({'yadage_obj': json.loads(serialized),
-    #                            'identifier': self.identifier})
-    #
-    # def finalize(self, adageobj):
-    #     self.track(adageobj)
