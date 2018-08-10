@@ -5,6 +5,9 @@
 .. image:: https://img.shields.io/travis/reanahub/reana-workflow-engine-cwl.svg
       :target: https://travis-ci.org/reanahub/reana-workflow-engine-cwl
 
+.. image:: https://img.shields.io/pypi/pyversions/reana-workflow-engine-cwl.svg
+      :target: https://pypi.org/pypi/reana-workflow-engine-cwl
+
 .. image:: https://img.shields.io/coveralls/reanahub/reana-workflow-engine-cwl.svg
       :target: https://coveralls.io/r/reanahub/reana-workflow-engine-cwl
 
