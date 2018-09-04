@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of REANA.
-# Copyright (C) 2017 CERN.
+# Copyright (C) 2017, 2018 CERN.
 #
 # REANA is free software; you can redistribute it and/or modify it under the
 # terms of the GNU General Public License as published by the Free Software
@@ -78,7 +78,7 @@ install_requires = [
     'SQLAlchemy>=1.1.14',
     'SQLAlchemy-Utils>=0.32.18',
     'pika>=0.11.2',
-    'reana-commons>=0.3.0',
+    'reana-commons>=0.3.1,<0.4',
 ]
 
 packages = find_packages()
