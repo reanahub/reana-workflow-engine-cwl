@@ -31,7 +31,6 @@ import time
 import traceback
 
 from cwltool.errors import WorkflowException
-from cwltool.job import JobBase
 from cwltool.mutation import MutationManager
 from cwltool.process import cleanIntermediate, relocateOutputs
 
@@ -45,7 +44,7 @@ class Pipeline(object):
         """Constructor."""
         self.threads = []
 
-    def executor(self, tool, job_order, **kwargs):
+    def executor(self, tool, job_order, runtimeContext, **kwargs):
         """Executor method."""
         final_output = []
         final_status = []
@@ -54,24 +53,25 @@ class Pipeline(object):
             final_status.append(processStatus)
             final_output.append(out)
 
-        if "basedir" not in kwargs:
-            raise WorkflowException("Must provide 'basedir' in kwargs")
+        if not runtimeContext.basedir:
+            raise WorkflowException('`runtimeContext` should contain a '
+                                    '`basedir`')
 
         output_dirs = set()
 
-        if kwargs.get("outdir"):
-            finaloutdir = os.path.abspath(kwargs.get("outdir"))
+        if runtimeContext.outdir:
+            finaloutdir = os.path.abspath(runtimeContext.outdir)
         else:
             finaloutdir = None
-        if kwargs.get("tmp_outdir_prefix"):
-            kwargs["outdir"] = tempfile.mkdtemp(
-                prefix=kwargs["tmp_outdir_prefix"]
+        if runtimeContext.tmp_outdir_prefix:
+            runtimeContext.outdir = tempfile.mkdtemp(
+                prefix=runtimeContext.tmp_outdir_prefix
             )
         else:
-            kwargs["outdir"] = tempfile.mkdtemp()
+            runtimeContext.outdir = tempfile.mkdtemp()
 
-        output_dirs.add(kwargs["outdir"])
-        kwargs["mutation_manager"] = MutationManager()
+        output_dirs.add(runtimeContext.outdir)
+        runtimeContext.mutation_manager = MutationManager()
 
         jobReqs = None
         if "cwl:requirements" in job_order:
@@ -83,30 +83,24 @@ class Pipeline(object):
             for req in jobReqs:
                 tool.requirements.append(req)
 
-        if kwargs.get("default_container"):
-            tool.requirements.insert(0, {
-                "class": "DockerRequirement",
-                "dockerPull": kwargs["default_container"]
-            })
-        else:
-            kwargs['default_container'] = 'frolvlad/alpine-bash'
-        kwargs['docker_outdir'] = os.path.join(
-            self.working_dir, "cwl/docker_outdir")
-        kwargs['docker_tmpdir'] = os.path.join(
-            self.working_dir, "cwl/docker_tmpdir")
-        kwargs["docker_stagedir"] = os.path.join(
-            self.working_dir, "cwl/docker_stagedir")
+        if not runtimeContext.default_container:
+            runtimeContext.default_container = 'frolvlad/alpine-bash'
+        runtimeContext.docker_outdir = os.path.join(
+            runtimeContext.working_dir, "cwl/docker_outdir")
+        runtimeContext.docker_tmpdir = os.path.join(
+            runtimeContext.working_dir, "cwl/docker_tmpdir")
+        runtimeContext.docker_stagedir = os.path.join(
+            runtimeContext.working_dir, "cwl/docker_stagedir")
 
-        jobs = tool.job(job_order, output_callback, **kwargs)
+        jobs = tool.job(job_order, output_callback, runtimeContext)
         try:
             for runnable in jobs:
                 if runnable:
-                    builder = kwargs.get("builder", None)
-                    if builder is not None:
-                        runnable.builder = builder
+                    if runtimeContext.builder:
+                        runnable.builder = runtimeContext.builder
                     if runnable.outdir:
                         output_dirs.add(runnable.outdir)
-                    runnable.run(**kwargs)
+                    runnable.run(runtimeContext)
                 else:
                     # log.error(
                     #     "Workflow cannot make any more progress"
@@ -127,14 +121,14 @@ class Pipeline(object):
         if final_output and final_output[0] and finaloutdir:
             final_output[0] = relocateOutputs(
                 final_output[0], finaloutdir,
-                output_dirs, kwargs.get("move_outputs"),
-                kwargs["make_fs_access"](""))
+                output_dirs, runtimeContext.move_outputs,
+                runtimeContext.make_fs_access(""))
 
-        if kwargs.get("rm_tmpdir"):
+        if runtimeContext.rm_tmpdir:
             cleanIntermediate(output_dirs)
 
         if final_output and final_status:
-            return (final_output[0], final_status[0])
+            return (str(final_output[0]), str(final_status[0]))
         else:
             return (None, "permanentFail")
 
@@ -157,35 +151,3 @@ class Pipeline(object):
                 break
         for t in self.threads:
             t.join()
-
-
-class PipelineJob(JobBase):
-    """Pipeline Job class."""
-
-    def __init__(self, spec, pipeline):
-        """Constructor."""
-        super(JobBase, self).__init__()
-        self.spec = spec
-        self.pipeline = pipeline
-        self.running = False
-
-    def find_docker_requirement(self):
-        """Find docker from pipeline."""
-        default = "python:2.7"
-        container = default
-        if self.pipeline.kwargs["default_container"]:
-            container = self.pipeline.kwargs["default_container"]
-
-        reqs = self.spec.get("requirements", []) + self.spec.get("hints", [])
-        for i in reqs:
-            if i.get("class", "NA") == "DockerRequirement":
-                container = i.get(
-                    "dockerPull",
-                    i.get("dockerImageId", default)
-                )
-        return container
-
-    def run(self, pull_image=True, rm_container=True, rm_tmpdir=True,
-            move_outputs="move", **kwargs):
-        """Run pipeline job."""
-        raise Exception("PipelineJob.run() not implemented")

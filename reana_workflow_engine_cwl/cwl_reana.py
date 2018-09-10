@@ -34,17 +34,16 @@ import time
 from pprint import pformat
 
 import shellescape
-from cwltool.draft2tool import CommandLineTool
+from cwltool.command_line_tool import CommandLineTool
 from cwltool.errors import WorkflowException
-from cwltool.job import (needs_shell_quoting_re, relink_initialworkdir,
-                         stageFiles)
+from cwltool.job import (JobBase, needs_shell_quoting_re,
+                         relink_initialworkdir, stageFiles)
 from cwltool.pathmapper import ensure_writable
-from cwltool.utils import get_feature
-from cwltool.workflow import defaultMakeTool
+from cwltool.workflow import default_make_tool
 
 from reana_workflow_engine_cwl.httpclient import \
     ReanaJobControllerHTTPClient as HttpClient
-from reana_workflow_engine_cwl.pipeline import Pipeline, PipelineJob
+from reana_workflow_engine_cwl.pipeline import Pipeline
 from reana_workflow_engine_cwl.poll import PollThread
 
 log = logging.getLogger("cwl-backend")
@@ -53,80 +52,73 @@ log = logging.getLogger("cwl-backend")
 class ReanaPipeline(Pipeline):
     """REANA Pipeline class."""
 
-    def __init__(self, workflow_uuid, working_dir, publisher, kwargs):
+    def __init__(self, **kwargs):
         """Constructor."""
         super(ReanaPipeline, self).__init__()
-        self.workflow_uuid = workflow_uuid
-        self.kwargs = kwargs
         self.service = HttpClient()
         if kwargs.get("basedir") is not None:
             self.basedir = kwargs.get("basedir")
         else:
             self.basedir = os.getcwd()
-        self.working_dir = working_dir
-        self.publisher = publisher
 
-    def make_exec_tool(self, spec, **kwargs):
+    def make_exec_tool(self, spec, loadingContext):
         """Make execution tool."""
-        return ReanaPipelineTool(self.workflow_uuid, spec, self,
-                                 working_dir=self.working_dir,
-                                 publisher=self.publisher,
-                                 **kwargs)
+        return ReanaPipelineTool(spec, loadingContext)
 
-    def make_tool(self, spec, **kwargs):
+    def make_tool(self, spec, loadingContext):
         """Make tool."""
         if "class" in spec and spec["class"] == "CommandLineTool":
-            return self.make_exec_tool(spec, **kwargs)
+            return self.make_exec_tool(spec, loadingContext)
         else:
-            return defaultMakeTool(spec, **kwargs)
+            return default_make_tool(spec, loadingContext)
 
 
 class ReanaPipelineTool(CommandLineTool):
     """REANA Pipeline Tool class."""
 
-    def __init__(self, workflow_uuid, spec, pipeline,
-                 working_dir, publisher, **kwargs):
-        """Constructor."""
-        super(ReanaPipelineTool, self).__init__(spec, **kwargs)
-        self.workflow_uuid = workflow_uuid
-        self.spec = spec
-        self.pipeline = pipeline
-        self.working_dir = working_dir
-        self.publisher = publisher
+    def __init__(self, spec, loadingContext):
+        """REANA tool adapted to support REANA jobs submission."""
+        super(ReanaPipelineTool, self).__init__(spec, loadingContext)
 
-    def makeJobRunner(self, use_container=True, **kwargs):
-        """Make job runner."""
+    def make_job_runner(self, runtimeContext):
+        """REANA make job runner."""
         dockerReq, _ = self.get_requirement("DockerRequirement")
-        if not dockerReq and use_container:
-            if self.find_default_container:
-                default_container = self.find_default_container(self)
+        if not dockerReq and runtimeContext.use_container:
+            if runtimeContext.find_default_container:
+                default_container = \
+                    runtimeContext.find_default_container(self)
                 if default_container:
                     self.requirements.insert(0, {
                         "class": "DockerRequirement",
                         "dockerPull": default_container
                     })
 
-        return ReanaPipelineJob(self.workflow_uuid, self.spec,
-                                self.pipeline, self.working_dir,
-                                self.publisher)
+        return ReanaPipelineJob
 
 
-class ReanaPipelineJob(PipelineJob):
+class ReanaPipelineJob(JobBase):
     """REANA Pipeline Job."""
 
-    def __init__(self, workflow_uuid, spec, pipeline, working_dir, publisher):
+    def __init__(self, builder, joborder, make_path_mapper, requirements,
+                 hints, jobname):
         """Constructor."""
-        super(ReanaPipelineJob, self).__init__(spec, pipeline)
-        self.workflow_uuid = workflow_uuid
+        super(ReanaPipelineJob, self).__init__(
+            builder, joborder, make_path_mapper, requirements, hints, jobname)
+
+        self.builder = builder
+        self.joborder = joborder
+        self.make_path_mapper = make_path_mapper
+        self.requirements = requirements
+        self.hints = hints
+        self.jobname = jobname
+
         self.outputs = None
-        self.working_dir = working_dir
         self.inplace_update = False
         self.volumes = []
         self.task_name_map = {}
-        self.publisher = publisher
 
     def add_volumes(self, pathmapper):
-        """Add volumes."""
+        """Customize add volumes for REANA system."""
         host_outdir = self.outdir
         container_outdir = self.builder.outdir
         for src, vol in pathmapper.items():
@@ -170,11 +162,16 @@ class ReanaPipelineJob(PipelineJob):
                     with os.fdopen(fd, "wb") as f:
                         f.write(vol.resolved.encode("utf-8"))
 
-    def create_task_msg(self):
-        """Create task message."""
+    def create_task_msg(self, working_dir):
+        """Create job message spec to be sent to REANA-Job-Controller."""
         prettified_cmd = self.command_line[2]
         job_name = self.name
-        container = self.find_docker_requirement()
+        docker_req, docker_is_req = self.get_requirement("DockerRequirement")
+        if docker_is_req:
+            container = str(docker_req['dockerPull'])
+        else:
+            raise WorkflowException("Job {} could not be started, docker "
+                                    "requirement is missing".format(job_name))
         requirements_command_line = ""
         for var in self.environment:
             requirements_command_line += "export {0}=\"{1}\";".format(
@@ -190,7 +187,7 @@ class ReanaPipelineJob(PipelineJob):
                         filepair[0], filepair[1])
 
         mounted_outdir = self.outdir
-        scr, _ = get_feature(self, "ShellCommandRequirement")
+        scr, _ = self.get_requirement("ShellCommandRequirement")
 
         shebang_lines = {"/bin/bash", "/bin/sh"}
         if scr or self.command_line[0] in shebang_lines:
@@ -210,10 +207,11 @@ class ReanaPipelineJob(PipelineJob):
                                  self.command_line])
         command_line = command_line.replace('/bin/sh -c ', '')
         command_line = re.sub(
-            "/var/lib/cwl/.*?/", "/".join(self.working_dir.split("/")[:-1]) +
+            "/var/lib/cwl/.*?/", "/".join(
+                working_dir.split("/")[:-1]) +
             "/workspace/", command_line)
         command_line = re.sub(
-            "/tmp/.*?/.*?/", self.working_dir + "/", command_line)
+            "/tmp/.*?/.*?/", working_dir + "/", command_line)
         if self.stdin:
             path = self.stdin.split("/")
             if os.path.isabs(self.stdin):
@@ -247,7 +245,7 @@ class ReanaPipelineJob(PipelineJob):
         wf_space_cmd = requirements_command_line + wf_space_cmd
 
         docker_output_dir = None
-        docker_req, _ = get_feature(self, "DockerRequirement")
+        docker_req, _ = self.get_requirement("DockerRequirement")
         if docker_req:
             docker_output_dir = docker_req.get("dockerOutputDirectory", None)
         if docker_output_dir:
@@ -261,23 +259,22 @@ class ReanaPipelineJob(PipelineJob):
             "experiment": "default",
             "image": container,
             "cmd": wrapped_cmd,
-            "workflow_workspace": self.working_dir,
+            "workflow_workspace": working_dir,
             "prettified_cmd": prettified_cmd,
             "job_name": job_name
         }
 
         return create_body
 
-    def run(self, pull_image=True, rm_container=True, rm_tmpdir=True,
-            move_outputs="move", **kwargs):
+    def run(self, runtimeContext):
         """Run a job."""
-        self._setup(kwargs)
+        self._setup(runtimeContext)
 
         env = self.environment
         if not os.path.exists(self.tmpdir):
             os.makedirs(self.tmpdir)
-        vars_to_preserve = kwargs.get("preserve_environment")
-        if kwargs.get("preserve_entire_environment"):
+        vars_to_preserve = runtimeContext.preserve_environment
+        if runtimeContext.preserve_entire_environment:
             vars_to_preserve = os.environ
         if vars_to_preserve is not None:
             for key, value in os.environ.items():
@@ -314,7 +311,7 @@ class ReanaPipelineJob(PipelineJob):
         )
         log.debug(pformat(self.__dict__))
 
-        task = self.create_task_msg()
+        task = self.create_task_msg(runtimeContext.working_dir)
 
         log.info(
             "[job %s] CREATED TASK MSG----------------------" %
@@ -324,10 +321,10 @@ class ReanaPipelineJob(PipelineJob):
 
         try:
             # task_id = job_id received from job-controller
-            task_id = self.pipeline.service.submit(**task)
+            task_id = runtimeContext.pipeline.service.submit(**task)
             running_jobs = {"total": 1, "job_ids": [task_id]}
-            self.publisher.publish_workflow_status(
-                self.workflow_uuid, 1,
+            runtimeContext.publisher.publish_workflow_status(
+                runtimeContext.workflow_uuid, 1,
                 message={
                     "progress": {
                         "running":
@@ -339,7 +336,7 @@ class ReanaPipelineJob(PipelineJob):
             )
             log.info("[job %s] task id: %s " % (self.name, task_id))
             self.task_name_map[self.name] = task_id
-            operation = self.pipeline.service.check_status(task_id)
+            operation = runtimeContext.pipeline.service.check_status(task_id)
         except Exception as e:
             log.error(
                 "[job %s] Failed to submit task to job controller:\n%s" %
@@ -372,19 +369,19 @@ class ReanaPipelineJob(PipelineJob):
                         (self.name)
                     )
                     log.info(pformat(self.outputs))
-                self.cleanup(rm_tmpdir)
+                self.cleanup(runtimeContext.rm_tmpdir)
 
         poll = ReanaPipelinePoll(
-            workflow_uuid=self.workflow_uuid,
+            workflow_uuid=runtimeContext.workflow_uuid,
             task_id=self.task_name_map.get(self.name),
             jobname=self.name,
-            service=self.pipeline.service,
+            service=runtimeContext.pipeline.service,
             operation=operation,
             callback=callback,
-            publisher=self.publisher
+            publisher=runtimeContext.publisher
         )
 
-        self.pipeline.add_thread(poll)
+        runtimeContext.pipeline.add_thread(poll)
         poll.start()
 
     def cleanup(self, rm_tmpdir):

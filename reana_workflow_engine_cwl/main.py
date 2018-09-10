@@ -33,9 +33,11 @@ from io import BytesIO
 
 import cwltool.main
 import pkg_resources
+from cwltool.context import LoadingContext
 
 from reana_workflow_engine_cwl.__init__ import __version__
 from reana_workflow_engine_cwl.config import SHARED_VOLUME_PATH
+from reana_workflow_engine_cwl.context import REANARuntimeContext
 from reana_workflow_engine_cwl.cwl_reana import ReanaPipeline
 from reana_workflow_engine_cwl.database import SQLiteHandler
 
@@ -113,16 +115,21 @@ def main(workflow_uuid, workflow_spec,
     if parsed_args.debug:
         log.setLevel(logging.DEBUG)
 
-    pipeline = ReanaPipeline(workflow_uuid, working_dir, publisher,
-                             vars(parsed_args))
+    pipeline = ReanaPipeline()
     log.error("starting the run..")
     db_log_writer = SQLiteHandler(workflow_uuid, publisher)
 
     f = BytesIO()
+    cwl_arguments = vars(parsed_args)
+    runtimeContext = REANARuntimeContext(workflow_uuid, working_dir,
+                                         publisher, pipeline,
+                                         **cwl_arguments)
     result = cwltool.main.main(
         args=parsed_args,
         executor=pipeline.executor,
-        makeTool=pipeline.make_tool,
+        loadingContext=LoadingContext(
+            {'construct_tool_object': pipeline.make_tool}),
+        runtimeContext=runtimeContext,
         versionfunc=versionstring,
         logger_handler=db_log_writer,
         stdout=f

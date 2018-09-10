@@ -35,7 +35,8 @@ log = logging.getLogger('yadage.cap.submit')
 class ReanaJobControllerHTTPClient:
     """REANA-Job-Controller http client class."""
 
-    def submit(self, experiment, image, cmd, workflow_workspace, prettified_cmd, job_name):
+    def submit(self, experiment, image, cmd, workflow_workspace,
+               prettified_cmd, job_name):
         """Submit a new job."""
         job_spec = {
             'experiment': experiment,
@@ -48,7 +49,8 @@ class ReanaJobControllerHTTPClient:
             'job_name': job_name
         }
 
-        log.info('submitting %s', json.dumps(job_spec, indent=4, sort_keys=True))
+        log.info('submitting %s', json.dumps(job_spec, indent=4,
+                                             sort_keys=True))
 
         response = requests.post(
             'http://{host}/{resource}'.format(
