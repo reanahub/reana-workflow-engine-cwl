@@ -164,7 +164,6 @@ class ReanaPipelineJob(JobBase):
 
     def create_task_msg(self, working_dir):
         """Create job message spec to be sent to REANA-Job-Controller."""
-        prettified_cmd = self.command_line[2]
         job_name = self.name
         docker_req, _ = self.get_requirement("DockerRequirement")
         container = str(docker_req['dockerPull'])
@@ -250,13 +249,12 @@ class ReanaPipelineJob(JobBase):
         wf_space_cmd += "; cp -r {0}/* {1}".format(
             self.environment['HOME'], mounted_outdir)
         wrapped_cmd = "/bin/sh -c {} ".format(pipes.quote(wf_space_cmd))
-
         create_body = {
             "experiment": "default",
             "image": container,
             "cmd": wrapped_cmd,
             "workflow_workspace": working_dir,
-            "prettified_cmd": prettified_cmd,
+            "prettified_cmd": wrapped_cmd,
             "job_name": job_name
         }
 
