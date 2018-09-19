@@ -166,12 +166,8 @@ class ReanaPipelineJob(JobBase):
         """Create job message spec to be sent to REANA-Job-Controller."""
         prettified_cmd = self.command_line[2]
         job_name = self.name
-        docker_req, docker_is_req = self.get_requirement("DockerRequirement")
-        if docker_is_req:
-            container = str(docker_req['dockerPull'])
-        else:
-            raise WorkflowException("Job {} could not be started, docker "
-                                    "requirement is missing".format(job_name))
+        docker_req, _ = self.get_requirement("DockerRequirement")
+        container = str(docker_req['dockerPull'])
         requirements_command_line = ""
         for var in self.environment:
             requirements_command_line += "export {0}=\"{1}\";".format(
