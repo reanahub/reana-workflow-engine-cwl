@@ -26,9 +26,9 @@ from cwltool.job import (JobBase, needs_shell_quoting_re,
                          relink_initialworkdir, stageFiles)
 from cwltool.pathmapper import ensure_writable
 from cwltool.workflow import default_make_tool
+from reana_commons.api_client import JobControllerAPIClient as rjc_api_client
 
-from reana_workflow_engine_cwl.httpclient import \
-    ReanaJobControllerHTTPClient as HttpClient
+from reana_workflow_engine_cwl.config import COMPONENTS_DATA
 from reana_workflow_engine_cwl.pipeline import Pipeline
 from reana_workflow_engine_cwl.poll import PollThread
 
@@ -41,7 +41,8 @@ class ReanaPipeline(Pipeline):
     def __init__(self, **kwargs):
         """Constructor."""
         super(ReanaPipeline, self).__init__()
-        self.service = HttpClient()
+        self.service = rjc_api_client('reana_workflow_engine_cwl',
+                                      COMPONENTS_DATA['reana-job-controller'])
         if kwargs.get("basedir") is not None:
             self.basedir = kwargs.get("basedir")
         else:
@@ -239,8 +240,8 @@ class ReanaPipelineJob(JobBase):
             "experiment": "default",
             "image": container,
             "cmd": wrapped_cmd,
-            "workflow_workspace": working_dir,
             "prettified_cmd": wrapped_cmd,
+            "workflow_workspace": working_dir,
             "job_name": job_name
         }
 
@@ -302,6 +303,7 @@ class ReanaPipelineJob(JobBase):
         try:
             # task_id = job_id received from job-controller
             task_id = runtimeContext.pipeline.service.submit(**task)
+            task_id = str(task_id['job_id'])
             running_jobs = {"total": 1, "job_ids": [task_id]}
             runtimeContext.publisher.publish_workflow_status(
                 runtimeContext.workflow_uuid, 1,

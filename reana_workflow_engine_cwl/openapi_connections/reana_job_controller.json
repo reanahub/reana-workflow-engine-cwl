@@ -1,0 +1,344 @@
+{
+  "definitions": {
+    "Job": {
+      "properties": {
+        "cmd": {
+          "type": "string"
+        },
+        "cvmfs_mounts": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "docker_img": {
+          "type": "string"
+        },
+        "experiment": {
+          "type": "string"
+        },
+        "job_id": {
+          "type": "string"
+        },
+        "max_restart_count": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "restart_count": {
+          "format": "int32",
+          "type": "integer"
+        },
+        "status": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "cmd",
+        "cvmfs_mounts",
+        "docker_img",
+        "experiment",
+        "job_id",
+        "max_restart_count",
+        "restart_count",
+        "status"
+      ],
+      "type": "object"
+    },
+    "JobRequest": {
+      "properties": {
+        "cmd": {
+          "default": "",
+          "type": "string"
+        },
+        "cvmfs_mounts": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "docker_img": {
+          "type": "string"
+        },
+        "env_vars": {
+          "default": {},
+          "type": "object"
+        },
+        "experiment": {
+          "type": "string"
+        },
+        "job_id": {
+          "format": "uuid",
+          "type": "string"
+        },
+        "job_name": {
+          "type": "string"
+        },
+        "job_type": {
+          "type": "string"
+        },
+        "prettified_cmd": {
+          "default": "",
+          "type": "string"
+        },
+        "shared_file_system": {
+          "default": true,
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "docker_img",
+        "experiment",
+        "job_name"
+      ],
+      "type": "object"
+    }
+  },
+  "info": {
+    "description": "REANA Job Controller API",
+    "title": "reana-job-controller",
+    "version": "0.0.1"
+  },
+  "parameters": {},
+  "paths": {
+    "/job_cache": {
+      "get": {
+        "description": "This resource takes a job specification and the workflow json, and checks if the job to be created, already exists in the cache.",
+        "operationId": "check_if_cached",
+        "parameters": [
+          {
+            "description": "Required. Specification of the job.",
+            "in": "query",
+            "name": "job_spec",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "description": "Required. Specification of the workflow.",
+            "in": "query",
+            "name": "workflow_json",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "description": "Required. Path to workflow workspace.",
+            "in": "query",
+            "name": "workflow_workspace",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Request succeeded. Returns boolean depicting if job is in cache.",
+            "examples": {
+              "application/json": {
+                "cached": true,
+                "result_path": "/reana/default/0000/xe2123d/archive/asd213"
+              }
+            }
+          },
+          "400": {
+            "description": "Request failed. The incoming data specification seems malformed."
+          },
+          "500": {
+            "description": "Request failed. Internal controller error."
+          }
+        },
+        "summary": "Returns boolean depicting if job is in cache."
+      }
+    },
+    "/jobs": {
+      "get": {
+        "description": "This resource is not expecting parameters and it will return a list representing all active jobs in JSON format.",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Request succeeded. The response contains the list of all active jobs.",
+            "examples": {
+              "application/json": {
+                "jobs": {
+                  "1612a779-f3fa-4344-8819-3d12fa9b9d90": {
+                    "cmd": "date",
+                    "cvmfs_mounts": [
+                      "atlas-condb",
+                      "atlas"
+                    ],
+                    "docker_img": "busybox",
+                    "experiment": "atlas",
+                    "job_id": "1612a779-f3fa-4344-8819-3d12fa9b9d90",
+                    "max_restart_count": 3,
+                    "restart_count": 0,
+                    "status": "succeeded"
+                  },
+                  "2e4bbc1d-db5e-4ee0-9701-6e2b1ba55c20": {
+                    "cmd": "date",
+                    "cvmfs_mounts": [
+                      "atlas-condb",
+                      "atlas"
+                    ],
+                    "docker_img": "busybox",
+                    "experiment": "atlas",
+                    "job_id": "2e4bbc1d-db5e-4ee0-9701-6e2b1ba55c20",
+                    "max_restart_count": 3,
+                    "restart_count": 0,
+                    "status": "started"
+                  }
+                }
+              }
+            },
+            "schema": {
+              "items": {
+                "$ref": "#/definitions/Job"
+              },
+              "type": "array"
+            }
+          }
+        },
+        "summary": "Returns list of all active jobs."
+      },
+      "post": {
+        "consumes": [
+          "application/json"
+        ],
+        "description": "This resource is expecting JSON data with all the necessary information of a new job.",
+        "operationId": "create_job",
+        "parameters": [
+          {
+            "description": "Information needed to instantiate a Job",
+            "in": "body",
+            "name": "job",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/JobRequest"
+            }
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "201": {
+            "description": "Request succeeded. The job has been launched.",
+            "examples": {
+              "application/json": {
+                "job_id": "cdcf48b1-c2f3-4693-8230-b066e088c6ac"
+              }
+            },
+            "schema": {
+              "properties": {
+                "job_id": {
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            }
+          },
+          "400": {
+            "description": "Request failed. The incoming data specification seems malformed."
+          },
+          "500": {
+            "description": "Request failed. Internal controller error. The job could probably not have been allocated."
+          }
+        },
+        "summary": "Creates a new job."
+      }
+    },
+    "/jobs/{job_id}": {
+      "get": {
+        "description": "This resource is expecting the job's UUID as a path parameter. Its information will be served in JSON format.",
+        "operationId": "get_job",
+        "parameters": [
+          {
+            "description": "Required. ID of the job.",
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Request succeeded. The response contains details about the given job ID.",
+            "examples": {
+              "application/json": {
+                "job": {
+                  "cmd": "date",
+                  "cvmfs_mounts": [
+                    "atlas-condb",
+                    "atlas"
+                  ],
+                  "docker_img": "busybox",
+                  "experiment": "atlas",
+                  "job_id": "cdcf48b1-c2f3-4693-8230-b066e088c6ac",
+                  "max_restart_count": 3,
+                  "restart_count": 0,
+                  "status": "started"
+                }
+              }
+            },
+            "schema": {
+              "$ref": "#/definitions/Job"
+            }
+          },
+          "404": {
+            "description": "Request failed. The given job ID does not seem to exist.",
+            "examples": {
+              "application/json": {
+                "message": "The job cdcf48b1-c2f3-4693-8230-b066e088444c doesn't exist"
+              }
+            }
+          }
+        },
+        "summary": "Returns details about a given job."
+      }
+    },
+    "/jobs/{job_id}/logs": {
+      "get": {
+        "description": "This resource is expecting the job's UUID as a path parameter. Its information will be served in JSON format.",
+        "operationId": "get_logs",
+        "parameters": [
+          {
+            "description": "Required. ID of the job.",
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Request succeeded. The response contains the logs for the given job.",
+            "examples": {
+              "application/json": {
+                "log": "Tue May 16 13:52:00 CEST 2017\n"
+              }
+            }
+          },
+          "404": {
+            "description": "Request failed. The given job ID does not seem to exist.",
+            "examples": {
+              "application/json": {
+                "message": "The job cdcf48b1-c2f3-4693-8230-b066e088444c doesn't exist"
+              }
+            }
+          }
+        },
+        "summary": "Returns the logs for a given job."
+      }
+    }
+  },
+  "swagger": "2.0",
+  "tags": []
+}
