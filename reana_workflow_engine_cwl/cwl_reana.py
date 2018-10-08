@@ -28,7 +28,6 @@ from cwltool.pathmapper import ensure_writable
 from cwltool.workflow import default_make_tool
 from reana_commons.api_client import JobControllerAPIClient as rjc_api_client
 
-from reana_workflow_engine_cwl.config import COMPONENTS_DATA
 from reana_workflow_engine_cwl.pipeline import Pipeline
 from reana_workflow_engine_cwl.poll import PollThread
 
@@ -41,8 +40,7 @@ class ReanaPipeline(Pipeline):
     def __init__(self, **kwargs):
         """Constructor."""
         super(ReanaPipeline, self).__init__()
-        self.service = rjc_api_client('reana_workflow_engine_cwl',
-                                      COMPONENTS_DATA['reana-job-controller'])
+        self.service = rjc_api_client('reana-job-controller')
         if kwargs.get("basedir") is not None:
             self.basedir = kwargs.get("basedir")
         else:
