@@ -13,7 +13,7 @@ from __future__ import absolute_import, print_function
 import json
 import logging
 
-from reana_commons.publisher import Publisher
+from reana_commons.publisher import WorkflowStatusPublisher
 
 from reana_workflow_engine_cwl import main
 from reana_workflow_engine_cwl.celeryapp import app
@@ -30,8 +30,7 @@ def run_cwl_workflow(workflow_uuid, workflow_workspace,
     """Run cwl workflow."""
     log.info('running workflow on context: {0}'.format(locals()))
     try:
-        publisher = Publisher()
-        publisher.connect()
+        publisher = WorkflowStatusPublisher()
         main.main(workflow_uuid, workflow_json,
                   parameters, workflow_workspace, publisher)
         log.info('workflow done')
