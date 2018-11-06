@@ -64,8 +64,7 @@ install_requires = [
     'enum34>=1.1.6',
     'SQLAlchemy>=1.1.14',
     'SQLAlchemy-Utils>=0.32.18',
-    'pika>=0.11.2',
-    'reana-commons>=0.4.0.dev20181016,<0.5.0',
+    'reana-commons>=0.4.0,<0.5.0',
 ]
 
 packages = find_packages()
