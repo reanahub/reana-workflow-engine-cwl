@@ -31,4 +31,4 @@ ARG CELERY_CONCURRENCY=2
 ENV CELERY_CONCURRENCY ${CELERY_CONCURRENCY}
 ENV PYTHONPATH=/workdir
 
-CMD celery -A reana_workflow_engine_cwl.celeryapp worker -l info -Q ${QUEUE_ENV} --concurrency ${CELERY_CONCURRENCY}
+CMD celery -A reana_workflow_engine_cwl.celeryapp worker -l info -Q ${QUEUE_ENV} --concurrency ${CELERY_CONCURRENCY} -Ofair

@@ -14,6 +14,7 @@ import json
 import logging
 
 from reana_commons.publisher import WorkflowStatusPublisher
+from reana_commons.tasks import stop_workflow
 
 from reana_workflow_engine_cwl import main
 from reana_workflow_engine_cwl.celeryapp import app
