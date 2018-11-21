@@ -23,7 +23,7 @@ import shellescape
 from cwltool.command_line_tool import CommandLineTool
 from cwltool.errors import WorkflowException
 from cwltool.job import (JobBase, needs_shell_quoting_re,
-                         relink_initialworkdir, stageFiles)
+                         relink_initialworkdir, stage_files)
 from cwltool.pathmapper import ensure_writable
 from cwltool.workflow import default_make_tool
 from reana_commons.api_client import JobControllerAPIClient as rjc_api_client
@@ -267,16 +267,16 @@ class ReanaPipelineJob(JobBase):
             env["SYSTEMROOT"] = os.environ["SYSTEMROOT"]
 
         try:
-            stageFiles(self.pathmapper, ignoreWritable=True, symLink=False)
+            stage_files(self.pathmapper, ignore_writable=True, symlink=False)
             if getattr(self, "generatemapper", ""):
-                stageFiles(self.generatemapper,
-                           ignoreWritable=self.inplace_update, symLink=False)
+                stage_files(self.generatemapper,
+                            ignore_writable=self.inplace_update, symlink=False)
                 relink_initialworkdir(self.generatemapper,
                                       self.outdir,
                                       self.builder.outdir,
                                       inplace_update=self.inplace_update)
         except OSError:
-            # cwltool/process.py, line 239, in stageFiles
+            # cwltool/process.py, line 239, in stage_files
             # shutil.copytree(p.resolved, p.target)
             pass
         self.add_volumes(self.pathmapper)

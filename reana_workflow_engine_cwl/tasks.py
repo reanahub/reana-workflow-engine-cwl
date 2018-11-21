@@ -27,13 +27,14 @@ known_dirs = ['inputs', 'logs', outputs_dir_name]
 @app.task(name='tasks.run_cwl_workflow', ignore_result=True)
 def run_cwl_workflow(workflow_uuid, workflow_workspace,
                      workflow_json=None,
-                     parameters=None):
+                     parameters=None,
+                     operational_options={}):
     """Run cwl workflow."""
     log.info('running workflow on context: {0}'.format(locals()))
     try:
         publisher = WorkflowStatusPublisher()
-        main.main(workflow_uuid, workflow_json,
-                  parameters, workflow_workspace, publisher)
+        main.main(workflow_uuid, workflow_json, parameters,
+                  operational_options, workflow_workspace, publisher)
         log.info('workflow done')
         publisher.publish_workflow_status(workflow_uuid, 2)
     except Exception as e:

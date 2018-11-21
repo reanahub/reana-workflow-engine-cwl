@@ -13,7 +13,6 @@ from __future__ import absolute_import, print_function, unicode_literals
 import json
 import logging
 import os
-import shutil
 import sys
 from io import BytesIO
 
@@ -43,8 +42,8 @@ def versionstring():
     return "%s %s with cwltool %s" % (sys.argv[0], __version__, cwltool_ver)
 
 
-def main(workflow_uuid, workflow_spec,
-         workflow_inputs, working_dir, publisher, **kwargs):
+def main(workflow_uuid, workflow_spec, workflow_inputs,
+         operational_options, working_dir, publisher, **kwargs):
     """Run main method."""
     working_dir = os.path.join(SHARED_VOLUME_PATH, working_dir)
     os.chdir(working_dir)
@@ -76,12 +75,14 @@ def main(workflow_uuid, workflow_spec,
     tmp_outdir = os.path.join(working_dir, "cwl/outdir")
     os.makedirs(tmpdir)
     os.makedirs(tmp_outdir)
-    args = ["--debug",
-            "--tmpdir-prefix", tmpdir + "/",
-            "--tmp-outdir-prefix", tmp_outdir + "/",
-            "--default-container", "frolvlad/alpine-bash",
-            "--outdir", os.path.join(os.path.dirname(working_dir), "outputs"),
-            "workflow.json#main", "inputs.json"]
+    args = operational_options
+    args = args + [
+        "--debug",
+        "--tmpdir-prefix", tmpdir + "/",
+        "--tmp-outdir-prefix", tmp_outdir + "/",
+        "--default-container", "frolvlad/alpine-bash",
+        "--outdir", os.path.join(os.path.dirname(working_dir), "outputs"),
+        "workflow.json#main", "inputs.json"]
     log.error("parsing arguments ...")
     parser = cwltool.main.arg_parser()
     parsed_args = parser.parse_args(args)
