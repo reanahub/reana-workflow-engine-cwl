@@ -60,6 +60,7 @@ install_requires = [
     'schema-salad==2.7.20181116024232',
     'kombu>=4.2.0,<5.0'
     'celery==4.1.0',
+    'click>=7,<8',
     'zmq',
     'enum34>=1.1.6',
     'SQLAlchemy>=1.1.14',
@@ -87,6 +88,12 @@ setup(
     url='https://github.com/reanahub/reana-workflow-engine-cwl',
     packages=['reana_workflow_engine_cwl'],
     zip_safe=False,
+    entry_points={
+        'console_scripts': [
+            'run-cwl-workflow='
+            'reana_workflow_engine_cwl.tasks:run_cwl_workflow',
+        ]
+    },
     extras_require=extras_require,
     install_requires=install_requires,
     setup_requires=setup_requires,

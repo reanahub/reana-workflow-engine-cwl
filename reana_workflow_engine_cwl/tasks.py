@@ -10,6 +10,7 @@
 
 from __future__ import absolute_import, print_function
 
+import click
 import json
 import logging
 
@@ -17,23 +18,49 @@ from reana_commons.publisher import WorkflowStatusPublisher
 from reana_commons.tasks import stop_workflow
 
 from reana_workflow_engine_cwl import main
-from reana_workflow_engine_cwl.celeryapp import app
 
 log = logging.getLogger(__name__)
 outputs_dir_name = 'outputs'
 known_dirs = ['inputs', 'logs', outputs_dir_name]
 
 
-@app.task(name='tasks.run_cwl_workflow', ignore_result=True)
+def load_json(ctx, param, value):
+    """Callback function for click option"""
+    return json.loads(value)
+
+@click.command()
+@click.option('--workflow-uuid',
+              required=True,
+              help='UUID of workflow to be run.')
+@click.option('--workflow-workspace',
+              required=True,
+              help='Name of workspace in which workflow should run.')
+@click.option('--workflow-json',
+              help='JSON representation of workflow object to be run.',
+              callback=load_json)
+@click.option('--workflow-parameters',
+              help='JSON representation of parameters received by'
+                   ' the workflow.',
+              callback=load_json)
+@click.option('--operational-options',
+              help='Options to be passed to the workflow engine'
+                   ' (i.e. caching).',
+            callback=load_json)
+
 def run_cwl_workflow(workflow_uuid, workflow_workspace,
                      workflow_json=None,
-                     parameters=None,
+                     workflow_parameters=None,
                      operational_options={}):
     """Run cwl workflow."""
+    print(workflow_uuid)
+    print(workflow_workspace)
+    print(workflow_json)
+    for w in workflow_parameters:
+        print(w)
     log.info('running workflow on context: {0}'.format(locals()))
     try:
         publisher = WorkflowStatusPublisher()
-        main.main(workflow_uuid, workflow_json, parameters,
+        main.main(workflow_uuid, workflow_json, workflow_parameters,
                   operational_options, workflow_workspace, publisher)
         log.info('workflow done')
         publisher.publish_workflow_status(workflow_uuid, 2)

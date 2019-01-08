@@ -47,7 +47,7 @@ def main(workflow_uuid, workflow_spec, workflow_inputs,
     """Run main method."""
     working_dir = os.path.join(SHARED_VOLUME_PATH, working_dir)
     os.chdir(working_dir)
-    log.error("Dumping workflow specification and input parameter files...")
+    log.info("Dumping workflow specification and input parameter files...")
     with open("workflow.json", "w") as f:
         json.dump(workflow_spec, f)
     with open("inputs.json", "w") as f:
@@ -83,6 +83,8 @@ def main(workflow_uuid, workflow_spec, workflow_inputs,
         "--default-container", "frolvlad/alpine-bash",
         "--outdir", os.path.join(os.path.dirname(working_dir), "outputs"),
         "workflow.json#main", "inputs.json"]
+
+    import wdb; wdb.set_trace()
     log.error("parsing arguments ...")
     parser = cwltool.main.arg_parser()
     parsed_args = parser.parse_args(args)
