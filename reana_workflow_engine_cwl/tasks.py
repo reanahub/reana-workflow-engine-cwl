@@ -15,7 +15,6 @@ import json
 import logging
 
 from reana_commons.publisher import WorkflowStatusPublisher
-from reana_commons.tasks import stop_workflow
 
 from reana_workflow_engine_cwl import main
 
@@ -52,11 +51,6 @@ def run_cwl_workflow(workflow_uuid, workflow_workspace,
                      workflow_parameters=None,
                      operational_options={}):
     """Run cwl workflow."""
-    print(workflow_uuid)
-    print(workflow_workspace)
-    print(workflow_json)
-    for w in workflow_parameters:
-        print(w)
     log.info('running workflow on context: {0}'.format(locals()))
     try:
         publisher = WorkflowStatusPublisher()

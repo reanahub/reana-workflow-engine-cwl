@@ -83,8 +83,6 @@ def main(workflow_uuid, workflow_spec, workflow_inputs,
         "--default-container", "frolvlad/alpine-bash",
         "--outdir", os.path.join(os.path.dirname(working_dir), "outputs"),
         "workflow.json#main", "inputs.json"]
-
-    import wdb; wdb.set_trace()
     log.error("parsing arguments ...")
     parser = cwltool.main.arg_parser()
     parsed_args = parser.parse_args(args)
