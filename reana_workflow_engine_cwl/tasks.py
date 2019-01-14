@@ -10,12 +10,12 @@
 
 from __future__ import absolute_import, print_function
 
-import click
+import base64
 import json
 import logging
 
+import click
 from reana_commons.publisher import WorkflowStatusPublisher
-
 from reana_workflow_engine_cwl import main
 
 log = logging.getLogger(__name__)
@@ -25,7 +25,9 @@ known_dirs = ['inputs', 'logs', outputs_dir_name]
 
 def load_json(ctx, param, value):
     """Callback function for click option"""
-    return json.loads(value)
+    value = value[1:]
+    return json.loads(base64.standard_b64decode(value).decode())
+
 
 @click.command()
 @click.option('--workflow-uuid',
@@ -44,8 +46,7 @@ def load_json(ctx, param, value):
 @click.option('--operational-options',
               help='Options to be passed to the workflow engine'
                    ' (i.e. caching).',
-            callback=load_json)
-
+              callback=load_json)
 def run_cwl_workflow(workflow_uuid, workflow_workspace,
                      workflow_json=None,
                      workflow_parameters=None,
