@@ -241,7 +241,8 @@ class ReanaPipelineJob(JobBase):
             "cmd": wrapped_cmd,
             "prettified_cmd": wrapped_cmd,
             "workflow_workspace": working_dir,
-            "job_name": job_name
+            "job_name": job_name,
+            "cvmfs_mounts": ["cms", "atlas", "alice", "lhcb"]
         }
 
         return create_body

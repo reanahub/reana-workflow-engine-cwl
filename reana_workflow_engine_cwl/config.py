@@ -13,7 +13,7 @@ import os
 JOBCONTROLLER_HOST = os.getenv('JOB_CONTROLLER_HOST',
                                'job-controller.default.svc.cluster.local')
 
-SHARED_VOLUME_PATH = os.getenv('SHARED_VOLUME_PATH', '/reana/default')
+SHARED_VOLUME_PATH = os.getenv('SHARED_VOLUME_PATH', '/var/reana')
 """Path to the mounted REANA shared volume."""
 
 BROKER_URL = os.getenv('RABBIT_MQ_URL',
