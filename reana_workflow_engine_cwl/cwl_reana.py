@@ -28,6 +28,7 @@ from cwltool.pathmapper import ensure_writable
 from cwltool.workflow import default_make_tool
 from reana_commons.api_client import JobControllerAPIClient as rjc_api_client
 
+from reana_workflow_engine_cwl.config import MOUNT_CVMFS
 from reana_workflow_engine_cwl.pipeline import Pipeline
 from reana_workflow_engine_cwl.poll import PollThread
 
@@ -242,8 +243,10 @@ class ReanaPipelineJob(JobBase):
             "prettified_cmd": wrapped_cmd,
             "workflow_workspace": working_dir,
             "job_name": job_name,
-            "cvmfs_mounts": ["cms", "atlas", "alice", "lhcb"]
+            "cvmfs_mounts": []
         }
+        if MOUNT_CVMFS:
+            create_body["cvmfs_mounts"] = ["cms", "atlas", "alice", "lhcb"]
 
         return create_body
 
