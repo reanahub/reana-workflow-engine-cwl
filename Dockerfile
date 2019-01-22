@@ -14,10 +14,9 @@ RUN apt update && \
 
 COPY CHANGES.rst README.rst setup.py /code/
 COPY reana_workflow_engine_cwl/version.py /code/reana_workflow_engine_cwl/
-RUN pip install -e git://github.com/dinosk/reana-commons.git@131-support-for-cvmfs#egg=reana-commons
 WORKDIR /code
-RUN pip install --no-cache-dir requirements-builder && \
-    requirements-builder -e all -l pypi setup.py | pip install --no-cache-dir -r /dev/stdin && \
+RUN pip install requirements-builder && \
+    requirements-builder -e all -l pypi setup.py | pip install -r /dev/stdin && \
     pip uninstall -y requirements-builder
 
 COPY . /code
