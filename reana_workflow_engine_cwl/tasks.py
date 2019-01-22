@@ -19,8 +19,6 @@ from reana_commons.publisher import WorkflowStatusPublisher
 from reana_workflow_engine_cwl import main
 
 log = logging.getLogger(__name__)
-outputs_dir_name = 'outputs'
-known_dirs = ['inputs', 'logs', outputs_dir_name]
 
 
 def load_json(ctx, param, value):
@@ -63,4 +61,9 @@ def run_cwl_workflow(workflow_uuid, workflow_workspace,
         log.error('workflow failed: {0}'.format(e))
         publisher.publish_workflow_status(workflow_uuid, 3, message=str(e))
     finally:
-        publisher.close()
+        if publisher:
+            publisher.close()
+        else:
+            log.error('Workflow {workflow_uuid} failed but status '
+                      'could not be published.'.format(
+                          workflow_uuid=workflow_uuid))
