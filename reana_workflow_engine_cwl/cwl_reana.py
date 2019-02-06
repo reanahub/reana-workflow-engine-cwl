@@ -243,10 +243,8 @@ class ReanaPipelineJob(JobBase):
             "prettified_cmd": wrapped_cmd,
             "workflow_workspace": working_dir,
             "job_name": job_name,
-            "cvmfs_mounts": []
+            "cvmfs_mounts": MOUNT_CVMFS
         }
-        if MOUNT_CVMFS:
-            create_body["cvmfs_mounts"] = ["cms", "atlas", "alice", "lhcb"]
 
         return create_body
 
