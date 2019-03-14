@@ -39,10 +39,6 @@ can be parsed to retrieve the produced output (used in ``reana-cwl-runner``).
 File structure
 ------------------------
 
-* *celery_zeromq.py*, *zeromq_tracker.py*
-
-functions for interacting with ``reana-workflow-monitor``
-
 * *celeryapp.py*
 
 registering Celery application - starting point to ``engine-cwl``
@@ -74,5 +70,3 @@ Pipeline - adds a few pieces to the default ``cwltool`` executor
 * *tasks.py*
 
 ``run_cwl_workflow`` task is called by another application via Celery to start a CWL workflow - an entry point to ``engine-cwl``
-
-

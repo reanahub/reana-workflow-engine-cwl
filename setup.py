@@ -25,7 +25,7 @@ tests_require = [
     'enum34>=1.1.6',
     'SQLAlchemy>=1.1.14',
     'SQLAlchemy-Utils>=0.32.18',
-    'isort>=4.2.2',
+    'isort>=4.2.2,<4.3',
     'marshmallow>=2.13',
     'pydocstyle>=1.0.0',
     'pytest-cache>=1.0',
@@ -61,7 +61,6 @@ install_requires = [
     'kombu>=4.2.0,<5.0'
     'celery==4.1.0',
     'click>=7,<8',
-    'zmq',
     'enum34>=1.1.6',
     'SQLAlchemy>=1.1.14',
     'SQLAlchemy-Utils>=0.32.18',
