@@ -27,6 +27,7 @@ from cwltool.job import (JobBase, needs_shell_quoting_re,
 from cwltool.pathmapper import ensure_writable
 from cwltool.workflow import default_make_tool
 from reana_commons.api_client import JobControllerAPIClient as rjc_api_client
+from reana_commons.config import REANA_WORKFLOW_UMASK
 
 from reana_workflow_engine_cwl.config import MOUNT_CVMFS
 from reana_workflow_engine_cwl.pipeline import Pipeline
@@ -132,7 +133,7 @@ class ReanaPipelineJob(JobBase):
             if vol.type == "WritableDirectory":
                 if vol.resolved.startswith("_:"):
                     if not os.path.exists(vol.target):
-                        os.makedirs(vol.target, mode=0o0755)
+                        os.makedirs(vol.target)
                 else:
                     if self.inplace_update:
                         pass
@@ -153,7 +154,8 @@ class ReanaPipelineJob(JobBase):
         job_name = self.name
         docker_req, _ = self.get_requirement("DockerRequirement")
         container = str(docker_req['dockerPull'])
-        requirements_command_line = ""
+        umask_cmd = "umask {};".format(REANA_WORKFLOW_UMASK)
+        requirements_command_line = umask_cmd
         for var in self.environment:
             requirements_command_line += "export {0}=\"{1}\";".format(
                 var, self.environment[var])

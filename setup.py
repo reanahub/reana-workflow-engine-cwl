@@ -59,12 +59,12 @@ install_requires = [
     'cwltool==1.0.20181118133959',
     'schema-salad==2.7.20181116024232',
     'kombu>=4.2.0,<5.0'
-    'celery==4.1.0',
+    'celery>=4.1.0,<4.3',
     'click>=7,<8',
     'enum34>=1.1.6',
     'SQLAlchemy>=1.1.14',
     'SQLAlchemy-Utils>=0.32.18',
-    'reana-commons[kubernetes]>=0.5.0.dev20190220,<0.6.0',
+    'reana-commons[kubernetes]>=0.5.0.dev20190321,<0.6.0',
 ]
 
 packages = find_packages()
