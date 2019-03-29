@@ -149,7 +149,7 @@ class ReanaPipelineJob(JobBase):
                     with os.fdopen(fd, "wb") as f:
                         f.write(vol.resolved.encode("utf-8"))
 
-    def create_task_msg(self, working_dir):
+    def create_task_msg(self, working_dir, workflow_uuid):
         """Create job message spec to be sent to REANA-Job-Controller."""
         job_name = self.name
         docker_req, _ = self.get_requirement("DockerRequirement")
@@ -245,7 +245,8 @@ class ReanaPipelineJob(JobBase):
             "prettified_cmd": wrapped_cmd,
             "workflow_workspace": working_dir,
             "job_name": job_name,
-            "cvmfs_mounts": MOUNT_CVMFS
+            "cvmfs_mounts": MOUNT_CVMFS,
+            "workflow_uuid": workflow_uuid
         }
 
         return create_body
@@ -295,7 +296,8 @@ class ReanaPipelineJob(JobBase):
         )
         log.debug(pformat(self.__dict__))
 
-        task = self.create_task_msg(runtimeContext.working_dir)
+        task = self.create_task_msg(runtimeContext.working_dir,
+                                    runtimeContext.workflow_uuid)
 
         log.info(
             "[job %s] CREATED TASK MSG----------------------" %
