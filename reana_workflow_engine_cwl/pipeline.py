@@ -20,7 +20,9 @@ from cwltool.errors import WorkflowException
 from cwltool.mutation import MutationManager
 from cwltool.process import cleanIntermediate, relocateOutputs
 
-log = logging.getLogger("tes-backend")
+from reana_workflow_engine_cwl.config import LOGGING_MODULE
+
+log = logging.getLogger(LOGGING_MODULE)
 
 
 class Pipeline(object):

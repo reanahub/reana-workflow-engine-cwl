@@ -17,8 +17,10 @@ import logging
 import click
 from reana_commons.publisher import WorkflowStatusPublisher
 from reana_workflow_engine_cwl import main
+from reana_workflow_engine_cwl.config import LOGGING_MODULE
 
-log = logging.getLogger(__name__)
+
+log = logging.getLogger(LOGGING_MODULE)
 
 
 def load_json(ctx, param, value):

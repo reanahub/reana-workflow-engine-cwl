@@ -29,11 +29,11 @@ from cwltool.workflow import default_make_tool
 from reana_commons.api_client import JobControllerAPIClient as rjc_api_client
 from reana_commons.config import REANA_WORKFLOW_UMASK
 
-from reana_workflow_engine_cwl.config import MOUNT_CVMFS
+from reana_workflow_engine_cwl.config import LOGGING_MODULE, MOUNT_CVMFS
 from reana_workflow_engine_cwl.pipeline import Pipeline
 from reana_workflow_engine_cwl.poll import PollThread
 
-log = logging.getLogger("cwl-backend")
+log = logging.getLogger(LOGGING_MODULE)
 
 
 class ReanaPipeline(Pipeline):
