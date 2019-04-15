@@ -31,7 +31,7 @@ tests_require = [
     'pytest-cache>=1.0',
     'pytest-cov>=1.8.0',
     'pytest-pep8>=1.0.6',
-    'pytest>=2.8.0',
+    'pytest>=3.8.0',
     'swagger_spec_validator>=2.1.0'
 ]
 
@@ -59,7 +59,7 @@ install_requires = [
     'cwltool==1.0.20181118133959',
     'schema-salad==2.7.20181116024232',
     'celery>=4.1.0,<4.3',
-    'click>=7,<8',
+    'click>=7',
     'enum34>=1.1.6',
     'SQLAlchemy>=1.1.14',
     'SQLAlchemy-Utils>=0.32.18',
