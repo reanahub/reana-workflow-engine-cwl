@@ -38,9 +38,7 @@ tests_require = [
 extras_require = {
     'docs': [
         'Sphinx>=1.4.4,<1.6',
-        'sphinx-rtd-theme>=0.1.9',
-        'sphinxcontrib-httpdomain>=1.5.0',
-        'sphinxcontrib-openapi>=0.3.0'
+        'sphinx-rtd-theme>=0.1.9'
     ],
     'tests': tests_require,
 }
@@ -63,7 +61,7 @@ install_requires = [
     'enum34>=1.1.6',
     'SQLAlchemy>=1.1.14',
     'SQLAlchemy-Utils>=0.32.18',
-    'reana-commons[kubernetes]>=0.5.0.dev20190402,<0.6.0',
+    'reana-commons>=0.5.0,<0.6.0',
 ]
 
 packages = find_packages()

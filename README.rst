@@ -2,13 +2,10 @@
  REANA-Workflow-Engine-CWL
 ===========================
 
-.. image:: https://img.shields.io/pypi/pyversions/reana-workflow-engine-cwl.svg
-      :target: https://pypi.org/pypi/reana-workflow-engine-cwl
-
 .. image:: https://img.shields.io/travis/reanahub/reana-workflow-engine-cwl.svg
       :target: https://travis-ci.org/reanahub/reana-workflow-engine-cwl
 
-.. image:: https://readthedocs.org/projects/docs/badge/?version=latest
+.. image:: https://readthedocs.org/projects/reana-workflow-engine-cwl/badge/?version=latest
       :target: https://reana-workflow-engine-cwl.readthedocs.io/en/latest/?badge=latest
 
 .. image:: https://img.shields.io/coveralls/reanahub/reana-workflow-engine-cwl.svg

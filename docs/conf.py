@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of REANA.
-# Copyright (C) 2017, 2018 CERN.
+# Copyright (C) 2017, 2018, 2019 CERN.
 #
 # REANA is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -40,8 +40,6 @@ extensions = [
     'sphinx.ext.graphviz',
     'sphinx.ext.intersphinx',
     'sphinx.ext.viewcode',
-    'sphinxcontrib.httpdomain',
-    'sphinxcontrib.openapi'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -58,7 +56,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'reana'
-copyright = '2017, info@reana.io'
+copyright = '2017-2019, info@reana.io'
 author = 'info@reana.io'
 
 # The version info for the project you're documenting, acts as replacement for

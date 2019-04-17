@@ -1,8 +1,23 @@
 Changes
 =======
 
+Version 0.5.0 (2019-04-23)
+--------------------------
+
+- Makes workflow engine independent of Celery so that independent workflow
+  instances are created on demand for each user.
+- Replaces ``api_client`` module with centralised one from REANA-Commons.
+- Introduces CVMFS mounts in job specifications.
+- Sets default file mode creation mask to 002 so that workflows are able to
+  write to shared directories for any user identity under which the workflow
+  processes may be running.
+- Makes docker image slimmer by using ``python:2.7-slim``.
+- Centralises log level and log format configuration.
+- Upgrades cwltool to 1.0.20181118133959.
+
 Version 0.4.0 (2018-11-06)
 --------------------------
+
 - Improves AMQP re-connection handling. Switches from ``pika`` to ``kombu``.
 - Utilises common openapi client for communication with REANA-Job-Controller.
 - Changes license to MIT.
