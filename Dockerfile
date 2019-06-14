@@ -10,6 +10,7 @@ ENV TERM=xterm
 RUN apt update && \
     apt install -y \
       gcc \
+      nodejs \
       vim-tiny && \
     pip install --upgrade pip
 
