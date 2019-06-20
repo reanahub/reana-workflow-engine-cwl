@@ -16,9 +16,10 @@ import logging
 
 import click
 from reana_commons.publisher import WorkflowStatusPublisher
+from reana_commons.utils import check_connection_to_job_controller
+
 from reana_workflow_engine_cwl import main
 from reana_workflow_engine_cwl.config import LOGGING_MODULE
-
 
 log = logging.getLogger(LOGGING_MODULE)
 
@@ -54,6 +55,7 @@ def run_cwl_workflow(workflow_uuid, workflow_workspace,
     """Run cwl workflow."""
     log.info('running workflow on context: {0}'.format(locals()))
     try:
+        check_connection_to_job_controller()
         publisher = WorkflowStatusPublisher()
         main.main(workflow_uuid, workflow_json, workflow_parameters,
                   operational_options, workflow_workspace, publisher)
