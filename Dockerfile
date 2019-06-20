@@ -24,11 +24,14 @@ RUN pip install requirements-builder && \
 COPY . /code
 
 # Debug off by default
-ARG DEBUG=false
-RUN if [ "${DEBUG}" = "true" ]; then pip install -r requirements-dev.txt; pip install -e .; else pip install .; fi;
+ARG DEBUG=0
+RUN if [ "${DEBUG}" -gt 0 ]; then pip install -r requirements-dev.txt; pip install -e .; else pip install .; fi;
 
 # Building with locally-checked-out shared modules?
 RUN if test -e modules/reana-commons; then pip install modules/reana-commons --upgrade; fi
+
+# Check if there are broken requirements
+RUN pip check
 
 ARG QUEUE_ENV=default
 ENV QUEUE_ENV ${QUEUE_ENV}
