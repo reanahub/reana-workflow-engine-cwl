@@ -457,14 +457,6 @@ class ReanaPipelinePoll(PollThread):
                 log.error(
                     "[job %s] task id: %s" % (self.name, self.id)
                 )
-                log.error(
-                    "[job %s] logs: %s" %
-                    (
-                        self.name,
-                        self.service.get_logs(self.id)
-                    )
-
-                )
             else:
                 self.publisher.publish_workflow_status(
                     self.workflow_uuid, 1, logs='',
