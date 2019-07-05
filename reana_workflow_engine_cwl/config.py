@@ -31,5 +31,5 @@ BROKER = os.getenv('RABBIT_MQ', 'amqp://{0}:{1}@{2}//'.format(BROKER_USER,
 
 MOUNT_CVMFS = os.getenv('REANA_MOUNT_CVMFS', 'false')
 
-LOGGING_MODULE =  'reana-workflow-engine-cwl'
+LOGGING_MODULE = 'reana-workflow-engine-cwl'
 """REANA Workflow Engine CWL logging module."""

@@ -19,9 +19,9 @@ from io import BytesIO
 import cwltool.main
 import pkg_resources
 from cwltool.context import LoadingContext
-
 from reana_commons.config import (REANA_LOG_FORMAT, REANA_LOG_LEVEL,
                                   REANA_WORKFLOW_UMASK)
+
 from reana_workflow_engine_cwl.__init__ import __version__
 from reana_workflow_engine_cwl.config import LOGGING_MODULE, SHARED_VOLUME_PATH
 from reana_workflow_engine_cwl.context import REANARuntimeContext

@@ -25,7 +25,7 @@ log = logging.getLogger(LOGGING_MODULE)
 
 
 def load_json(ctx, param, value):
-    """Callback function for click option"""
+    """Load json from click option."""
     value = value[1:]
     return json.loads(base64.standard_b64decode(value).decode())
 
