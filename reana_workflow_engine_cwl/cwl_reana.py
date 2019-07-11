@@ -151,7 +151,7 @@ class ReanaPipelineJob(JobBase):
 
     def create_task_msg(self, working_dir, workflow_uuid):
         """Create job message spec to be sent to REANA-Job-Controller."""
-        job_name = self.name
+        name = self.name
         docker_req, _ = self.get_requirement("DockerRequirement")
         container = str(docker_req['dockerPull'])
         umask_cmd = "umask {};".format(REANA_WORKFLOW_UMASK)
@@ -244,7 +244,7 @@ class ReanaPipelineJob(JobBase):
             "cmd": wrapped_cmd,
             "prettified_cmd": wrapped_cmd,
             "workflow_workspace": working_dir,
-            "job_name": job_name,
+            "name": name,
             "cvmfs_mounts": MOUNT_CVMFS,
             "workflow_uuid": workflow_uuid
         }
