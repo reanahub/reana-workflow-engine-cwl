@@ -33,10 +33,4 @@ RUN if test -e modules/reana-commons; then pip install modules/reana-commons --u
 # Check if there are broken requirements
 RUN pip check
 
-ARG QUEUE_ENV=default
-ENV QUEUE_ENV ${QUEUE_ENV}
-ARG CELERY_CONCURRENCY=2
-ENV CELERY_CONCURRENCY ${CELERY_CONCURRENCY}
 ENV PYTHONPATH=/workdir
-
-CMD celery -A reana_workflow_engine_cwl.celeryapp worker -l info -Q ${QUEUE_ENV} --concurrency ${CELERY_CONCURRENCY} -Ofair

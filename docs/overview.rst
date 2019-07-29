@@ -11,7 +11,7 @@ The implementation of ``engine-cwl`` is based on `cwl-tes <https://github.com/co
 
 The general execution model is the following:
 
-1. A celery task activates the execution by passing the id of the workflow to be started.
+1. The command ``run-cwl-workflow`` is run and it activates the execution by passing the id of the workflow to be started.
 
 2. ``engine-cwl`` extracts the [packed]() workflow description from the database, along with the inputs,
 and dumps the information to ``workflow.json`` to contain CWL workflow and ``inputs.json`` with
@@ -38,10 +38,6 @@ can be parsed to retrieve the produced output (used in ``reana-cwl-runner``).
 
 File structure
 ------------------------
-
-* *celeryapp.py*
-
-registering Celery application - starting point to ``engine-cwl``
 
 * *config.py*
 

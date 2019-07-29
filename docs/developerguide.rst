@@ -44,7 +44,6 @@ and set environmental variables (use your own values for ``SHARED_VOLUME_PATH`` 
 
 .. code-block:: console
 
-   $ export QUEUE_ENV=cwl-default-queue
    $ export JOB_CONTROLLER_HOST=http://192.168.99.100:31060
    $ export SHARED_VOLUME_PATH=/reana/default
    $ export RABBIT_MQ=amqp://reana:reana@localhost:5672/reanahost
@@ -53,7 +52,11 @@ and set environmental variables (use your own values for ``SHARED_VOLUME_PATH`` 
 
 .. code-block:: console
 
-   $ python reana_workflow_engine_cwl/celeryapp.py worker -l debug -Q cwl-default-queue
+   $ run-cwl-workflow --workflow-uuid [id]
+                      --workflow-workspace [workspace]
+                      --workflow-json [workflow_json]
+                      --workflow-parameters [parameters]
+                      --operational-options [options]
 
 
 Running CWL conformance tests
