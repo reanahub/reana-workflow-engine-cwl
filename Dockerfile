@@ -4,7 +4,7 @@
 # REANA is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 
-FROM python:2.7-slim
+FROM python:3.6-slim
 
 ENV TERM=xterm
 RUN apt update && \

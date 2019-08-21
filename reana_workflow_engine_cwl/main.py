@@ -14,7 +14,7 @@ import json
 import logging
 import os
 import sys
-from io import BytesIO
+from io import StringIO
 
 import cwltool.main
 import pkg_resources
@@ -111,7 +111,8 @@ def main(workflow_uuid, workflow_spec, workflow_inputs,
     log.error("starting the run..")
     db_log_writer = SQLiteHandler(workflow_uuid, publisher)
 
-    f = BytesIO()
+    f = StringIO()
+
     cwl_arguments = vars(parsed_args)
     runtimeContext = REANARuntimeContext(workflow_uuid, working_dir,
                                          publisher, pipeline,
@@ -124,8 +125,8 @@ def main(workflow_uuid, workflow_spec, workflow_inputs,
         runtimeContext=runtimeContext,
         versionfunc=versionstring,
         logger_handler=db_log_writer,
-        stdout=f
+        stdout=f, stderr=f
     )
     publisher.publish_workflow_status(workflow_uuid, 2,
-                                      f.getvalue().decode("utf-8"))
+                                      f.getvalue())
     return result

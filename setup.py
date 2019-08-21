@@ -41,12 +41,12 @@ setup_requires = [
 ]
 
 install_requires = [
-    'cwltool==1.0.20181118133959',
-    'schema-salad==2.7.20181116024232',
+    'cwltool==1.0.20190815141648',
+    'schema-salad==4.5.20190815125611',
     'click>=7',
     'enum34>=1.1.6',
-    'SQLAlchemy>=1.1.14',
-    'SQLAlchemy-Utils>=0.32.18',
+    'SQLAlchemy>=1.3.7',
+    'SQLAlchemy-Utils>=0.34.2',
     'reana-commons>=0.6.0.dev20190812,<0.7.0',
 ]
 
@@ -86,8 +86,8 @@ setup(
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: Implementation :: CPython',
         'Programming Language :: Python',
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
