@@ -238,7 +238,8 @@ class ReanaPipelineJob(JobBase):
             self.environment['HOME'], mounted_outdir)
         wrapped_cmd = "/bin/sh -c {} ".format(pipes.quote(wf_space_cmd))
         experiment = os.getenv("REANA_WORKFLOW_ENGINE_EXPERIMENT", "default")
-        compute_backend = self._get_compute_backend()
+        compute_backend = self._get_hint('compute_backend')
+        kerberos = self._get_hint('kerberos')
         create_body = {
             "experiment": experiment,
             "image": container,
@@ -249,14 +250,15 @@ class ReanaPipelineJob(JobBase):
             "cvmfs_mounts": MOUNT_CVMFS,
             "workflow_uuid": workflow_uuid,
             "compute_backend": compute_backend,
+            "kerberos": kerberos
         }
 
         return create_body
 
-    def _get_compute_backend(self):
-        """Return compute backend if specified."""
+    def _get_hint(self, hint_name):
+        """Return specific hint if specified."""
         if self.hints:
-            return self.hints[0].get('compute_backend', None)
+            return self.hints[0].get(hint_name, None)
         else:
             return None
 
