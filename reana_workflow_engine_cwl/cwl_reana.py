@@ -100,7 +100,6 @@ class ReanaPipelineJob(JobBase):
         self.jobname = jobname
 
         self.outputs = None
-        self.inplace_update = False
         self.volumes = []
         self.task_name_map = {}
 
@@ -342,9 +341,9 @@ class ReanaPipelineJob(JobBase):
             )
             return WorkflowException(e)
 
-        def callback():
+        def callback(rcode):
             try:
-                outputs = self.collect_outputs(self.outdir)
+                outputs = self.collect_outputs(self.outdir, rcode=rcode)
                 cleaned_outputs = {}
                 for k, v in outputs.items():
                     if isinstance(k, bytes):
@@ -416,6 +415,7 @@ class ReanaPipelinePoll(PollThread):
         self.service = service
         self.callback = callback
         self.publisher = publisher
+        self.rcode = None
 
     def run(self):
         """Start polling."""
@@ -455,6 +455,7 @@ class ReanaPipelinePoll(PollThread):
                 (self.name, operation['status'])
             )
             if operation['status'] != "failed":
+                self.rcode = 0
                 # here we could publish that the job with id: self.task_id
                 # succeeded or failed.
                 self.publisher.publish_workflow_status(
@@ -469,6 +470,7 @@ class ReanaPipelinePoll(PollThread):
                     "[job %s] task id: %s" % (self.name, self.id)
                 )
             else:
+                self.rcode = 1
                 self.publisher.publish_workflow_status(
                     self.workflow_uuid, 1, logs='',
                     message={
@@ -482,4 +484,4 @@ class ReanaPipelinePoll(PollThread):
 
     def complete(self, operation):
         """Complete."""
-        self.callback()
+        self.callback(self.rcode)

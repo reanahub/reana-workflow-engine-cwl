@@ -12,10 +12,9 @@ from __future__ import absolute_import
 
 import logging
 import time
-from logging import StreamHandler
 
 
-class SQLiteHandler(StreamHandler):
+class SQLiteHandler(logging.StreamHandler):
     """
     Logging handler for SQLite.
 
@@ -36,7 +35,7 @@ class SQLiteHandler(StreamHandler):
 
         If stream is not specified, sys.stderr is used.
         """
-        StreamHandler.__init__(self, stream)
+        logging.StreamHandler.__init__(self, stream)
         self.workflow_uuid = workflow_uuid
         self.publisher = publisher
 
@@ -60,42 +59,38 @@ class SQLiteHandler(StreamHandler):
             logs = self.format(record)
             stream = self.stream
             fs = "%s\n"
-            if not logging._unicode:  # if no unicode support...
-                stream.write(fs % logs)
-                self.publisher.publish_workflow_status(
-                    self.workflow_uuid, 1, logs)
-            else:
-                try:
-                    if (isinstance(logs, unicode) and
-                            getattr(stream, 'encoding', None)):
-                        ufs = u'%s\n'
-                        try:
-                            stream.write(ufs % logs)
-                            self.publisher.publish_workflow_status(
-                                self.workflow_uuid, 1, logs)
 
-                        except UnicodeEncodeError:
-                            # Printing to terminals sometimes fails.
-                            # For example,
-                            # with an encoding of 'cp1251', the above write
-                            # will work if written to a stream opened or
-                            # wrapped by the codecs module, but fail when
-                            # writing to a terminal even when the codepage
-                            # is set to cp1251. An extra encoding step seems
-                            # to be needed.
-                            stream.write((ufs % logs).encode(stream.encoding))
-                            self.publisher.publish_workflow_status(
-                                self.workflow_uuid, 1, logs)
-
-                    else:
-                        stream.write(fs % logs)
+            try:
+                if getattr(stream, 'encoding', None):
+                    ufs = u'%s\n'
+                    try:
+                        stream.write(ufs % logs)
                         self.publisher.publish_workflow_status(
                             self.workflow_uuid, 1, logs)
 
-                except UnicodeError:
-                    stream.write(fs % logs.encode("UTF-8"))
+                    except UnicodeEncodeError:
+                        # Printing to terminals sometimes fails.
+                        # For example,
+                        # with an encoding of 'cp1251', the above write
+                        # will work if written to a stream opened or
+                        # wrapped by the codecs module, but fail when
+                        # writing to a terminal even when the codepage
+                        # is set to cp1251. An extra encoding step seems
+                        # to be needed.
+                        stream.write((ufs % logs).encode(stream.encoding))
+                        self.publisher.publish_workflow_status(
+                            self.workflow_uuid, 1, logs)
+
+                else:
+                    stream.write(fs % logs)
                     self.publisher.publish_workflow_status(
-                        self.workflow_uuid, 1, logs.encode("UTF-8"))
+                        self.workflow_uuid, 1, logs)
+
+            except UnicodeError:
+                stream.write(fs % logs.encode("UTF-8"))
+                self.publisher.publish_workflow_status(
+                    self.workflow_uuid, 1, logs.encode("UTF-8"))
+
             self.flush()
         except (KeyboardInterrupt, SystemExit):
             raise
