@@ -431,8 +431,7 @@ class ReanaPipelinePoll(PollThread):
             try:
                 self.operation = self.poll()
             except Exception as e:
-                log.error("[job %s] POLLING ERROR %s" % (self.name, e))
-                if self.poll_retries > 0:
+                log.error("[job %s] POLLING ERROR %s" % (self.name, e))                if self.poll_retries > 0:
                     self.poll_retries -= 1
                     continue
                 else:

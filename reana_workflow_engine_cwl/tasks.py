@@ -23,11 +23,17 @@ from reana_workflow_engine_cwl.config import LOGGING_MODULE
 
 log = logging.getLogger(LOGGING_MODULE)
 
+rcode_to_workflow_status = {0: 2, 1: 3}
+
 
 def load_json(ctx, param, value):
     """Load json from click option."""
     value = value[1:]
     return json.loads(base64.standard_b64decode(value).decode())
+
+
+def get_workflow_status(response_code):
+    return rcode_to_workflow_status[response_code]
 
 
 @click.command()
@@ -57,10 +63,13 @@ def run_cwl_workflow(workflow_uuid, workflow_workspace,
     try:
         check_connection_to_job_controller()
         publisher = WorkflowStatusPublisher()
-        main.main(workflow_uuid, workflow_json, workflow_parameters,
-                  operational_options, workflow_workspace, publisher)
+        result = main.main(workflow_uuid, workflow_json, workflow_parameters,
+                           operational_options, workflow_workspace, publisher)
         log.info('workflow done')
-        publisher.publish_workflow_status(workflow_uuid, 2)
+
+        publisher.publish_workflow_status(workflow_uuid,
+                                          get_workflow_status(result))
+
     except Exception as e:
         log.error('workflow failed: {0}'.format(e))
         publisher.publish_workflow_status(workflow_uuid, 3, message=str(e))

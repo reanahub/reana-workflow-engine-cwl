@@ -116,9 +116,9 @@ class Pipeline(object):
             cleanIntermediate(output_dirs)
 
         if final_output and final_status:
-            return (str(final_output[0]), str(final_status[0]))
+            return str(final_output[0]), str(final_status[0])
         else:
-            return (None, "permanentFail")
+            return None, "permanentFail"
 
     def make_exec_tool(self, spec, **kwargs):
         """Make execution tool."""
