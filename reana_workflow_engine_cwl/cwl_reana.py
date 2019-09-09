@@ -153,20 +153,21 @@ class ReanaPipelineJob(JobBase):
         job_name = self.name
         docker_req, _ = self.get_requirement("DockerRequirement")
         container = str(docker_req['dockerPull'])
-        umask_cmd = "umask {};".format(REANA_WORKFLOW_UMASK)
+        umask_cmd = f"umask {REANA_WORKFLOW_UMASK};"
         requirements_command_line = umask_cmd
         for var in self.environment:
-            requirements_command_line += "export {0}=\"{1}\";".format(
-                var, self.environment[var])
+            requirements_command_line += f"export {var}" \
+                                         f"=\"{self.environment[var]}\";"
 
         if self.volumes:
             for filepair in self.volumes:
                 if os.path.isdir(filepair[0]):
-                    requirements_command_line += "cp -a {0} {1} ;".format(
-                        filepair[0], "/".join(filepair[1].split("/")[:-1]))
+                    requirements_command_line \
+                        += f"cp -a {filepair[0]} " \
+                           f"{'/'.join(filepair[1].split('/')[:-1])} ;"
                 else:
-                    requirements_command_line += "cp -a {0} {1} ;".format(
-                        filepair[0], filepair[1])
+                    requirements_command_line \
+                        += f"cp -a {filepair[0]} {filepair[1]} ;"
 
         mounted_outdir = self.outdir
         scr, _ = self.get_requirement("ShellCommandRequirement")
@@ -197,22 +198,19 @@ class ReanaPipelineJob(JobBase):
         if self.stdin:
             path = self.stdin.split("/")
             if os.path.isabs(self.stdin):
-                command_line = command_line + " < {0}".format(self.stdin)
+                command_line += f" < {self.stdin}"
             else:
                 if len(path) > 1:
                     parent_dir = "/".join(mounted_outdir.split("/")[:-1])
-                    command_line = command_line + \
-                        " < {0}".format(os.path.join(parent_dir, path[-1]))
+                    command_line += f" < {os.path.join(parent_dir, path[-1])}"
                 else:
-                    command_line = command_line + \
-                        " < {0}".format(os.path.join(mounted_outdir, path))
+                    command_line += f" < {os.path.join(mounted_outdir, path)}"
         if self.stdout:
             if os.path.isabs(self.stdout):
-                command_line = command_line + " > {0}".format(self.stdout)
+                command_line += f" > {self.stdout}"
             else:
-                command_line = command_line + \
-                    " > {0}".format(os.path.join(
-                        self.environment["HOME"], self.stdout))
+                _cmd = os.path.join(self.environment['HOME'], self.stdout)
+                command_line += f" > {_cmd}"
         if self.stderr:
             if os.path.isabs(self.stderr):
                 stderr = self.stderr
@@ -222,8 +220,9 @@ class ReanaPipelineJob(JobBase):
             if scr and not shellQuote:
                 command_line = command_line.replace("&2", stderr)
 
-        wf_space_cmd = "mkdir -p {0} && cd {0} && ".format(
-            self.environment["HOME"]) + command_line
+        wf_space_cmd = f"mkdir -p {self.environment['HOME']} " \
+                       f"&& cd {self.environment['HOME']} " \
+                       f"&& {command_line}"
         wf_space_cmd = requirements_command_line + wf_space_cmd
 
         docker_output_dir = None
@@ -231,11 +230,11 @@ class ReanaPipelineJob(JobBase):
         if docker_req:
             docker_output_dir = docker_req.get("dockerOutputDirectory", None)
         if docker_output_dir:
-            wf_space_cmd = "mkdir -p {0} && {1} ; cp -r {0} {2}".format(
-                docker_output_dir, wf_space_cmd, mounted_outdir)
-        wf_space_cmd += "; cp -r {0}/* {1}".format(
-            self.environment['HOME'], mounted_outdir)
-        wrapped_cmd = "/bin/sh -c {} ".format(pipes.quote(wf_space_cmd))
+            wf_space_cmd = f"mkdir -p {docker_output_dir} && {wf_space_cmd}" \
+                           f" ; cp -r {docker_output_dir} {mounted_outdir}"
+        wf_space_cmd += f"; cp -r {self.environment['HOME']}/* " \
+                        f"{mounted_outdir}"
+        wrapped_cmd = f"/bin/sh -c {pipes.quote(wf_space_cmd)} "
         experiment = os.getenv("REANA_WORKFLOW_ENGINE_EXPERIMENT", "default")
         compute_backend = self._get_hint('compute_backend')
         kerberos = self._get_hint('kerberos')
@@ -300,19 +299,13 @@ class ReanaPipelineJob(JobBase):
             self.add_volumes(self.generatemapper)
 
         # useful for debugging
-        log.debug(
-            "[job %s] self.__dict__ in run() ----------------------" %
-            (self.name)
-        )
+        log.debug(f"[job {self.name}] self.__dict__ in run() ---------------")
         log.debug(pformat(self.__dict__))
 
         task = self.create_task_msg(runtimeContext.working_dir,
                                     runtimeContext.workflow_uuid)
 
-        log.info(
-            "[job %s] CREATED TASK MSG----------------------" %
-            (self.name)
-        )
+        log.info(f"[job {self.name}] CREATED TASK MSG----------------------")
         log.info(pformat(task))
 
         try:
@@ -327,18 +320,13 @@ class ReanaPipelineJob(JobBase):
                         "running":
                         running_jobs,
                     }})
-            log.info(
-                "[job %s] SUBMITTED TASK ----------------------" %
-                (self.name)
-            )
-            log.info("[job %s] task id: %s " % (self.name, task_id))
+            log.info(f"[job {self.name}] SUBMITTED TASK --------------------")
+            log.info(f"[job {self.name}] task id: {task_id} ")
             self.task_name_map[self.name] = task_id
             operation = runtimeContext.pipeline.service.check_status(task_id)
         except Exception as e:
-            log.error(
-                "[job %s] Failed to submit task to job controller:\n%s" %
-                (self.name, e)
-            )
+            log.error(f"[job {self.name}] "
+                      f"Failed to submit task to job controller:\n{e}")
             return WorkflowException(e)
 
         def callback(rcode):
@@ -354,17 +342,14 @@ class ReanaPipelineJob(JobBase):
                 self.outputs = cleaned_outputs
                 self.output_callback(self.outputs, "success")
             except WorkflowException as e:
-                log.error("[job %s] job error:\n%s" % (self.name, e))
+                log.error(f"[job {self.name}] workflow job error:\n{e}")
                 self.output_callback({}, "permanentFail")
             except Exception as e:
-                log.error("[job %s] job error:\n%s" % (self.name, e))
+                log.error(f"[job {self.name}] job error:\n{e}")
                 self.output_callback({}, "permanentFail")
             finally:
                 if self.outputs is not None:
-                    log.info(
-                        "[job %s] OUTPUTS ------------------" %
-                        (self.name)
-                    )
+                    log.info(f"[job {self.name}] OUTPUTS ------------------")
                     log.info(pformat(self.outputs))
                 self.cleanup(runtimeContext.rm_tmpdir)
 
@@ -383,22 +368,15 @@ class ReanaPipelineJob(JobBase):
 
     def cleanup(self, rm_tmpdir):
         """Clean up procedure."""
-        log.debug(
-            "[job %s] STARTING CLEAN UP ------------------" %
-            (self.name)
-        )
+        log.debug(f"[job {self.name}] STARTING CLEAN UP ------------------")
         if self.stagedir and os.path.exists(self.stagedir):
-            log.debug(
-                "[job %s] Removing input staging directory %s" %
-                (self.name, self.stagedir)
-            )
+            log.debug(f"[job {self.name}] "
+                      f"Removing input staging directory {self.stagedir}")
             shutil.rmtree(self.stagedir, True)
 
         if rm_tmpdir:
-            log.debug(
-                "[job %s] Removing temporary directory %s" %
-                (self.name, self.tmpdir)
-            )
+            log.debug(f"[job {self.name}] "
+                      f"Removing temporary directory {self.tmpdir}")
             shutil.rmtree(self.tmpdir, True)
 
 
@@ -424,19 +402,17 @@ class ReanaPipelinePoll(PollThread):
             # slow down polling over time till it hits a max
             # if self.poll_interval < 30:
             #     self.poll_interval += 1
-            log.debug(
-                "[job %s] POLLING %s" %
-                (self.name, pformat(self.id))
-            )
+            log.debug(f"[job {self.name}] POLLING {format(self.id)}")
             try:
                 self.operation = self.poll()
             except Exception as e:
-                log.error("[job %s] POLLING ERROR %s" % (self.name, e))                if self.poll_retries > 0:
+                log.error(f"[job {self.name}] POLLING ERROR {e}")
+                if self.poll_retries > 0:
                     self.poll_retries -= 1
                     continue
                 else:
-                    log.error("[job %s] MAX POLLING RETRIES EXCEEDED" %
-                              (self.name))
+                    log.error(f"[job {self.name}] "
+                              f"MAX POLLING RETRIES EXCEEDED")
                     break
 
         self.complete(self.operation)
@@ -449,10 +425,8 @@ class ReanaPipelinePoll(PollThread):
         """Check if operation is done."""
         terminal_states = ["succeeded", "failed"]
         if operation['status'] in terminal_states:
-            log.info(
-                "[job %s] FINAL JOB STATE: %s ------------------" %
-                (self.name, operation['status'])
-            )
+            log.info(f"[job {self.name}] FINAL JOB STATE: "
+                     f"{ operation['status']} ------------------")
             if operation['status'] != "failed":
                 self.rcode = 0
                 # here we could publish that the job with id: self.task_id
@@ -465,9 +439,7 @@ class ReanaPipelinePoll(PollThread):
                             {'total': 1, 'job_ids': [
                                 self.task_id]},
                         }})
-                log.error(
-                    "[job %s] task id: %s" % (self.name, self.id)
-                )
+                log.error(f"[job {self.name}] task id: {self.id}")
             else:
                 self.rcode = 1
                 self.publisher.publish_workflow_status(

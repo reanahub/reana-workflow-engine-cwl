@@ -23,7 +23,7 @@ from reana_workflow_engine_cwl.config import LOGGING_MODULE
 
 log = logging.getLogger(LOGGING_MODULE)
 
-rcode_to_workflow_status = {0: 2, 1: 3}
+rcode_to_workflow_status_mapping = {0: 2, 1: 3}
 
 
 def load_json(ctx, param, value):
@@ -32,8 +32,9 @@ def load_json(ctx, param, value):
     return json.loads(base64.standard_b64decode(value).decode())
 
 
-def get_workflow_status(response_code):
-    return rcode_to_workflow_status[response_code]
+def rcode_to_workflow_status(response_code):
+    """Map the cwl tool exit code to a workflow status."""
+    return rcode_to_workflow_status_mapping[response_code]
 
 
 @click.command()
@@ -59,24 +60,23 @@ def run_cwl_workflow(workflow_uuid, workflow_workspace,
                      workflow_parameters=None,
                      operational_options={}):
     """Run cwl workflow."""
-    log.info('running workflow on context: {0}'.format(locals()))
+    log.info(f'running workflow on context: {locals()}')
     try:
         check_connection_to_job_controller()
         publisher = WorkflowStatusPublisher()
-        result = main.main(workflow_uuid, workflow_json, workflow_parameters,
-                           operational_options, workflow_workspace, publisher)
+        rcode = main.main(workflow_uuid, workflow_json, workflow_parameters,
+                          operational_options, workflow_workspace, publisher)
         log.info('workflow done')
 
         publisher.publish_workflow_status(workflow_uuid,
-                                          get_workflow_status(result))
+                                          rcode_to_workflow_status(rcode))
 
     except Exception as e:
-        log.error('workflow failed: {0}'.format(e))
+        log.error(f'workflow failed: {e}')
         publisher.publish_workflow_status(workflow_uuid, 3, message=str(e))
     finally:
         if publisher:
             publisher.close()
         else:
-            log.error('Workflow {workflow_uuid} failed but status '
-                      'could not be published.'.format(
-                          workflow_uuid=workflow_uuid))
+            log.error(f'Workflow {workflow_uuid} failed but status '
+                      'could not be published.')
