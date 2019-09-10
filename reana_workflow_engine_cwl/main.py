@@ -81,8 +81,14 @@ def main(workflow_uuid, workflow_spec, workflow_inputs,
     os.makedirs(tmp_outdir)
     os.makedirs(docker_stagedir)
     args = operational_options
-    args = args + [
-        "--debug",
+
+    log.setLevel(REANA_LOG_LEVEL)
+    if REANA_LOG_LEVEL == logging.DEBUG:
+        args += ["--debug"]
+    elif REANA_LOG_LEVEL == logging.ERROR:
+        args += ["--quiet"]
+
+    args += [
         "--tmpdir-prefix", tmpdir + "/",
         "--tmp-outdir-prefix", tmp_outdir + "/",
         "--default-container", "frolvlad/alpine-bash",
