@@ -37,6 +37,35 @@ def rcode_to_workflow_status(response_code):
     return rcode_to_workflow_status_mapping[response_code]
 
 
+def parse_str_to_int(workflow_parameters):
+    """Parse integers stored as strings to integers.
+
+    >>> parse_str_to_int({'sleeptime': "'2'"})
+    {'sleeptime': 2}
+    >>> parse_str_to_int({'sleeptime': '2'})
+    {'sleeptime': 2}
+    >>> parse_str_to_int({'sleeptime': 'two'})
+    {'sleeptime': 'two'}
+    >>> parse_str_to_int({'helloworld': {'class': 'File'}})
+    {'helloworld': {'class': 'File', 'location': 'code/helloworld.py'}}
+    """
+    for (key, val) in workflow_parameters.items():
+        try:
+            if val[0] == "'":
+                # The actual value of the int as str could be stored as:
+                # '\'val\'', since ' is an escape character.
+                workflow_parameters[key] = int(val[1:-1])
+            else:
+                workflow_parameters[key] = int(val)
+        except KeyError:
+            # Skip dict errors
+            pass
+        except ValueError:
+            # Skip values that cannot be casted to int
+            pass
+    return workflow_parameters
+
+
 @click.command()
 @click.option('--workflow-uuid',
               required=True,
@@ -60,6 +89,7 @@ def run_cwl_workflow(workflow_uuid, workflow_workspace,
                      workflow_parameters=None,
                      operational_options={}):
     """Run cwl workflow."""
+    workflow_parameters = parse_str_to_int(workflow_parameters)
     log.info(f'running workflow on context: {locals()}')
     try:
         check_connection_to_job_controller()

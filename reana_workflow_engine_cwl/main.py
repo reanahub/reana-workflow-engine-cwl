@@ -41,7 +41,7 @@ def versionstring():
         cwltool_ver = pkg[0].version
     else:
         cwltool_ver = "unknown"
-    return "%s %s with cwltool %s" % (sys.argv[0], __version__, cwltool_ver)
+    return f"{sys.argv[0]} {__version__} with cwltool {cwltool_ver}"
 
 
 def main(workflow_uuid, workflow_spec, workflow_inputs,
