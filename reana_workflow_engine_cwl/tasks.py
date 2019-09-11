@@ -51,17 +51,14 @@ def parse_str_to_int(workflow_parameters):
     """
     for (key, val) in workflow_parameters.items():
         try:
-            if val[0] == "'":
+            if isinstance(val, str) and val[0] == "'":
                 # The actual value of the int as str could be stored as:
                 # '\'val\'', since ' is an escape character.
                 workflow_parameters[key] = int(val[1:-1])
             else:
                 workflow_parameters[key] = int(val)
-        except KeyError:
-            # Skip dict errors
-            pass
-        except ValueError:
-            # Skip values that cannot be casted to int
+        except (ValueError, TypeError, KeyError):
+            # Skip values and types which cannot be casted to integer.
             pass
     return workflow_parameters
 
