@@ -41,8 +41,8 @@ setup_requires = [
 ]
 
 install_requires = [
-    'cwltool==1.0.20190815141648',
-    'schema-salad==4.5.20190815125611',
+    'cwltool==1.0.20191022103248',
+    'schema-salad==4.5.20191023134839',
     'click>=7',
     'enum34>=1.1.6',
     'SQLAlchemy>=1.3.7',
