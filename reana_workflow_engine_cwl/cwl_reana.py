@@ -235,11 +235,9 @@ class ReanaPipelineJob(JobBase):
         wf_space_cmd += f"; cp -r {self.environment['HOME']}/* " \
                         f"{mounted_outdir}"
         wrapped_cmd = f"/bin/sh -c {pipes.quote(wf_space_cmd)} "
-        experiment = os.getenv("REANA_WORKFLOW_ENGINE_EXPERIMENT", "default")
         compute_backend = self._get_hint('compute_backend')
         kerberos = self._get_hint('kerberos')
         create_body = {
-            "experiment": experiment,
             "image": container,
             "cmd": wrapped_cmd,
             "prettified_cmd": wrapped_cmd,
