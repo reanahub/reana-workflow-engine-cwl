@@ -29,7 +29,7 @@ class Pipeline(object):
     """Pipeline class."""
 
     def __init__(self):
-        """Constructor."""
+        """Instanciate pipeline."""
         self.threads = []
 
     def executor(self, tool, job_order, runtimeContext, **kwargs):

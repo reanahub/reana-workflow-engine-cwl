@@ -40,7 +40,7 @@ class ReanaPipeline(Pipeline):
     """REANA Pipeline class."""
 
     def __init__(self, **kwargs):
-        """Constructor."""
+        """Instanciate reana pipeline."""
         super(ReanaPipeline, self).__init__()
         self.service = rjc_api_client('reana-job-controller')
         if kwargs.get("basedir") is not None:
@@ -88,7 +88,7 @@ class ReanaPipelineJob(JobBase):
 
     def __init__(self, builder, joborder, make_path_mapper, requirements,
                  hints, jobname):
-        """Constructor."""
+        """Instanciate REANA pipeline job."""
         super(ReanaPipelineJob, self).__init__(
             builder, joborder, make_path_mapper, requirements, hints, jobname)
 
@@ -383,7 +383,7 @@ class ReanaPipelinePoll(PollThread):
 
     def __init__(self, workflow_uuid, task_id, jobname,
                  service, operation, callback, publisher):
-        """Constructor."""
+        """Instanciate REANA pipeline poll."""
         super(ReanaPipelinePoll, self).__init__(operation)
         self.workflow_uuid = workflow_uuid
         self.task_id = task_id

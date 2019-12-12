@@ -18,7 +18,7 @@ class PollThread(threading.Thread):
     """Polling thread class."""
 
     def __init__(self, operation, poll_interval=5, poll_retries=10):
-        """Constructor."""
+        """Instanciate poll thread."""
         super(PollThread, self).__init__()
         self.daemon = True
         self.operation = operation
