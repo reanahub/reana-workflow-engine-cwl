@@ -1,6 +1,15 @@
 Changes
 =======
 
+Version 0.6.0 (2019-12-20)
+--------------------------
+
+- Allows to specify compute backend (HTCondor, Kubernetes or Slurm) and
+  Kerberos authentication requirement for CWL workflow jobs.
+- Upgrades cwltool to 1.0.20191022103248.
+- Moves workflow engine to the same Kubernetes pod with the REANA-Job-Controller
+  (sidecar pattern).
+
 Version 0.5.0 (2019-04-23)
 --------------------------
 

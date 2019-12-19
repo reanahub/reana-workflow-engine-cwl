@@ -19,7 +19,7 @@ readme = open('README.rst').read()
 history = open('CHANGES.rst').read()
 
 tests_require = [
-    'pytest-reana>=0.6.0.dev20190705,<0.7.0',
+    'pytest-reana>=0.6.0,<0.7.0',
 ]
 
 extras_require = {
@@ -47,7 +47,7 @@ install_requires = [
     'enum34>=1.1.6',
     'SQLAlchemy>=1.3.7',
     'SQLAlchemy-Utils>=0.34.2',
-    'reana-commons>=0.6.0.dev20191212,<0.7.0',
+    'reana-commons>=0.6.0,<0.7.0',
 ]
 
 packages = find_packages()
