@@ -73,6 +73,9 @@ def parse_str_to_int(workflow_parameters):
 @click.option('--workflow-json',
               help='JSON representation of workflow object to be run.',
               callback=load_json)
+@click.option('--workflow-file',
+              help='Path to the workflow file. This field is used when'
+                   ' no workflow JSON has been passed.')
 @click.option('--workflow-parameters',
               help='JSON representation of parameters received by'
                    ' the workflow.',
@@ -83,6 +86,7 @@ def parse_str_to_int(workflow_parameters):
               callback=load_json)
 def run_cwl_workflow(workflow_uuid, workflow_workspace,
                      workflow_json=None,
+                     workflow_file=None,
                      workflow_parameters=None,
                      operational_options={}):
     """Run cwl workflow."""
