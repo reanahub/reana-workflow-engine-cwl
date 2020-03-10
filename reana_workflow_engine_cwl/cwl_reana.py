@@ -237,6 +237,7 @@ class ReanaPipelineJob(JobBase):
         wrapped_cmd = f"/bin/sh -c {pipes.quote(wf_space_cmd)} "
         compute_backend = self._get_hint('compute_backend')
         kerberos = self._get_hint('kerberos')
+        unpacked_img = self._get_hint('unpacked_img')
         create_body = {
             "image": container,
             "cmd": wrapped_cmd,
@@ -246,7 +247,8 @@ class ReanaPipelineJob(JobBase):
             "cvmfs_mounts": MOUNT_CVMFS,
             "workflow_uuid": workflow_uuid,
             "compute_backend": compute_backend,
-            "kerberos": kerberos
+            "kerberos": kerberos,
+            "unpacked_img": unpacked_img
         }
 
         return create_body
