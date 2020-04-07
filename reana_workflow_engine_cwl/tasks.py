@@ -32,6 +32,15 @@ def load_json(ctx, param, value):
     return json.loads(base64.standard_b64decode(value).decode())
 
 
+def load_operational_options(ctx, param, value):
+    """Load json and prepare operational options for CWL engine."""
+    operational_options = load_json(ctx, param, value)
+    res = []
+    for option, val in operational_options.items():
+        res.extend([option, val])
+    return res
+
+
 def rcode_to_workflow_status(response_code):
     """Map the cwl tool exit code to a workflow status."""
     return rcode_to_workflow_status_mapping[response_code]
@@ -83,7 +92,7 @@ def parse_str_to_int(workflow_parameters):
 @click.option('--operational-options',
               help='Options to be passed to the workflow engine'
                    ' (i.e. caching).',
-              callback=load_json)
+              callback=load_operational_options)
 def run_cwl_workflow(workflow_uuid, workflow_workspace,
                      workflow_json=None,
                      workflow_file=None,
