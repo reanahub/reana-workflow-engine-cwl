@@ -238,6 +238,7 @@ class ReanaPipelineJob(JobBase):
         compute_backend = self._get_hint('compute_backend')
         kerberos = self._get_hint('kerberos')
         unpacked_img = self._get_hint('unpacked_img')
+        voms_proxy = self._get_hint('voms_proxy')
         create_body = {
             "image": container,
             "cmd": wrapped_cmd,
@@ -248,7 +249,8 @@ class ReanaPipelineJob(JobBase):
             "workflow_uuid": workflow_uuid,
             "compute_backend": compute_backend,
             "kerberos": kerberos,
-            "unpacked_img": unpacked_img
+            "unpacked_img": unpacked_img,
+            "voms_proxy": voms_proxy,
         }
 
         return create_body
