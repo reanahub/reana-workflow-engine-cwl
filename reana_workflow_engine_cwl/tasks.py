@@ -73,50 +73,67 @@ def parse_str_to_int(workflow_parameters):
 
 
 @click.command()
-@click.option('--workflow-uuid',
-              required=True,
-              help='UUID of workflow to be run.')
-@click.option('--workflow-workspace',
-              required=True,
-              help='Name of workspace in which workflow should run.')
-@click.option('--workflow-json',
-              help='JSON representation of workflow object to be run.',
-              callback=load_json)
-@click.option('--workflow-file',
-              help='Path to the workflow file. This field is used when'
-                   ' no workflow JSON has been passed.')
-@click.option('--workflow-parameters',
-              help='JSON representation of parameters received by'
-                   ' the workflow.',
-              callback=load_json)
-@click.option('--operational-options',
-              help='Options to be passed to the workflow engine'
-                   ' (i.e. caching).',
-              callback=load_operational_options)
-def run_cwl_workflow(workflow_uuid, workflow_workspace,
-                     workflow_json=None,
-                     workflow_file=None,
-                     workflow_parameters=None,
-                     operational_options={}):
+@click.option("--workflow-uuid", required=True, help="UUID of workflow to be run.")
+@click.option(
+    "--workflow-workspace",
+    required=True,
+    help="Name of workspace in which workflow should run.",
+)
+@click.option(
+    "--workflow-json",
+    help="JSON representation of workflow object to be run.",
+    callback=load_json,
+)
+@click.option(
+    "--workflow-file",
+    help="Path to the workflow file. This field is used when"
+    " no workflow JSON has been passed.",
+)
+@click.option(
+    "--workflow-parameters",
+    help="JSON representation of parameters received by" " the workflow.",
+    callback=load_json,
+)
+@click.option(
+    "--operational-options",
+    help="Options to be passed to the workflow engine" " (i.e. caching).",
+    callback=load_operational_options,
+)
+def run_cwl_workflow(
+    workflow_uuid,
+    workflow_workspace,
+    workflow_json=None,
+    workflow_file=None,
+    workflow_parameters=None,
+    operational_options={},
+):
     """Run cwl workflow."""
     workflow_parameters = parse_str_to_int(workflow_parameters)
-    log.info(f'running workflow on context: {locals()}')
+    log.info(f"running workflow on context: {locals()}")
     try:
         check_connection_to_job_controller()
         publisher = WorkflowStatusPublisher()
-        rcode = main.main(workflow_uuid, workflow_json, workflow_parameters,
-                          operational_options, workflow_workspace, publisher)
-        log.info('workflow done')
+        rcode = main.main(
+            workflow_uuid,
+            workflow_json,
+            workflow_parameters,
+            operational_options,
+            workflow_workspace,
+            publisher,
+        )
+        log.info("workflow done")
 
-        publisher.publish_workflow_status(workflow_uuid,
-                                          rcode_to_workflow_status(rcode))
+        publisher.publish_workflow_status(
+            workflow_uuid, rcode_to_workflow_status(rcode)
+        )
 
     except Exception as e:
-        log.error(f'workflow failed: {e}')
+        log.error(f"workflow failed: {e}")
         publisher.publish_workflow_status(workflow_uuid, 3, message=str(e))
     finally:
         if publisher:
             publisher.close()
         else:
-            log.error(f'Workflow {workflow_uuid} failed but status '
-                      'could not be published.')
+            log.error(
+                f"Workflow {workflow_uuid} failed but status " "could not be published."
+            )

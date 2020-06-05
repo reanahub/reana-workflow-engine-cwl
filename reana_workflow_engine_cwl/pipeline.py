@@ -42,8 +42,7 @@ class Pipeline(object):
             final_output.append(out)
 
         if not runtimeContext.basedir:
-            raise WorkflowException('`runtimeContext` should contain a '
-                                    '`basedir`')
+            raise WorkflowException("`runtimeContext` should contain a " "`basedir`")
 
         output_dirs = set()
 
@@ -64,21 +63,26 @@ class Pipeline(object):
         jobReqs = None
         if "cwl:requirements" in job_order:
             jobReqs = job_order["cwl:requirements"]
-        elif ("cwl:defaults" in tool.metadata and
-              "cwl:requirements" in tool.metadata["cwl:defaults"]):
+        elif (
+            "cwl:defaults" in tool.metadata
+            and "cwl:requirements" in tool.metadata["cwl:defaults"]
+        ):
             jobReqs = tool.metadata["cwl:defaults"]["cwl:requirements"]
         if jobReqs:
             for req in jobReqs:
                 tool.requirements.append(req)
 
         if not runtimeContext.default_container:
-            runtimeContext.default_container = 'frolvlad/alpine-bash'
+            runtimeContext.default_container = "frolvlad/alpine-bash"
         runtimeContext.docker_outdir = os.path.join(
-            runtimeContext.working_dir, "cwl/docker_outdir")
+            runtimeContext.working_dir, "cwl/docker_outdir"
+        )
         runtimeContext.docker_tmpdir = os.path.join(
-            runtimeContext.working_dir, "cwl/docker_tmpdir")
+            runtimeContext.working_dir, "cwl/docker_tmpdir"
+        )
         runtimeContext.docker_stagedir = os.path.join(
-            runtimeContext.working_dir, "cwl/docker_stagedir")
+            runtimeContext.working_dir, "cwl/docker_stagedir"
+        )
 
         jobs = tool.job(job_order, output_callback, runtimeContext)
         try:
@@ -108,9 +112,12 @@ class Pipeline(object):
 
         if final_output and final_output[0] and finaloutdir:
             final_output[0] = relocateOutputs(
-                final_output[0], finaloutdir,
-                output_dirs, runtimeContext.move_outputs,
-                runtimeContext.make_fs_access(""))
+                final_output[0],
+                finaloutdir,
+                output_dirs,
+                runtimeContext.move_outputs,
+                runtimeContext.make_fs_access(""),
+            )
 
         if runtimeContext.rm_tmpdir:
             cleanIntermediate(output_dirs)

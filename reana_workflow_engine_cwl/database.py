@@ -42,7 +42,8 @@ class SQLiteHandler(logging.StreamHandler):
     def formatDBTime(self, record):
         """Format DB time."""
         record.dbtime = time.strftime(
-            "%Y-%m-%d %H:%M:%S", time.localtime(record.created))
+            "%Y-%m-%d %H:%M:%S", time.localtime(record.created)
+        )
 
     def emit(self, record):
         """
@@ -61,12 +62,13 @@ class SQLiteHandler(logging.StreamHandler):
             fs = "%s\n"
 
             try:
-                if getattr(stream, 'encoding', None):
-                    ufs = u'%s\n'
+                if getattr(stream, "encoding", None):
+                    ufs = u"%s\n"
                     try:
                         stream.write(ufs % logs)
                         self.publisher.publish_workflow_status(
-                            self.workflow_uuid, 1, logs)
+                            self.workflow_uuid, 1, logs
+                        )
 
                     except UnicodeEncodeError:
                         # Printing to terminals sometimes fails.
@@ -79,17 +81,18 @@ class SQLiteHandler(logging.StreamHandler):
                         # to be needed.
                         stream.write((ufs % logs).encode(stream.encoding))
                         self.publisher.publish_workflow_status(
-                            self.workflow_uuid, 1, logs)
+                            self.workflow_uuid, 1, logs
+                        )
 
                 else:
                     stream.write(fs % logs)
-                    self.publisher.publish_workflow_status(
-                        self.workflow_uuid, 1, logs)
+                    self.publisher.publish_workflow_status(self.workflow_uuid, 1, logs)
 
             except UnicodeError:
                 stream.write(fs % logs.encode("UTF-8"))
                 self.publisher.publish_workflow_status(
-                    self.workflow_uuid, 1, logs.encode("UTF-8"))
+                    self.workflow_uuid, 1, logs.encode("UTF-8")
+                )
 
             self.flush()
         except (KeyboardInterrupt, SystemExit):

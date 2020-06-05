@@ -14,4 +14,5 @@ from __future__ import absolute_import, print_function
 def test_version():
     """Test version import."""
     from reana_workflow_engine_cwl import __version__
+
     assert __version__

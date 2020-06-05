@@ -14,8 +14,7 @@ from cwltool.context import RuntimeContext
 class REANARuntimeContext(RuntimeContext):
     """REANA runtime context."""
 
-    def __init__(self, workflow_uuid, working_dir, publisher, pipeline,
-                 **kwargs):
+    def __init__(self, workflow_uuid, working_dir, publisher, pipeline, **kwargs):
         """REANA runtime context constructor."""
         self.workflow_uuid = workflow_uuid or None
         self.working_dir = working_dir or None

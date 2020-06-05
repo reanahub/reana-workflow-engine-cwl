@@ -19,8 +19,7 @@ from io import StringIO
 import cwltool.main
 import pkg_resources
 from cwltool.context import LoadingContext
-from reana_commons.config import (REANA_LOG_FORMAT, REANA_LOG_LEVEL,
-                                  REANA_WORKFLOW_UMASK)
+from reana_commons.config import REANA_LOG_FORMAT, REANA_LOG_LEVEL, REANA_WORKFLOW_UMASK
 
 from reana_workflow_engine_cwl.__init__ import __version__
 from reana_workflow_engine_cwl.config import LOGGING_MODULE, SHARED_VOLUME_PATH
@@ -44,8 +43,15 @@ def versionstring():
     return f"{sys.argv[0]} {__version__} with cwltool {cwltool_ver}"
 
 
-def main(workflow_uuid, workflow_spec, workflow_inputs,
-         operational_options, working_dir, publisher, **kwargs):
+def main(
+    workflow_uuid,
+    workflow_spec,
+    workflow_inputs,
+    operational_options,
+    working_dir,
+    publisher,
+    **kwargs,
+):
     """Run main method."""
     working_dir = os.path.join(SHARED_VOLUME_PATH, working_dir)
     os.chdir(working_dir)
@@ -56,24 +62,27 @@ def main(workflow_uuid, workflow_spec, workflow_inputs,
     with open("inputs.json", "w") as f:
         json.dump(workflow_inputs, f)
     total_commands = 0
-    print('workflow_spec:', workflow_spec)
-    if '$graph' in workflow_spec:
-        total_commands = len(workflow_spec['$graph'])
+    print("workflow_spec:", workflow_spec)
+    if "$graph" in workflow_spec:
+        total_commands = len(workflow_spec["$graph"])
     total_jobs = {"total": total_commands - 1, "job_ids": []}
     initial_job_state = {"total": 0, "job_ids": []}
     running_jobs = initial_job_state
     finished_jobs = initial_job_state
     failed_jobs = initial_job_state
     publisher.publish_workflow_status(
-        workflow_uuid, 1,
-        logs='',
+        workflow_uuid,
+        1,
+        logs="",
         message={
             "progress": {
                 "total": total_jobs,
                 "running": running_jobs,
                 "finished": finished_jobs,
-                "failed": failed_jobs
-            }})
+                "failed": failed_jobs,
+            }
+        },
+    )
     tmpdir = os.path.join(working_dir, "cwl/tmpdir")
     tmp_outdir = os.path.join(working_dir, "cwl/outdir")
     docker_stagedir = os.path.join(working_dir, "cwl/docker_stagedir")
@@ -89,11 +98,17 @@ def main(workflow_uuid, workflow_spec, workflow_inputs,
         args += ["--quiet"]
 
     args += [
-        "--tmpdir-prefix", tmpdir + "/",
-        "--tmp-outdir-prefix", tmp_outdir + "/",
-        "--default-container", "frolvlad/alpine-bash",
-        "--outdir", working_dir + "/" + "outputs",
-        "workflow.json#main", "inputs.json"]
+        "--tmpdir-prefix",
+        tmpdir + "/",
+        "--tmp-outdir-prefix",
+        tmp_outdir + "/",
+        "--default-container",
+        "frolvlad/alpine-bash",
+        "--outdir",
+        working_dir + "/" + "outputs",
+        "workflow.json#main",
+        "inputs.json",
+    ]
     log.info("parsing arguments ...")
     parser = cwltool.main.arg_parser()
     parsed_args = parser.parse_args(args)
@@ -120,18 +135,18 @@ def main(workflow_uuid, workflow_spec, workflow_inputs,
     f = StringIO()
 
     cwl_arguments = vars(parsed_args)
-    runtimeContext = REANARuntimeContext(workflow_uuid, working_dir,
-                                         publisher, pipeline,
-                                         **cwl_arguments)
+    runtimeContext = REANARuntimeContext(
+        workflow_uuid, working_dir, publisher, pipeline, **cwl_arguments
+    )
     result = cwltool.main.main(
         args=parsed_args,
         executor=pipeline.executor,
-        loadingContext=LoadingContext(
-            {'construct_tool_object': pipeline.make_tool}),
+        loadingContext=LoadingContext({"construct_tool_object": pipeline.make_tool}),
         runtimeContext=runtimeContext,
         versionfunc=versionstring,
         logger_handler=db_log_writer,
-        stdout=f, stderr=f
+        stdout=f,
+        stderr=f,
     )
 
     # Publish logs

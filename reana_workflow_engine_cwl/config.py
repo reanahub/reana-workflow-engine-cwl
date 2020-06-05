@@ -10,10 +10,10 @@
 
 import os
 
-SHARED_VOLUME_PATH = os.getenv('SHARED_VOLUME_PATH', '/var/reana')
+SHARED_VOLUME_PATH = os.getenv("SHARED_VOLUME_PATH", "/var/reana")
 """Path to the mounted REANA shared volume."""
 
-MOUNT_CVMFS = os.getenv('REANA_MOUNT_CVMFS', 'false')
+MOUNT_CVMFS = os.getenv("REANA_MOUNT_CVMFS", "false")
 
-LOGGING_MODULE = 'reana-workflow-engine-cwl'
+LOGGING_MODULE = "reana-workflow-engine-cwl"
 """REANA Workflow Engine CWL logging module."""
