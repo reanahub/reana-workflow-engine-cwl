@@ -1,6 +1,14 @@
 Changes
 =======
 
+Version master (UNRELEASED)
+---------------------------
+
+- Allows specifying unpacked Docker images as workflow step requirement.
+- Handles new workflow operational options.
+- Adds VOMS proxy support as a new authentication method.
+- Add Black formatter support.
+
 Version 0.6.0 (2019-12-20)
 --------------------------
 
