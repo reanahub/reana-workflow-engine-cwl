@@ -7,7 +7,7 @@
 # under the terms of the MIT License; see LICENSE file for more details.
 
 pydocstyle reana_workflow_engine_cwl && \
-isort -rc -c -df **/*.py && \
+black --check . && \
 check-manifest --ignore ".travis-*" && \
 sphinx-build -qnNW docs docs/_build/html && \
 python setup.py test && \
