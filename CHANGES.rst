@@ -9,6 +9,11 @@ Version master (UNRELEASED)
 - Adds VOMS proxy support as a new authentication method.
 - Add Black formatter support.
 
+Version 0.6.1 (2020-05-25)
+--------------------------
+
+- Upgrades REANA-Commons package using latest Kubernetes Python client version.
+
 Version 0.6.0 (2019-12-20)
 --------------------------
 
