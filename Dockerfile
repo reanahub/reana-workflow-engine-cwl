@@ -1,12 +1,11 @@
 # This file is part of REANA.
-# Copyright (C) 2017, 2018, 2019 CERN.
+# Copyright (C) 2017, 2018, 2019, 2020 CERN.
 #
 # REANA is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 
+# Install base image and its dependencies
 FROM python:3.6-slim
-
-ENV TERM=xterm
 RUN apt update && \
     apt install -y \
       gcc \
@@ -14,23 +13,24 @@ RUN apt update && \
       vim-tiny && \
     pip install --upgrade pip
 
-COPY CHANGES.rst README.rst setup.py /code/
-COPY reana_workflow_engine_cwl/version.py /code/reana_workflow_engine_cwl/
-WORKDIR /code
-RUN pip install requirements-builder && \
-    requirements-builder -l pypi setup.py | pip install -r /dev/stdin && \
-    pip uninstall -y requirements-builder
+# Install dependencies
+COPY requirements.txt /code/
+RUN pip install -r /code/requirements.txt
 
+# Copy cluster component source code
+WORKDIR /code
 COPY . /code
 
-# Debug off by default
+# Are we debugging?
 ARG DEBUG=0
-RUN if [ "${DEBUG}" -gt 0 ]; then pip install -r requirements-dev.txt; pip install -e .; else pip install .; fi;
+RUN if [ "${DEBUG}" -gt 0 ]; then pip install pip install -e ".[debug]"; else pip install .; fi;
 
-# Building with locally-checked-out shared modules?
-RUN if test -e modules/reana-commons; then pip install -e modules/reana-commons --upgrade; fi
+# Are we building with locally-checked-out shared modules?
+RUN if test -e modules/reana-commons; then pip install -e modules/reana-commons[kubernetes] --upgrade; fi
 
 # Check if there are broken requirements
 RUN pip check
 
-ENV PYTHONPATH=/workdir
+# Set useful environment variables
+ENV PYTHONPATH=/workdir \
+    TERM=xterm

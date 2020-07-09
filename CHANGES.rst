@@ -4,6 +4,7 @@ Changes
 Version master (UNRELEASED)
 ---------------------------
 
+- Pins all Python dependencies allowing to easily rebuild component images at later times.
 - Allows specifying unpacked Docker images as workflow step requirement.
 - Handles new workflow operational options.
 - Adds VOMS proxy support as a new authentication method.
