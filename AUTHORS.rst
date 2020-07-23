@@ -3,6 +3,7 @@ Authors
 
 The list of contributors in alphabetical order:
 
+- `Adelina Lintuluoto <https://orcid.org/0000-0002-0726-1452>`_
 - `Anton Khodak <https://orcid.org/0000-0003-3263-4553>`_
 - `Dan Leehr <https://orcid.org/0000-0003-3221-9579>`_
 - `Daniel Prelipcean <https://orcid.org/0000-0002-4855-194X>`_

@@ -17,7 +17,6 @@ click==7.1.2              # via reana-commons, reana-workflow-engine-cwl (setup.
 coloredlogs==14.0         # via cwltool
 cwltool==1.0.20191022103248  # via reana-workflow-engine-cwl (setup.py)
 decorator==4.4.2          # via networkx
-enum34==1.1.10            # via reana-workflow-engine-cwl (setup.py)
 future==0.18.2            # via cwltool, schema-salad
 humanfriendly==8.2        # via coloredlogs
 idna==2.10                # via jsonschema, requests

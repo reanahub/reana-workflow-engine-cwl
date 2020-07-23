@@ -4,6 +4,7 @@ Changes
 Version master (UNRELEASED)
 ---------------------------
 
+- Uses python3.8
 - Pins all Python dependencies allowing to easily rebuild component images at later times.
 - Allows specifying unpacked Docker images as workflow step requirement.
 - Handles new workflow operational options.
