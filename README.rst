@@ -1,6 +1,6 @@
-===========================
- REANA-Workflow-Engine-CWL
-===========================
+#########################
+REANA-Workflow-Engine-CWL
+#########################
 
 .. image:: https://img.shields.io/travis/reanahub/reana-workflow-engine-cwl.svg
       :target: https://travis-ci.org/reanahub/reana-workflow-engine-cwl
@@ -21,7 +21,7 @@
    :target: https://github.com/psf/black
 
 About
------
+=====
 
 REANA-Workflow-Engine-CWL is a component of the `REANA <http://www.reana.io/>`_
 reusable and reproducible research data analysis platform. It takes care of
@@ -29,19 +29,26 @@ instantiating, executing and managing `Common Workflow Language (CWL)
 <http://www.commonwl.org/>`_ based computational workflows.
 
 Features
---------
+========
 
 - start Common Workflow Language (CWL) based workflows
 - control workflow steps
 
+Usage
+=====
+
+The detailed information on how to install and use REANA can be found in
+`docs.reana.io <https://docs.reana.io>`_.
+
 Useful links
-------------
+============
 
-- `documentation <https://reana-workflow-engine-cwl.readthedocs.io/>`_
-- `releases <https://github.com/reanahub/reana-workflow-engine-cwl/releases>`_
-- `known issues <https://github.com/reanahub/reana-workflow-engine-cwl/issues>`_
-- `source code <https://github.com/reanahub/reana-workflow-engine-cwl>`_
+- `REANA project home page <http://www.reana.io/>`_
+- `REANA user documentation <https://docs.reana.io>`_
+- `REANA user support forum <https://forum.reana.io>`_
 
-For more information about the REANA reusable analysis platform, please see the
-`REANA project <http://www.reana.io>`_ home page and the general `REANA
-documentation <http://reana.readthedocs.io/>`_ pages.
+- `REANA-Workflow-Engine-CWL releases <https://reana-workflow-engine-cwl.readthedocs.io/en/latest#changes>`_
+- `REANA-Workflow-Engine-CWL docker images <https://hub.docker.com/r/reanahub/reana-workflow-engine-cwl>`_
+- `REANA-Workflow-Engine-CWL developer documentation <https://reana-workflow-engine-cwl.readthedocs.io/>`_
+- `REANA-Workflow-Engine-CWL known issues <https://github.com/reanahub/reana-workflow-engine-cwl/issues>`_
+- `REANA-Workflow-Engine-CWL source code <https://github.com/reanahub/reana-workflow-engine-cwl>`_
