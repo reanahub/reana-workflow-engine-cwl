@@ -4,7 +4,7 @@
 #
 #    pip-compile
 #
-amqp==2.6.0               # via kombu
+amqp==2.6.1               # via kombu
 attrs==19.3.0             # via jsonschema
 bagit==1.7.0              # via cwltool
 bravado-core==5.17.0      # via bravado
@@ -20,14 +20,13 @@ decorator==4.4.2          # via networkx
 future==0.18.2            # via cwltool, schema-salad
 humanfriendly==8.2        # via coloredlogs
 idna==2.10                # via jsonschema, requests
-importlib-metadata==1.7.0  # via jsonschema, kombu
 isodate==0.6.0            # via rdflib
 jsonpointer==2.0          # via jsonschema
 jsonref==0.2              # via bravado-core
 jsonschema[format]==3.2.0  # via bravado-core, reana-commons
 kombu==4.6.11             # via reana-commons
 lockfile==0.12.2          # via schema-salad
-lxml==4.5.1               # via prov
+lxml==4.5.2               # via prov
 mistune==0.8.4            # via schema-salad
 mock==4.0.2               # via reana-commons
 monotonic==1.5            # via bravado
@@ -37,7 +36,7 @@ mypy-extensions==0.4.3    # via cwltool
 networkx==2.4             # via prov
 pathlib2==2.3.5           # via cwltool
 prov==1.5.1               # via cwltool
-psutil==5.7.0             # via cwltool
+psutil==5.7.2             # via cwltool
 pyparsing==2.4.7          # via rdflib
 pyrsistent==0.16.0        # via jsonschema
 python-dateutil==2.8.1    # via bravado, bravado-core, prov
@@ -45,26 +44,24 @@ pytz==2020.1              # via bravado-core
 pyyaml==5.3.1             # via bravado, bravado-core, reana-commons
 rdflib-jsonld==0.4.0      # via schema-salad
 rdflib==4.2.2             # via cwltool, prov, rdflib-jsonld, schema-salad
-reana-commons==0.7.0a4	# via reana-workflow-engine-cwl (setup.py)
+reana-commons==0.7.0a4    # via reana-workflow-engine-cwl (setup.py)
 requests==2.24.0          # via bravado, cachecontrol, cwltool, schema-salad
 rfc3987==1.3.8            # via jsonschema
-ruamel.yaml.clib==0.2.0   # via ruamel.yaml
 ruamel.yaml==0.16.0       # via cwltool, schema-salad
 scandir==1.10.0           # via cwltool
 schema-salad==4.5.20191023134839  # via cwltool, reana-workflow-engine-cwl (setup.py)
 shellescape==3.4.1        # via cwltool
-simplejson==3.17.0        # via bravado, bravado-core
+simplejson==3.17.2        # via bravado, bravado-core
 six==1.15.0               # via bravado, bravado-core, cwltool, isodate, jsonschema, pathlib2, prov, pyrsistent, python-dateutil, schema-salad, sqlalchemy-utils
 sqlalchemy-utils==0.36.8  # via reana-workflow-engine-cwl (setup.py)
 sqlalchemy==1.3.18        # via reana-workflow-engine-cwl (setup.py), sqlalchemy-utils
 strict-rfc3339==0.7       # via jsonschema
 swagger-spec-validator==2.7.3  # via bravado-core
 typing-extensions==3.7.4.2  # via bravado, cwltool, schema-salad
-urllib3==1.25.9           # via requests
+urllib3==1.25.10          # via requests
 vine==1.3.0               # via amqp
 webcolors==1.11.1         # via jsonschema
 werkzeug==1.0.1           # via reana-commons
-zipp==3.1.0               # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
