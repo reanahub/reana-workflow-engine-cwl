@@ -44,7 +44,7 @@ install_requires = [
     "click>=7",
     "SQLAlchemy>=1.3.7",
     "SQLAlchemy-Utils>=0.34.2",
-    "reana-commons>=0.7.0a4,<0.8.0",
+    "reana-commons>=0.8.0a1,<0.9.0",
 ]
 
 packages = find_packages()
