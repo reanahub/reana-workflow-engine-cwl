@@ -47,17 +47,7 @@ def rcode_to_workflow_status(response_code):
 
 
 def parse_str_to_int(workflow_parameters):
-    """Parse integers stored as strings to integers.
-
-    >>> parse_str_to_int({'sleeptime': "'2'"})
-    {'sleeptime': 2}
-    >>> parse_str_to_int({'sleeptime': '2'})
-    {'sleeptime': 2}
-    >>> parse_str_to_int({'sleeptime': 'two'})
-    {'sleeptime': 'two'}
-    >>> parse_str_to_int({'helloworld': {'class': 'File'}})
-    {'helloworld': {'class': 'File', 'location': 'code/helloworld.py'}}
-    """
+    """Parse integers stored as strings to integers."""
     for (key, val) in workflow_parameters.items():
         try:
             if isinstance(val, str) and val[0] == "'":
