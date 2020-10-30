@@ -2,14 +2,14 @@
 REANA-Workflow-Engine-CWL
 #########################
 
-.. image:: https://img.shields.io/travis/reanahub/reana-workflow-engine-cwl.svg
-      :target: https://travis-ci.org/reanahub/reana-workflow-engine-cwl
+.. image:: https://github.com/reanahub/reana-workflow-engine-cwl/workflows/CI/badge.svg
+      :target: https://github.com/reanahub/reana-workflow-engine-cwl/actions
 
 .. image:: https://readthedocs.org/projects/reana-workflow-engine-cwl/badge/?version=latest
       :target: https://reana-workflow-engine-cwl.readthedocs.io/en/latest/?badge=latest
 
-.. image:: https://img.shields.io/coveralls/reanahub/reana-workflow-engine-cwl.svg
-      :target: https://coveralls.io/r/reanahub/reana-workflow-engine-cwl
+.. image:: https://codecov.io/gh/reanahub/reana-workflow-engine-cwl/branch/master/graph/badge.svg
+   :target: https://codecov.io/gh/reanahub/reana-workflow-engine-cwl
 
 .. image:: https://badges.gitter.im/Join%20Chat.svg
       :target: https://gitter.im/reanahub/reana?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge
@@ -18,7 +18,7 @@ REANA-Workflow-Engine-CWL
       :target: https://github.com/reanahub/reana-workflow-engine-cwl/blob/master/LICENSE
 
 .. image:: https://img.shields.io/badge/code%20style-black-000000.svg
-   :target: https://github.com/psf/black
+      :target: https://github.com/psf/black
 
 About
 =====
