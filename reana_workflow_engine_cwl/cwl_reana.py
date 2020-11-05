@@ -254,6 +254,8 @@ class ReanaPipelineJob(JobBase):
         kerberos = self._get_hint("kerberos")
         unpacked_img = self._get_hint("unpacked_img")
         voms_proxy = self._get_hint("voms_proxy")
+        htcondor_max_runtime = self._get_hint("htcondor_max_runtime")
+        htcondor_accounting_group = self._get_hint("htcondor_accounting_group")
         create_body = {
             "image": container,
             "cmd": wrapped_cmd,
@@ -266,6 +268,8 @@ class ReanaPipelineJob(JobBase):
             "kerberos": kerberos,
             "unpacked_img": unpacked_img,
             "voms_proxy": voms_proxy,
+            "htcondor_max_runtime": htcondor_max_runtime,
+            "htcondor_accounting_group": htcondor_accounting_group,
         }
 
         return create_body

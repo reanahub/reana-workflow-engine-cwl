@@ -1,6 +1,11 @@
 Changes
 =======
 
+Version 0.7.1 (UNRELEASED)
+--------------------------
+
+- Allows ``htcondor_max_runtime`` and ``htcondor_accounting_group`` to be specified for HTC jobs.
+
 Version 0.7.0 (2020-10-20)
 --------------------------
 
