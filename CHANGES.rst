@@ -1,10 +1,11 @@
 Changes
 =======
 
-Version 0.7.1 (UNRELEASED)
+Version 0.7.1 (2020-11-10)
 --------------------------
 
-- Allows ``htcondor_max_runtime`` and ``htcondor_accounting_group`` to be specified for HTC jobs.
+- Adds support for specifying ``htcondor_max_runtime`` and ``htcondor_accounting_group`` for HTCondor compute backend jobs.
+- Fixes restarting of CWL workflows.
 
 Version 0.7.0 (2020-10-20)
 --------------------------
