@@ -86,9 +86,9 @@ def main(
     tmpdir = os.path.join(working_dir, "cwl/tmpdir")
     tmp_outdir = os.path.join(working_dir, "cwl/outdir")
     docker_stagedir = os.path.join(working_dir, "cwl/docker_stagedir")
-    os.makedirs(tmpdir)
-    os.makedirs(tmp_outdir)
-    os.makedirs(docker_stagedir)
+    os.makedirs(tmpdir, exist_ok=True)
+    os.makedirs(tmp_outdir, exist_ok=True)
+    os.makedirs(docker_stagedir, exist_ok=True)
     args = operational_options
 
     log.setLevel(REANA_LOG_LEVEL)
