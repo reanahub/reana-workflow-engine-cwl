@@ -156,7 +156,7 @@ class ReanaPipelineJob(JobBase):
                     with os.fdopen(fd, "wb") as f:
                         f.write(vol.resolved.encode("utf-8"))
 
-    def create_task_msg(self, working_dir, workflow_uuid):
+    def create_task_msg(self, working_dir, workflow_uuid):  # noqa: C901
         """Create job message spec to be sent to REANA-Job-Controller."""
         job_name = self.name
         docker_req, _ = self.get_requirement("DockerRequirement")
@@ -281,7 +281,7 @@ class ReanaPipelineJob(JobBase):
         else:
             return None
 
-    def run(self, runtimeContext):
+    def run(self, runtimeContext):  # noqa: C901
         """Run a job."""
         self._setup(runtimeContext)
 

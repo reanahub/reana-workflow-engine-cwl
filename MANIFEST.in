@@ -9,6 +9,7 @@ include *.rst
 include *.md
 include *.sh
 include *.txt
+include .flake8
 include pytest.ini
 include docs/*.json
 include scripts/*.py

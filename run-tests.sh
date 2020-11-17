@@ -24,6 +24,10 @@ check_black () {
     black --check .
 }
 
+check_flake8 () {
+    flake8 .
+}
+
 check_manifest () {
     check-manifest
 }
@@ -36,6 +40,10 @@ check_pytest () {
     python setup.py test
 }
 
+check_dockerfile () {
+    docker run -i --rm hadolint/hadolint < Dockerfile
+}
+
 check_docker_build () {
     docker build -t reana-workflow-engine-cwl .
 }
@@ -44,9 +52,11 @@ check_all () {
     check_script
     check_pydocstyle
     check_black
+    check_flake8
     check_manifest
     check_sphinx
     check_pytest
+    check_dockerfile
     check_docker_build
 }
 
@@ -61,9 +71,11 @@ do
         --check-shellscript) check_script;;
         --check-pydocstyle) check_pydocstyle;;
         --check-black) check_black;;
+        --check-flake8) check_flake8;;
         --check-manifest) check_manifest;;
         --check-sphinx) check_sphinx;;
         --check-pytest) check_pytest;;
+        --check-dockerfile) check_dockerfile;;
         --check-docker-build) check_docker_build;;
         *)
     esac
