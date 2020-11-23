@@ -32,7 +32,7 @@ class Pipeline(object):
         """Instanciate pipeline."""
         self.threads = []
 
-    def executor(self, tool, job_order, runtimeContext, **kwargs):
+    def executor(self, tool, job_order, runtimeContext, **kwargs):  # noqa: C901
         """Executor method."""
         final_output = []
         final_status = []
