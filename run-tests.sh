@@ -45,7 +45,7 @@ check_dockerfile () {
 }
 
 check_docker_build () {
-    docker build -t reana-workflow-engine-cwl .
+    docker build -t reanahub/reana-workflow-engine-cwl .
 }
 
 check_all () {
