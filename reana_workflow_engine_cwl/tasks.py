@@ -16,7 +16,10 @@ import logging
 
 import click
 from reana_commons.publisher import WorkflowStatusPublisher
-from reana_commons.utils import check_connection_to_job_controller
+from reana_commons.utils import (
+    check_connection_to_job_controller,
+    handle_workflow_engine_graceful_exit,
+)
 
 from reana_workflow_engine_cwl import main
 from reana_workflow_engine_cwl.config import LOGGING_MODULE
@@ -24,6 +27,7 @@ from reana_workflow_engine_cwl.config import LOGGING_MODULE
 log = logging.getLogger(LOGGING_MODULE)
 
 rcode_to_workflow_status_mapping = {0: 2, 1: 3}
+PUBLISHER = WorkflowStatusPublisher()
 
 
 def load_json(ctx, param, value):
@@ -89,6 +93,7 @@ def parse_str_to_int(workflow_parameters):
     help="Options to be passed to the workflow engine" " (i.e. caching).",
     callback=load_operational_options,
 )
+@handle_workflow_engine_graceful_exit(publisher=PUBLISHER)
 def run_cwl_workflow(
     workflow_uuid,
     workflow_workspace,
@@ -102,27 +107,27 @@ def run_cwl_workflow(
     log.info(f"running workflow on context: {locals()}")
     try:
         check_connection_to_job_controller()
-        publisher = WorkflowStatusPublisher()
+
         rcode = main.main(
             workflow_uuid,
             workflow_json,
             workflow_parameters,
             operational_options,
             workflow_workspace,
-            publisher,
+            PUBLISHER,
         )
         log.info("workflow done")
 
-        publisher.publish_workflow_status(
+        PUBLISHER.publish_workflow_status(
             workflow_uuid, rcode_to_workflow_status(rcode)
         )
 
     except Exception as e:
         log.error(f"workflow failed: {e}")
-        publisher.publish_workflow_status(workflow_uuid, 3, message=str(e))
+        PUBLISHER.publish_workflow_status(workflow_uuid, 3, message=str(e))
     finally:
-        if publisher:
-            publisher.close()
+        if PUBLISHER:
+            PUBLISHER.close()
         else:
             log.error(
                 f"Workflow {workflow_uuid} failed but status " "could not be published."
