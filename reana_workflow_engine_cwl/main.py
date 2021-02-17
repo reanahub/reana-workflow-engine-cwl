@@ -44,12 +44,13 @@ def versionstring():
 
 
 def main(
+    publisher,
+    rjc_api_client,
     workflow_uuid,
     workflow_spec,
     workflow_inputs,
     operational_options,
     working_dir,
-    publisher,
     **kwargs,
 ):
     """Run main method."""
@@ -128,7 +129,7 @@ def main(
     if parsed_args.debug:
         log.setLevel(logging.DEBUG)
 
-    pipeline = ReanaPipeline()
+    pipeline = ReanaPipeline(rjc_api_client=rjc_api_client)
     log.info("starting the run..")
     db_log_writer = SQLiteHandler(workflow_uuid, publisher)
 

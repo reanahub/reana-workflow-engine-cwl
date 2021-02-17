@@ -46,7 +46,9 @@ class ReanaPipeline(Pipeline):
     def __init__(self, **kwargs):
         """Instanciate reana pipeline."""
         super(ReanaPipeline, self).__init__()
-        self.service = rjc_api_client("reana-job-controller")
+        self.service = kwargs.get(
+            "rjc_api_client", rjc_api_client("reana-job-controller")
+        )
         if kwargs.get("basedir") is not None:
             self.basedir = kwargs.get("basedir")
         else:
