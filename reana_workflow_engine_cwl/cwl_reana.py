@@ -454,7 +454,7 @@ class ReanaPipelinePoll(PollThread):
 
     def is_done(self, operation):
         """Check if operation is done."""
-        terminal_states = ["succeeded", "failed"]
+        terminal_states = ["finished", "failed"]
         if operation["status"] in terminal_states:
             log.info(
                 f"[job {self.name}] FINAL JOB STATE: "
@@ -463,7 +463,7 @@ class ReanaPipelinePoll(PollThread):
             if operation["status"] != "failed":
                 self.rcode = 0
                 # here we could publish that the job with id: self.task_id
-                # succeeded or failed.
+                # finished or failed.
                 self.publisher.publish_workflow_status(
                     self.workflow_uuid,
                     1,
