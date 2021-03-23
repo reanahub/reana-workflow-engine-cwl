@@ -1,7 +1,7 @@
 Changes
 =======
 
-Version 0.7.4 (UNRELEASED)
+Version 0.7.4 (2021-03-23)
 --------------------------
 
 - Changes job command serialisation using central REANA-Commons job command serialiser.
