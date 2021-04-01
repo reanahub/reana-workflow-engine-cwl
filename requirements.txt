@@ -52,9 +52,7 @@ scandir==1.10.0           # via cwltool
 schema-salad==4.5.20191023134839  # via cwltool, reana-workflow-engine-cwl (setup.py)
 shellescape==3.4.1        # via cwltool
 simplejson==3.17.2        # via bravado, bravado-core
-six==1.15.0               # via bravado, bravado-core, cwltool, isodate, jsonschema, mock, pathlib2, prov, pyrsistent, python-dateutil, schema-salad, sqlalchemy-utils
-sqlalchemy-utils==0.36.8  # via reana-workflow-engine-cwl (setup.py)
-sqlalchemy==1.3.18        # via reana-workflow-engine-cwl (setup.py), sqlalchemy-utils
+six==1.15.0               # via bravado, bravado-core, cwltool, isodate, jsonschema, mock, pathlib2, prov, pyrsistent, python-dateutil, schema-salad
 strict-rfc3339==0.7       # via jsonschema
 swagger-spec-validator==2.7.3  # via bravado-core
 typing-extensions==3.7.4.2  # via bravado, cwltool, schema-salad
