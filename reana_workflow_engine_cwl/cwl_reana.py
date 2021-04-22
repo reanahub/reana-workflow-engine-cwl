@@ -258,6 +258,8 @@ class ReanaPipelineJob(JobBase):
         voms_proxy = self._get_hint("voms_proxy")
         htcondor_max_runtime = self._get_hint("htcondor_max_runtime")
         htcondor_accounting_group = self._get_hint("htcondor_accounting_group")
+        kubernetes_uid = self._get_hint("kubernetes_uid")
+        kubernetes_memory_limit = self._get_hint("kubernetes_memory_limit")
         create_body = {
             "image": container,
             "cmd": wrapped_cmd,
@@ -272,6 +274,8 @@ class ReanaPipelineJob(JobBase):
             "voms_proxy": voms_proxy,
             "htcondor_max_runtime": htcondor_max_runtime,
             "htcondor_accounting_group": htcondor_accounting_group,
+            "kubernetes_uid": kubernetes_uid,
+            "kubernetes_memory_limit": kubernetes_memory_limit,
         }
 
         return create_body
