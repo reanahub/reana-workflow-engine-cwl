@@ -359,7 +359,7 @@ class ReanaPipelineJob(JobBase):
             log.error(
                 f"[job {self.name}] " f"Failed to submit task to job controller:\n{e}"
             )
-            return WorkflowException(e)
+            raise WorkflowException(e)
 
         def callback(rcode):
             try:
