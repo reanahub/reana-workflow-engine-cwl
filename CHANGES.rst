@@ -1,6 +1,22 @@
 Changes
 =======
 
+Version 0.7.5 (2021-04-28)
+--------------------------
+
+- Adds support for specifying ``kubernetes_memory_limit`` for Kubernetes compute backend jobs.
+
+Version 0.7.4 (2021-03-23)
+--------------------------
+
+- Changes job command serialisation using central REANA-Commons job command serialiser.
+
+Version 0.7.3 (2021-03-17)
+--------------------------
+
+- Changes workflow engine instantiation to use central REANA-Commons factory.
+- Changes status ``succeeded`` to ``finished`` to use central REANA nomenclature.
+
 Version 0.7.2 (2021-02-03)
 --------------------------
 

@@ -46,7 +46,9 @@ class ReanaPipeline(Pipeline):
     def __init__(self, **kwargs):
         """Instanciate reana pipeline."""
         super(ReanaPipeline, self).__init__()
-        self.service = rjc_api_client("reana-job-controller")
+        self.service = kwargs.get(
+            "rjc_api_client", rjc_api_client("reana-job-controller")
+        )
         if kwargs.get("basedir") is not None:
             self.basedir = kwargs.get("basedir")
         else:
@@ -256,6 +258,8 @@ class ReanaPipelineJob(JobBase):
         voms_proxy = self._get_hint("voms_proxy")
         htcondor_max_runtime = self._get_hint("htcondor_max_runtime")
         htcondor_accounting_group = self._get_hint("htcondor_accounting_group")
+        kubernetes_uid = self._get_hint("kubernetes_uid")
+        kubernetes_memory_limit = self._get_hint("kubernetes_memory_limit")
         create_body = {
             "image": container,
             "cmd": wrapped_cmd,
@@ -270,6 +274,8 @@ class ReanaPipelineJob(JobBase):
             "voms_proxy": voms_proxy,
             "htcondor_max_runtime": htcondor_max_runtime,
             "htcondor_accounting_group": htcondor_accounting_group,
+            "kubernetes_uid": kubernetes_uid,
+            "kubernetes_memory_limit": kubernetes_memory_limit,
         }
 
         return create_body
@@ -353,7 +359,7 @@ class ReanaPipelineJob(JobBase):
             log.error(
                 f"[job {self.name}] " f"Failed to submit task to job controller:\n{e}"
             )
-            return WorkflowException(e)
+            raise WorkflowException(e)
 
         def callback(rcode):
             try:
@@ -452,7 +458,7 @@ class ReanaPipelinePoll(PollThread):
 
     def is_done(self, operation):
         """Check if operation is done."""
-        terminal_states = ["succeeded", "failed"]
+        terminal_states = ["finished", "failed"]
         if operation["status"] in terminal_states:
             log.info(
                 f"[job {self.name}] FINAL JOB STATE: "
@@ -461,7 +467,7 @@ class ReanaPipelinePoll(PollThread):
             if operation["status"] != "failed":
                 self.rcode = 0
                 # here we could publish that the job with id: self.task_id
-                # succeeded or failed.
+                # finished or failed.
                 self.publisher.publish_workflow_status(
                     self.workflow_uuid,
                     1,
