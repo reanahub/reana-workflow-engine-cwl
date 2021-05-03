@@ -19,7 +19,7 @@ readme = open("README.rst").read()
 history = open("CHANGES.rst").read()
 
 tests_require = [
-    "pytest-reana>=0.8.0a3,<0.9.0",
+    "pytest-reana>=0.8.0a4,<0.9.0",
 ]
 
 extras_require = {
@@ -42,7 +42,7 @@ install_requires = [
     "cwltool==1.0.20191022103248",
     "schema-salad==4.5.20191023134839",
     "click>=7",
-    "reana-commons>=0.8.0a9,<0.9.0",
+    "reana-commons>=0.8.0a11,<0.9.0",
 ]
 
 packages = find_packages()
