@@ -13,7 +13,7 @@ cachecontrol==0.11.7      # via schema-salad
 certifi==2020.6.20        # via requests
 chardet==3.0.4            # via requests
 checksumdir==1.1.9        # via reana-commons
-click==7.1.2              # via reana-commons, reana-workflow-engine-cwl (setup.py)
+click==7.1.2              # via reana-commons
 coloredlogs==14.0         # via cwltool
 cwltool==1.0.20191022103248  # via reana-workflow-engine-cwl (setup.py)
 decorator==4.4.2          # via networkx
@@ -44,7 +44,7 @@ pytz==2020.1              # via bravado-core
 pyyaml==5.3.1             # via bravado, bravado-core, reana-commons
 rdflib-jsonld==0.4.0      # via schema-salad
 rdflib==4.2.2             # via cwltool, prov, rdflib-jsonld, schema-salad
-reana-commons==0.7.5a2      # via reana-workflow-engine-cwl (setup.py)
+reana-commons==0.7.5a2    # via reana-workflow-engine-cwl (setup.py)
 requests==2.24.0          # via bravado, cachecontrol, cwltool, schema-salad
 rfc3987==1.3.8            # via jsonschema
 ruamel.yaml==0.16.0       # via cwltool, schema-salad
