@@ -14,7 +14,7 @@ cachecontrol==0.11.7      # via schema-salad
 certifi==2020.12.5        # via requests
 chardet==4.0.0            # via requests
 checksumdir==1.1.9        # via reana-commons
-click==7.1.2              # via reana-commons, reana-workflow-engine-cwl (setup.py)
+click==7.1.2              # via reana-commons
 coloredlogs==15.0         # via cwltool
 cwltool==1.0.20191022103248  # via reana-workflow-engine-cwl (setup.py)
 decorator==4.4.2          # via networkx
