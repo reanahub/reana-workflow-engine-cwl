@@ -10,6 +10,7 @@ The list of contributors in alphabetical order:
 - `Daniel Prelipcean <https://orcid.org/0000-0002-4855-194X>`_
 - `Diego Rodriguez <https://orcid.org/0000-0003-0649-2002>`_
 - `Dinos Kousidis <https://orcid.org/0000-0002-4914-4289>`_
+- `Marco Vidal <https://orcid.org/0000-0002-9363-4971>`_
 - `Michael R. Crusoe <https://orcid.org/0000-0002-2961-9670>`_
 - `Rokas Maciulaitis <https://orcid.org/0000-0003-1064-6967>`_
 - `Sinclert Pérez <https://www.linkedin.com/in/sinclert>`_
