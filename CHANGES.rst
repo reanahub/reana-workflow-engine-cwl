@@ -1,6 +1,11 @@
 Changes
 =======
 
+Version 0.7.6 (2021-07-05)
+--------------------------
+
+- Changes internal dependencies to remove click.
+
 Version 0.7.5 (2021-04-28)
 --------------------------
 
