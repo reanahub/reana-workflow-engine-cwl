@@ -28,7 +28,7 @@ from cwltool.job import (
     relink_initialworkdir,
     stage_files,
 )
-from cwltool.pathmapper import ensure_writable
+from cwltool.utils import ensure_writable
 from cwltool.workflow import default_make_tool
 from reana_commons.api_client import JobControllerAPIClient as rjc_api_client
 from reana_commons.config import REANA_WORKFLOW_UMASK
@@ -280,6 +280,13 @@ class ReanaPipelineJob(JobBase):
 
         return create_body
 
+    def _required_env(self):
+        """Variables required by the CWL spec."""
+        return {
+            "TMPDIR": self.tmpdir,
+            "HOME": self.builder.outdir,
+        }
+
     def _get_hint(self, hint_name):
         """Return specific hint if specified."""
         if self.hints:
@@ -382,7 +389,6 @@ class ReanaPipelineJob(JobBase):
             finally:
                 if self.outputs is not None:
                     log.info(f"[job {self.name}] OUTPUTS ------------------")
-                    log.info(pformat(self.outputs))
                 self.cleanup(runtimeContext.rm_tmpdir)
 
         poll = ReanaPipelinePoll(

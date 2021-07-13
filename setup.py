@@ -39,8 +39,7 @@ setup_requires = [
 ]
 
 install_requires = [
-    "cwltool==1.0.20191022103248",
-    "schema-salad==4.5.20191023134839",
+    "cwltool==3.1.20210628163208",
     "reana-commons>=0.8.0a21,<0.9.0",
 ]
 

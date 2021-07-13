@@ -123,6 +123,8 @@ class Pipeline(object):
             cleanIntermediate(output_dirs)
 
         if final_output and final_status:
+            output = str(final_output[0]).encode("utf8").decode("unicode_escape")
+            log.info(f"FinalOutput{output}FinalOutput")
             return str(final_output[0]), str(final_status[0])
         else:
             return None, "permanentFail"

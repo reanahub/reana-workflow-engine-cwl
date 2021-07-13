@@ -26,22 +26,6 @@ def rcode_to_workflow_status(response_code):
     return rcode_to_workflow_status_mapping[response_code]
 
 
-def parse_str_to_int(workflow_parameters):
-    """Parse integers stored as strings to integers."""
-    for (key, val) in workflow_parameters.items():
-        try:
-            if isinstance(val, str) and val[0] == "'":
-                # The actual value of the int as str could be stored as:
-                # '\'val\'', since ' is an escape character.
-                workflow_parameters[key] = int(val[1:-1])
-            else:
-                workflow_parameters[key] = int(val)
-        except (ValueError, TypeError, KeyError):
-            # Skip values and types which cannot be casted to integer.
-            pass
-    return workflow_parameters
-
-
 def run_cwl_workflow_engine_adapter(
     publisher,
     rjc_api_client,
@@ -53,7 +37,6 @@ def run_cwl_workflow_engine_adapter(
     **kwargs,
 ):
     """Run cwl workflow."""
-    workflow_parameters = parse_str_to_int(workflow_parameters)
     log.info(f"running workflow on context: {locals()}")
     rcode = main.main(
         publisher,
