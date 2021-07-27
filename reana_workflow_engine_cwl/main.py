@@ -22,7 +22,7 @@ from cwltool.context import LoadingContext
 from reana_commons.config import REANA_LOG_FORMAT, REANA_LOG_LEVEL, REANA_WORKFLOW_UMASK
 
 from reana_workflow_engine_cwl.__init__ import __version__
-from reana_workflow_engine_cwl.config import LOGGING_MODULE, SHARED_VOLUME_PATH
+from reana_workflow_engine_cwl.config import LOGGING_MODULE
 from reana_workflow_engine_cwl.context import REANARuntimeContext
 from reana_workflow_engine_cwl.cwl_reana import ReanaPipeline
 from reana_workflow_engine_cwl.database import SQLiteHandler
@@ -54,7 +54,6 @@ def main(
     **kwargs,
 ):
     """Run main method."""
-    working_dir = os.path.join(SHARED_VOLUME_PATH, working_dir)
     os.chdir(working_dir)
     os.umask(REANA_WORKFLOW_UMASK)
     log.info("Dumping workflow specification and input parameter files...")
