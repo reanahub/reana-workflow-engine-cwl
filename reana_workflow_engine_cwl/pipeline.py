@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of REANA.
-# Copyright (C) 2017, 2018 CERN.
+# Copyright (C) 2017, 2018, 2021 CERN.
 #
 # REANA is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -10,6 +10,7 @@
 
 from __future__ import absolute_import, print_function, unicode_literals
 
+import json
 import logging
 import os
 import tempfile
@@ -74,15 +75,12 @@ class Pipeline(object):
 
         if not runtimeContext.default_container:
             runtimeContext.default_container = "frolvlad/alpine-bash"
-        runtimeContext.docker_outdir = os.path.join(
-            runtimeContext.working_dir, "cwl/docker_outdir"
-        )
-        runtimeContext.docker_tmpdir = os.path.join(
-            runtimeContext.working_dir, "cwl/docker_tmpdir"
-        )
+        runtimeContext.tmpdir = runtimeContext.get_tmpdir()
         runtimeContext.docker_stagedir = os.path.join(
             runtimeContext.working_dir, "cwl/docker_stagedir"
         )
+        runtimeContext.docker_outdir = runtimeContext.outdir
+        runtimeContext.docker_tmpdir = runtimeContext.tmpdir
 
         jobs = tool.job(job_order, output_callback, runtimeContext)
         try:
@@ -123,7 +121,7 @@ class Pipeline(object):
             cleanIntermediate(output_dirs)
 
         if final_output and final_status:
-            output = str(final_output[0]).encode("utf8").decode("unicode_escape")
+            output = json.dumps(final_output[0])
             log.info(f"FinalOutput{output}FinalOutput")
             return str(final_output[0]), str(final_status[0])
         else:
