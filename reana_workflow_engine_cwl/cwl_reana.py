@@ -290,9 +290,10 @@ class ReanaPipelineJob(JobBase):
     def _get_hint(self, hint_name):
         """Return specific hint if specified."""
         if self.hints:
-            return self.hints[0].get(hint_name, None)
-        else:
-            return None
+            for hint in self.hints:
+                if hint_name in hint:
+                    return hint.get(hint_name)
+        return None
 
     def run(self, runtimeContext):  # noqa: C901
         """Run a job."""

@@ -148,8 +148,6 @@ def main(
         stdout=f,
         stderr=f,
     )
+    logs = f.getvalue()
 
-    # Publish logs
-    publisher.publish_workflow_status(workflow_uuid, 2, f.getvalue())
-
-    return result
+    return result, logs

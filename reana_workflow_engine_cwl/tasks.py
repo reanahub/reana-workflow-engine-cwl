@@ -38,7 +38,7 @@ def run_cwl_workflow_engine_adapter(
 ):
     """Run cwl workflow."""
     log.info(f"running workflow on context: {locals()}")
-    rcode = main.main(
+    rcode, logs = main.main(
         publisher,
         rjc_api_client,
         workflow_uuid,
@@ -49,7 +49,9 @@ def run_cwl_workflow_engine_adapter(
     )
     log.info("workflow done")
 
-    publisher.publish_workflow_status(workflow_uuid, rcode_to_workflow_status(rcode))
+    publisher.publish_workflow_status(
+        workflow_uuid, rcode_to_workflow_status(rcode), logs
+    )
 
 
 run_cwl_workflow = create_workflow_engine_command(
