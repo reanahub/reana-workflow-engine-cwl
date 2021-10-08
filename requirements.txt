@@ -13,13 +13,13 @@ bravado-core==5.17.0      # via bravado
 bravado==10.3.2           # via reana-commons
 cachecontrol==0.12.6      # via schema-salad
 certifi==2021.5.30        # via requests
-charset-normalizer==2.0.4  # via requests
+charset-normalizer==2.0.6  # via requests
 checksumdir==1.1.9        # via reana-commons
 click==8.0.1              # via reana-commons
 coloredlogs==15.0.1       # via cwltool
 cwltool==3.1.20210628163208  # via reana-workflow-engine-cwl (setup.py)
 fs==2.4.13                # via reana-commons
-humanfriendly==9.2        # via coloredlogs
+humanfriendly==10.0       # via coloredlogs
 idna==3.2                 # via jsonschema, requests
 isodate==0.6.0            # via rdflib
 jsonpointer==2.1          # via jsonschema
@@ -34,14 +34,14 @@ monotonic==1.6            # via bravado
 msgpack-python==0.5.6     # via bravado
 msgpack==1.0.2            # via bravado-core, cachecontrol
 mypy-extensions==0.4.3    # via cwltool
-networkx==2.6.2           # via prov
+networkx==2.6.3           # via prov
 prov==1.5.1               # via cwltool
 psutil==5.8.0             # via cwltool
 pydot==1.4.2              # via cwltool
 pyparsing==2.4.7          # via pydot, rdflib
 pyrsistent==0.18.0        # via jsonschema
 python-dateutil==2.8.2    # via bravado, bravado-core, prov
-pytz==2021.1              # via bravado-core, fs
+pytz==2021.3              # via bravado-core, fs
 pyyaml==5.4.1             # via bravado, bravado-core, reana-commons
 rdflib==5.0.0             # via cwltool, prov, schema-salad
 reana-commons==0.8.0a31   # via reana-workflow-engine-cwl (setup.py)
@@ -49,17 +49,17 @@ requests==2.26.0          # via bravado, cachecontrol, cwltool, schema-salad
 rfc3987==1.3.8            # via jsonschema
 ruamel.yaml.clib==0.2.6   # via ruamel.yaml
 ruamel.yaml==0.17.10      # via cwltool, schema-salad
-schema-salad==8.1.20210721123742  # via cwltool
+schema-salad==8.2.20210918131710  # via cwltool
 shellescape==3.8.1        # via cwltool
 simplejson==3.17.5        # via bravado, bravado-core
 six==1.16.0               # via bravado, bravado-core, fs, isodate, jsonschema, mock, prov, python-dateutil, rdflib
 strict-rfc3339==0.7       # via jsonschema
 swagger-spec-validator==2.7.3  # via bravado-core
-typing-extensions==3.10.0.0  # via bravado, cwltool
-urllib3==1.26.6           # via requests
+typing-extensions==3.10.0.2  # via bravado, cwltool
+urllib3==1.26.7           # via requests
 vine==1.3.0               # via amqp
 webcolors==1.11.1         # via jsonschema
-werkzeug==2.0.1           # via reana-commons
+werkzeug==2.0.2           # via reana-commons
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
