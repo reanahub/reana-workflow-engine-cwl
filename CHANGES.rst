@@ -1,6 +1,12 @@
 Changes
 =======
 
+Version 0.8.0 (2021-11-22)
+--------------------------
+
+- Adds support for custom workspace paths.
+- Adds supoort for ``cwltool`` version ``3.1.20210628163208``
+
 Version 0.7.6 (2021-07-05)
 --------------------------
 
