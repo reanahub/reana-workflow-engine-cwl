@@ -27,7 +27,7 @@ jsonref==0.2              # via bravado-core
 jsonschema[format]==3.2.0  # via bravado-core, reana-commons
 kombu==4.6.11             # via reana-commons
 lockfile==0.12.2          # via schema-salad
-lxml==4.6.3               # via prov
+lxml==4.6.5               # via prov
 mistune==0.8.4            # via schema-salad
 mock==3.0.5               # via reana-commons
 monotonic==1.6            # via bravado
