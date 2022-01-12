@@ -17,6 +17,7 @@ include docs/requirements.txt
 include Dockerfile
 include .dockerignore
 prune docs/_build
+recursive-include badges *.json
 recursive-include docs *.py
 recursive-include docs *.png
 recursive-include docs *.rst
