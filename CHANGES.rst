@@ -1,6 +1,11 @@
 Changes
 =======
 
+Version 0.8.1 (UNRELEASED)
+---------------------------
+
+- Adds support for specifying ``kubernetes_job_timeout`` for Kubernetes compute backend jobs.
+
 Version 0.8.0 (2021-11-22)
 --------------------------
 

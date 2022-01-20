@@ -260,6 +260,7 @@ class ReanaPipelineJob(JobBase):
         htcondor_accounting_group = self._get_hint("htcondor_accounting_group")
         kubernetes_uid = self._get_hint("kubernetes_uid")
         kubernetes_memory_limit = self._get_hint("kubernetes_memory_limit")
+        kubernetes_job_timeout = self._get_hint("kubernetes_job_timeout")
         create_body = {
             "image": container,
             "cmd": wrapped_cmd,
@@ -276,6 +277,7 @@ class ReanaPipelineJob(JobBase):
             "htcondor_accounting_group": htcondor_accounting_group,
             "kubernetes_uid": kubernetes_uid,
             "kubernetes_memory_limit": kubernetes_memory_limit,
+            "kubernetes_job_timeout": kubernetes_job_timeout,
         }
 
         return create_body
