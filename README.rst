@@ -58,6 +58,8 @@ CWL conformance tests
 
 REANA 0.8.0 tested on 2022-01-11
 
+See https://docs.reana.io/running-workflows/supported-systems/cwl/#cwl-v10-specification-conformance-results for more details
+
 CWL v1.0
 ########
 
