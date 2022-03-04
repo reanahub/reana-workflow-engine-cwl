@@ -39,8 +39,7 @@ setup_requires = [
 ]
 
 install_requires = [
-    "cwltool==3.1.20210628163208",
-    "reana-commons>=0.9.0a2,<0.10.0",
+    "reana-commons[cwl]>=0.9.0a3,<0.10.0",
 ]
 
 packages = find_packages()
