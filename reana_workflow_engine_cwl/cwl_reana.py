@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of REANA.
-# Copyright (C) 2018, 2019, 2020, 2021 CERN.
+# Copyright (C) 2018, 2019, 2020, 2021, 2022 CERN.
 #
 # REANA is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -386,7 +386,8 @@ class ReanaPipelineJob(JobBase):
                         v = v.decode("utf8")
                     cleaned_outputs[k] = v
                 self.outputs = cleaned_outputs
-                self.output_callback(self.outputs, "success")
+                status = "success" if rcode == 0 else "permanentFail"
+                self.output_callback(self.outputs, status)
             except WorkflowException as e:
                 log.error(f"[job {self.name}] workflow job error:\n{e}")
                 self.output_callback({}, "permanentFail")

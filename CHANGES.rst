@@ -1,6 +1,11 @@
 Changes
 =======
 
+Version 0.9.0 (UNRELEASED)
+---------------------------
+
+- Fixes failed jobs incorrectly reported as successful.
+
 Version 0.8.1 (2022-02-07)
 ---------------------------
 
