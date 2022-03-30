@@ -359,7 +359,11 @@ class ReanaPipelineJob(JobBase):
             runtimeContext.publisher.publish_workflow_status(
                 runtimeContext.workflow_uuid,
                 1,
-                message={"progress": {"running": running_jobs,}},
+                message={
+                    "progress": {
+                        "running": running_jobs,
+                    }
+                },
             )
             log.info(f"[job {self.name}] SUBMITTED TASK --------------------")
             log.info(f"[job {self.name}] task id: {task_id} ")
@@ -495,7 +499,9 @@ class ReanaPipelinePoll(PollThread):
                     1,
                     logs="",
                     message={
-                        "progress": {"failed": {"total": 1, "job_ids": [self.task_id]},}
+                        "progress": {
+                            "failed": {"total": 1, "job_ids": [self.task_id]},
+                        }
                     },
                 )
             return True

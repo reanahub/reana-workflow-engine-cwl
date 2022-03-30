@@ -63,7 +63,7 @@ class SQLiteHandler(logging.StreamHandler):
 
             try:
                 if getattr(stream, "encoding", None):
-                    ufs = u"%s\n"
+                    ufs = "%s\n"
                     try:
                         stream.write(ufs % logs)
                         self.publisher.publish_workflow_status(

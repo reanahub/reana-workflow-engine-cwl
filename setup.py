@@ -19,11 +19,15 @@ readme = open("README.rst").read()
 history = open("CHANGES.rst").read()
 
 tests_require = [
-    "pytest-reana>=0.9.0a1,<0.10.0",
+    "pytest-reana>=0.9.0a3,<0.10.0",
 ]
 
 extras_require = {
-    "debug": ["wdb", "ipdb", "Flask-DebugToolbar",],
+    "debug": [
+        "wdb",
+        "ipdb",
+        "Flask-DebugToolbar",
+    ],
     "docs": ["Sphinx>=1.4.4,<1.6", "sphinx-rtd-theme>=0.1.9"],
     "tests": tests_require,
 }
