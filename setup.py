@@ -43,7 +43,7 @@ setup_requires = [
 ]
 
 install_requires = [
-    "reana-commons[cwl]>=0.9.0a6,<0.10.0",
+    "reana-commons[cwl]>=0.9.0a7,<0.10.0",
 ]
 
 packages = find_packages()
