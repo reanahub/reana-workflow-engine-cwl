@@ -4,6 +4,7 @@ Changes
 Version 0.9.0 (UNRELEASED)
 ---------------------------
 
+- Adds support for specifying ``slurm_partition`` and ``slurm_time`` for Slurm compute backend jobs.
 - Fixes failed jobs incorrectly reported as successful.
 
 Version 0.8.1 (2022-02-07)

@@ -258,6 +258,8 @@ class ReanaPipelineJob(JobBase):
         voms_proxy = self._get_hint("voms_proxy")
         htcondor_max_runtime = self._get_hint("htcondor_max_runtime")
         htcondor_accounting_group = self._get_hint("htcondor_accounting_group")
+        slurm_partition = self._get_hint("slurm_partition")
+        slurm_time = self._get_hint("slurm_time")
         kubernetes_uid = self._get_hint("kubernetes_uid")
         kubernetes_memory_limit = self._get_hint("kubernetes_memory_limit")
         kubernetes_job_timeout = self._get_hint("kubernetes_job_timeout")
@@ -278,6 +280,8 @@ class ReanaPipelineJob(JobBase):
             "kubernetes_uid": kubernetes_uid,
             "kubernetes_memory_limit": kubernetes_memory_limit,
             "kubernetes_job_timeout": kubernetes_job_timeout,
+            "slurm_partition": slurm_partition,
+            "slurm_time": slurm_time,
         }
 
         return create_body
