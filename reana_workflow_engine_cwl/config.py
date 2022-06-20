@@ -8,6 +8,7 @@
 
 """REANA Workflow Engine CWL configuration."""
 
+from distutils.util import strtobool
 import os
 
 SHARED_VOLUME_PATH = os.getenv("SHARED_VOLUME_PATH", "/var/reana")
@@ -17,3 +18,6 @@ MOUNT_CVMFS = os.getenv("REANA_MOUNT_CVMFS", "false")
 
 LOGGING_MODULE = "reana-workflow-engine-cwl"
 """REANA Workflow Engine CWL logging module."""
+
+WORKFLOW_KERBEROS = bool(strtobool(os.getenv("REANA_WORKFLOW_KERBEROS", "false")))
+"""Whether Kerberos is needed for the whole workflow."""

@@ -4,6 +4,7 @@ Changes
 Version 0.9.0 (UNRELEASED)
 ---------------------------
 
+- Adds support for propagating global Kerberos flag from workflow specification to each job.
 - Adds support for specifying ``slurm_partition`` and ``slurm_time`` for Slurm compute backend jobs.
 - Fixes failed jobs incorrectly reported as successful.
 

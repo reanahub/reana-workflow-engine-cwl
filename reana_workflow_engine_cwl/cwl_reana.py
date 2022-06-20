@@ -37,6 +37,8 @@ from reana_workflow_engine_cwl.config import LOGGING_MODULE, MOUNT_CVMFS
 from reana_workflow_engine_cwl.pipeline import Pipeline
 from reana_workflow_engine_cwl.poll import PollThread
 
+from .config import WORKFLOW_KERBEROS
+
 log = logging.getLogger(LOGGING_MODULE)
 
 
@@ -253,7 +255,11 @@ class ReanaPipelineJob(JobBase):
         wf_space_cmd += f"; cp -r {self.environment['HOME']}/* " f"{mounted_outdir}"
         wrapped_cmd = f"/bin/sh -c {pipes.quote(wf_space_cmd)} "
         compute_backend = self._get_hint("compute_backend")
+
         kerberos = self._get_hint("kerberos")
+        if kerberos is None:
+            kerberos = WORKFLOW_KERBEROS
+
         unpacked_img = self._get_hint("unpacked_img")
         voms_proxy = self._get_hint("voms_proxy")
         htcondor_max_runtime = self._get_hint("htcondor_max_runtime")
