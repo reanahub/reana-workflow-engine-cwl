@@ -262,6 +262,7 @@ class ReanaPipelineJob(JobBase):
 
         unpacked_img = self._get_hint("unpacked_img")
         voms_proxy = self._get_hint("voms_proxy")
+        rucio = self._get_hint("rucio")
         htcondor_max_runtime = self._get_hint("htcondor_max_runtime")
         htcondor_accounting_group = self._get_hint("htcondor_accounting_group")
         slurm_partition = self._get_hint("slurm_partition")
@@ -281,6 +282,7 @@ class ReanaPipelineJob(JobBase):
             "kerberos": kerberos,
             "unpacked_img": unpacked_img,
             "voms_proxy": voms_proxy,
+            "rucio": rucio,
             "htcondor_max_runtime": htcondor_max_runtime,
             "htcondor_accounting_group": htcondor_accounting_group,
             "kubernetes_uid": kubernetes_uid,
