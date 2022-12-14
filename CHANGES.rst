@@ -1,16 +1,17 @@
 Changes
 =======
 
-Version 0.9.0 (UNRELEASED)
----------------------------
+Version 0.9.0 (2023-01-19)
+--------------------------
 
-- Adds support for Rucio
-- Adds support for propagating global Kerberos flag from workflow specification to each job.
 - Adds support for specifying ``slurm_partition`` and ``slurm_time`` for Slurm compute backend jobs.
-- Fixes failed jobs incorrectly reported as successful.
+- Adds support for Kerberos authentication for workflow orchestration.
+- Adds support for Rucio authentication for workflow jobs.
+- Changes the base image of the component to Ubuntu 20.04 LTS and reduces final Docker image size by removing build-time dependencies.
+- Fixes status reporting for failed jobs that were incorrectly considered successful.
 
 Version 0.8.1 (2022-02-07)
----------------------------
+--------------------------
 
 - Adds support for specifying ``kubernetes_job_timeout`` for Kubernetes compute backend jobs.
 
