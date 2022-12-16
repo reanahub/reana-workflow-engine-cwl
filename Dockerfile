@@ -1,29 +1,34 @@
 # This file is part of REANA.
-# Copyright (C) 2018, 2019, 2020, 2021, 2022 CERN.
+# Copyright (C) 2018, 2019, 2020, 2021, 2022, 2023 CERN.
 #
 # REANA is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 
-# Install base image and its dependencies
+# Use Ubuntu LTS base image
 FROM ubuntu:20.04
 
+# Use default answers in installation commands
 ENV DEBIAN_FRONTEND=noninteractive
 
+# Prepare list of Python dependencies
+COPY requirements.txt /code/
+
+# Install all system and Python dependencies in one go
 # hadolint ignore=DL3008, DL3013
-RUN apt-get update && \
+RUN apt-get update -y && \
     apt-get install --no-install-recommends -y \
       gcc \
       nodejs \
       python3.8 \
       python3-pip \
       vim-tiny && \
+    pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r /code/requirements.txt && \
+    apt-get remove -y \
+      gcc && \
+    apt-get autoremove -y && \
     apt-get clean && \
-    rm -rf /var/lib/apt/lists/* && \
-    pip install --upgrade pip
-
-# Install dependencies
-COPY requirements.txt /code/
-RUN pip install --no-cache-dir -r /code/requirements.txt
+    rm -rf /var/lib/apt/lists/*
 
 # Copy cluster component source code
 WORKDIR /code
@@ -37,7 +42,7 @@ RUN if [ "${DEBUG}" -gt 0 ]; then pip install -e ".[debug]"; else pip install .;
 # hadolint ignore=SC2102
 RUN if test -e modules/reana-commons; then pip install -e modules/reana-commons[kubernetes] --upgrade; fi
 
-# Check if there are broken requirements
+# Check for any broken Python dependencies
 RUN pip check
 
 # Set useful environment variables
