@@ -16,6 +16,7 @@ include scripts/*.py
 include docs/requirements.txt
 include Dockerfile
 include .dockerignore
+exclude .readthedocs.yaml
 prune docs/_build
 recursive-include badges *.json
 recursive-include docs *.py

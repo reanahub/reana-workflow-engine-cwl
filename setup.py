@@ -28,7 +28,7 @@ extras_require = {
         "ipdb",
         "Flask-DebugToolbar",
     ],
-    "docs": ["Sphinx>=1.4.4", "sphinx-rtd-theme>=0.1.9"],
+    "docs": ["Sphinx>=1.4.4", "sphinx-rtd-theme>=0.1.9", "Jinja2<3.1"],
     "tests": tests_require,
 }
 
