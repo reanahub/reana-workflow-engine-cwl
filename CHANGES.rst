@@ -1,6 +1,11 @@
 Changes
 =======
 
+Version 0.9.1 (2023-09-27)
+--------------------------
+
+- Fixes container image names to be Podman-compatible.
+
 Version 0.9.0 (2023-01-19)
 --------------------------
 
