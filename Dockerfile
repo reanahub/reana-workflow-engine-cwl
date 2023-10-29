@@ -14,18 +14,20 @@ ENV DEBIAN_FRONTEND=noninteractive
 COPY requirements.txt /code/
 
 # Install all system and Python dependencies in one go
-# hadolint ignore=DL3008, DL3013
+# hadolint ignore=DL3008,DL3013
 RUN apt-get update -y && \
     apt-get install --no-install-recommends -y \
       gcc \
       nodejs \
       python3.8 \
+      python3-dev \
       python3-pip \
       vim-tiny && \
     pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r /code/requirements.txt && \
     apt-get remove -y \
-      gcc && \
+      gcc \
+      python3-dev && \
     apt-get autoremove -y && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
@@ -36,11 +38,11 @@ COPY . /code
 
 # Are we debugging?
 ARG DEBUG=0
-RUN if [ "${DEBUG}" -gt 0 ]; then pip install -e ".[debug]"; else pip install .; fi;
+RUN if [ "${DEBUG}" -gt 0 ]; then pip install --no-cache-dir -e ".[debug]"; else pip install --no-cache-dir .; fi;
 
 # Are we building with locally-checked-out shared modules?
 # hadolint ignore=SC2102
-RUN if test -e modules/reana-commons; then pip install -e modules/reana-commons[kubernetes] --upgrade; fi
+RUN if test -e modules/reana-commons; then pip install --no-cache-dir -e modules/reana-commons[kubernetes] --upgrade; fi
 
 # Check for any broken Python dependencies
 RUN pip check
