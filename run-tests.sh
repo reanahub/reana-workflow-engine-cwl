@@ -37,7 +37,11 @@ check_sphinx () {
 }
 
 check_pytest () {
-    python setup.py test
+    if [ -n "${PYTESTARG-}" ]; then
+        pytest "$PYTESTARG"
+    else
+        python setup.py test
+    fi
 }
 
 check_dockerfile () {
