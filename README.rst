@@ -56,7 +56,7 @@ Useful links
 CWL conformance tests
 ==============
 
-REANA 0.8.0 tested on 2022-01-11
+EANA 0.9.1 tested on 2023-12-05
 
 CWL v1.0
 ########
