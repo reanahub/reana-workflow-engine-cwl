@@ -4,6 +4,7 @@ Changes
 Version 0.9.2 (UNRELEASED)
 --------------------------
 
+- Adds metadata labels to Dockerfile.
 - Fixes container image building on the arm64 architecture.
 
 Version 0.9.1 (2023-09-27)
