@@ -1,21 +1,23 @@
 # This file is part of REANA.
-# Copyright (C) 2017, 2018, 2020, 2021 CERN.
+# Copyright (C) 2017, 2018, 2020, 2021, 2024 CERN.
 #
 # REANA is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
 
-include LICENSE
-include *.rst
+include *.json
 include *.md
+include *.rst
 include *.sh
 include *.txt
-include .flake8
-include pytest.ini
-include docs/*.json
-include scripts/*.py
-include docs/requirements.txt
-include Dockerfile
+include *.yaml
 include .dockerignore
+include .flake8
+include Dockerfile
+include LICENSE
+include docs/*.json
+include docs/requirements.txt
+include pytest.ini
+include scripts/*.py
 exclude .readthedocs.yaml
 prune docs/_build
 recursive-include badges *.json
