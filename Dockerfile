@@ -72,4 +72,6 @@ LABEL org.opencontainers.image.source="https://github.com/reanahub/reana-workflo
 LABEL org.opencontainers.image.title="reana-workflow-engine-cwl"
 LABEL org.opencontainers.image.url="https://github.com/reanahub/reana-workflow-engine-cwl"
 LABEL org.opencontainers.image.vendor="reanahub"
+# x-release-please-start-version
 LABEL org.opencontainers.image.version="0.9.2"
+# x-release-please-end
