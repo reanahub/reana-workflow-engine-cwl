@@ -484,13 +484,13 @@ class ReanaPipelinePoll(PollThread):
 
     def is_done(self, operation):
         """Check if operation is done."""
-        terminal_states = ["finished", "failed"]
+        terminal_states = ["finished", "failed", "stopped"]
         if operation["status"] in terminal_states:
             log.info(
                 f"[job {self.name}] FINAL JOB STATE: "
                 f"{ operation['status']} ------------------"
             )
-            if operation["status"] != "failed":
+            if operation["status"] == "finished":
                 self.rcode = 0
                 # here we could publish that the job with id: self.task_id
                 # finished or failed.
