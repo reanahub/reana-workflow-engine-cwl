@@ -37,7 +37,7 @@ The detailed information on how to install and use REANA can be found in
 
 ## CWL conformance tests
 
-REANA 0.8.0 tested on 2022-01-11
+REANA 0.9.2 tested on 2024-02-07
 
 ### CWL v1.0
 
