@@ -1,5 +1,41 @@
 # Changelog
 
+## [0.9.3](https://github.com/reanahub/reana-workflow-engine-cwl/compare/0.9.2...0.9.3) (2024-03-04)
+
+
+### Build
+
+* **docker:** install correct extras of reana-commons submodule ([#261](https://github.com/reanahub/reana-workflow-engine-cwl/issues/261)) ([21957fe](https://github.com/reanahub/reana-workflow-engine-cwl/commit/21957fe41921d9c557067b2773205af6385f755b))
+* **docker:** non-editable submodules in "latest" mode ([#255](https://github.com/reanahub/reana-workflow-engine-cwl/issues/255)) ([a6acc88](https://github.com/reanahub/reana-workflow-engine-cwl/commit/a6acc888a36694e3306993cfc3108752b60bd1f3))
+* **python:** bump all required packages as of 2024-03-04 ([#267](https://github.com/reanahub/reana-workflow-engine-cwl/issues/267)) ([ed6a846](https://github.com/reanahub/reana-workflow-engine-cwl/commit/ed6a846eb1d8a0bf92f77906749b5853e5794114))
+* **python:** bump shared REANA packages as of 2024-03-04 ([#267](https://github.com/reanahub/reana-workflow-engine-cwl/issues/267)) ([47155ef](https://github.com/reanahub/reana-workflow-engine-cwl/commit/47155ef95c4eb19642dd54a732402b2551973658))
+
+
+### Bug fixes
+
+* **progress:** handle stopped jobs ([#260](https://github.com/reanahub/reana-workflow-engine-cwl/issues/260)) ([bc36cb7](https://github.com/reanahub/reana-workflow-engine-cwl/commit/bc36cb7813a20fde685a40694af0732ded483d3a))
+
+
+### Code refactoring
+
+* **docs:** move from reST to Markdown ([#263](https://github.com/reanahub/reana-workflow-engine-cwl/issues/263)) ([3cf272f](https://github.com/reanahub/reana-workflow-engine-cwl/commit/3cf272f657cc3e0b329c6d159f5e476f06000f93))
+
+
+### Continuous integration
+
+* **commitlint:** addition of commit message linter ([#256](https://github.com/reanahub/reana-workflow-engine-cwl/issues/256)) ([021854e](https://github.com/reanahub/reana-workflow-engine-cwl/commit/021854e309999938cf01c31bda5ab095679e03b0))
+* **commitlint:** allow release commit style ([#268](https://github.com/reanahub/reana-workflow-engine-cwl/issues/268)) ([ed7ad11](https://github.com/reanahub/reana-workflow-engine-cwl/commit/ed7ad114ccf09ab3182b4cdd49265761f44cd37b))
+* **commitlint:** check for the presence of concrete PR number ([#262](https://github.com/reanahub/reana-workflow-engine-cwl/issues/262)) ([9a45817](https://github.com/reanahub/reana-workflow-engine-cwl/commit/9a45817075f98e04405845f0d49cbcd86ee95556))
+* **release-please:** initial configuration ([#256](https://github.com/reanahub/reana-workflow-engine-cwl/issues/256)) ([bcd87d1](https://github.com/reanahub/reana-workflow-engine-cwl/commit/bcd87d1bbaa4c9b589e4025989ff880594af2b3d))
+* **release-please:** update version in Dockerfile ([#259](https://github.com/reanahub/reana-workflow-engine-cwl/issues/259)) ([0961257](https://github.com/reanahub/reana-workflow-engine-cwl/commit/096125709172e6bea1510a9fd2fdcb90299fac8b))
+* **shellcheck:** fix exit code propagation ([#262](https://github.com/reanahub/reana-workflow-engine-cwl/issues/262)) ([6568b9b](https://github.com/reanahub/reana-workflow-engine-cwl/commit/6568b9b229141dd8dd2a261a833057358143590f))
+
+
+### Documentation
+
+* **authors:** complete list of contributors ([#266](https://github.com/reanahub/reana-workflow-engine-cwl/issues/266)) ([2960cd9](https://github.com/reanahub/reana-workflow-engine-cwl/commit/2960cd9c06a8e12283822ec9fbf87aba7b9b9fb5))
+* **conformance-tests:** update CWL conformance test badges ([#264](https://github.com/reanahub/reana-workflow-engine-cwl/issues/264)) ([45afa2e](https://github.com/reanahub/reana-workflow-engine-cwl/commit/45afa2efd984fd84bbae48fde6ca663f70dd86dc))
+
 ## 0.9.2 (2023-12-12)
 
 - Adds automated multi-platform container image building for amd64 and arm64 architectures.
@@ -110,4 +146,3 @@
 ## 0.2.0 (2018-04-19)
 
 - Initial public release.
-
