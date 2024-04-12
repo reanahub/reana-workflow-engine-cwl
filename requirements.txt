@@ -23,7 +23,7 @@ cwltool==3.1.20210628163208  # via reana-commons
 filelock==3.13.1          # via cachecontrol
 fs==2.4.16                # via reana-commons
 humanfriendly==10.0       # via coloredlogs
-idna==3.6                 # via jsonschema, requests
+idna==3.7                 # via jsonschema, requests
 importlib-resources==6.1.2  # via schema-salad
 isodate==0.6.1            # via rdflib
 jsonpointer==2.4          # via jsonschema
