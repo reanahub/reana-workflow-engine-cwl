@@ -55,7 +55,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: 3.8
+          python-version: "3.8"
 
       - name: Check Python code formatting
         run: |
@@ -72,7 +72,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: 3.8
+          python-version: "3.8"
 
       - name: Check compliance with pep8, pyflakes and circular complexity
         run: |
@@ -89,7 +89,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: 3.8
+          python-version: "3.8"
 
       - name: Check compliance with Python docstring conventions
         run: |
@@ -106,7 +106,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: 3.8
+          python-version: "3.8"
 
       - name: Check Python manifest completeness
         run: |
@@ -123,7 +123,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: 3.8
+          python-version: "3.8"
 
       - name: Install system dependencies
         run: |
@@ -148,7 +148,7 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: 3.8
+          python-version: "3.8"
 
       - name: Install Python dependencies
         run: |

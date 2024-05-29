@@ -71,6 +71,7 @@ setup(
             "run-cwl-workflow=" "reana_workflow_engine_cwl.tasks:run_cwl_workflow",
         ]
     },
+    python_requires=">=3.8",
     extras_require=extras_require,
     install_requires=install_requires,
     setup_requires=setup_requires,
