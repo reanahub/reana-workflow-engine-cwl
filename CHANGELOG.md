@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.4](https://github.com/reanahub/reana-workflow-engine-cwl/compare/0.9.3...0.9.4) (2024-07-05)
+
+
+### Features
+
+* **task:** allow Compute4PUNCH backend options ([#277](https://github.com/reanahub/reana-workflow-engine-cwl/issues/277)) ([9b2a3d0](https://github.com/reanahub/reana-workflow-engine-cwl/commit/9b2a3d0872329e79d0b2d9a0972b0c09f08ff694))
+
 ## [0.9.3](https://github.com/reanahub/reana-workflow-engine-cwl/compare/0.9.2...0.9.3) (2024-03-04)
 
 
