@@ -14,7 +14,7 @@ bracex==2.4               # via wcmatch
 bravado==10.3.2           # via reana-commons
 bravado-core==6.1.0       # via bravado, reana-commons
 cachecontrol[filecache]==0.13.1  # via cachecontrol, schema-salad
-certifi==2024.2.2         # via requests
+certifi==2024.7.4         # via requests
 charset-normalizer==3.3.2  # via requests
 checksumdir==1.1.9        # via reana-commons
 click==8.1.7              # via reana-commons
