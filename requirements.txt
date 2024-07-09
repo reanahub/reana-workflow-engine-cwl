@@ -66,7 +66,7 @@ vine==5.1.0               # via amqp, kombu
 wcmatch==8.4.1            # via reana-commons
 webcolors==1.13           # via jsonschema
 werkzeug==3.0.1           # via reana-commons
-zipp==3.17.0              # via importlib-resources
+zipp==3.19.1              # via importlib-resources
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
