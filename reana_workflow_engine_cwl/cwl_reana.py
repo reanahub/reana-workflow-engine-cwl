@@ -488,7 +488,7 @@ class ReanaPipelinePoll(PollThread):
         if operation["status"] in terminal_states:
             log.info(
                 f"[job {self.name}] FINAL JOB STATE: "
-                f"{ operation['status']} ------------------"
+                f"{operation['status']} ------------------"
             )
             if operation["status"] == "finished":
                 self.rcode = 0
