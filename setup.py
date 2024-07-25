@@ -71,6 +71,7 @@ setup(
             "run-cwl-workflow=" "reana_workflow_engine_cwl.tasks:run_cwl_workflow",
         ]
     },
+    python_requires=">=3.8",
     extras_require=extras_require,
     install_requires=install_requires,
     setup_requires=setup_requires,
@@ -82,7 +83,7 @@ setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.12",
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python",
         "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
