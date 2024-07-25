@@ -19,5 +19,6 @@ The list of contributors in alphabetical order:
 - [Parth Shandilya](https://github.com/ParthS007)
 - [Rokas Maciulaitis](https://orcid.org/0000-0003-1064-6967)
 - [Sinclert Pérez](https://www.linkedin.com/in/sinclert)
+- [Stavros Moiras](https://orcid.org/0009-0005-4331-096X)
 - [Tibor Simko](https://orcid.org/0000-0001-7202-5803)
 - [Vladyslav Moisieienkov](https://orcid.org/0000-0001-9717-0775)
