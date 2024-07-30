@@ -55,7 +55,7 @@ check_sphinx () {
 }
 
 check_pytest () {
-    python setup.py test
+    pytest
 }
 
 check_dockerfile () {
