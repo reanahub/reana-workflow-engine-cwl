@@ -374,7 +374,8 @@ class ReanaPipelineJob(JobBase):
                 message={
                     "progress": {
                         "running": running_jobs,
-                    }
+                    },
+                    "pod_name": os.getenv("WORKFLOW_POD_NAME"),
                 },
             )
             log.info(f"[job {self.name}] SUBMITTED TASK --------------------")
