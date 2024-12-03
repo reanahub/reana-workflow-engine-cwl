@@ -13,6 +13,7 @@ The list of contributors in alphabetical order:
 - [Dinos Kousidis](https://orcid.org/0000-0002-4914-4289)
 - [Giuseppe Steduto](https://orcid.org/0009-0002-1258-8553)
 - [Jan Okraska](https://orcid.org/0000-0002-1416-3244)
+- [Manuel Giffels](https://orcid.org/0000-0003-0193-3032)
 - [Marco Donadoni](https://orcid.org/0000-0003-2922-5505)
 - [Marco Vidal](https://orcid.org/0000-0002-9363-4971)
 - [Michael R. Crusoe](https://orcid.org/0000-0002-2961-9670)

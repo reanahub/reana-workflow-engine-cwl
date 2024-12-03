@@ -270,6 +270,9 @@ class ReanaPipelineJob(JobBase):
         kubernetes_uid = self._get_hint("kubernetes_uid")
         kubernetes_memory_limit = self._get_hint("kubernetes_memory_limit")
         kubernetes_job_timeout = self._get_hint("kubernetes_job_timeout")
+        c4p_cpu_cores = self._get_hint("c4p_cpu_cores")
+        c4p_memory_limit = self._get_hint("c4p_memory_limit")
+        c4p_additional_requirements = self._get_hint("c4p_additional_requirements")
         create_body = {
             "image": container,
             "cmd": wrapped_cmd,
@@ -290,6 +293,9 @@ class ReanaPipelineJob(JobBase):
             "kubernetes_job_timeout": kubernetes_job_timeout,
             "slurm_partition": slurm_partition,
             "slurm_time": slurm_time,
+            "c4p_cpu_cores": c4p_cpu_cores,
+            "c4p_memory_limit": c4p_memory_limit,
+            "c4p_additional_requirements": c4p_additional_requirements,
         }
 
         return create_body

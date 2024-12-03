@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.9.4](https://github.com/reanahub/reana-workflow-engine-cwl/compare/0.9.3...0.9.4) (2024-11-29)
+
+
+### Build
+
+* **docker:** pin setuptools 70 ([#287](https://github.com/reanahub/reana-workflow-engine-cwl/issues/287)) ([3c2cd8a](https://github.com/reanahub/reana-workflow-engine-cwl/commit/3c2cd8a474d167574bf8746b6430f4ae13a83e61))
+* **python:** bump shared REANA packages as of 2024-11-28 ([#289](https://github.com/reanahub/reana-workflow-engine-cwl/issues/289)) ([f9d3688](https://github.com/reanahub/reana-workflow-engine-cwl/commit/f9d3688858e6f1ff52fa58fecd9ce233dd97b0e1))
+
+
+### Features
+
+* **task:** allow Compute4PUNCH backend options ([#277](https://github.com/reanahub/reana-workflow-engine-cwl/issues/277)) ([9b2a3d0](https://github.com/reanahub/reana-workflow-engine-cwl/commit/9b2a3d0872329e79d0b2d9a0972b0c09f08ff694))
+
 ## [0.9.3](https://github.com/reanahub/reana-workflow-engine-cwl/compare/0.9.2...0.9.3) (2024-03-04)
 
 
