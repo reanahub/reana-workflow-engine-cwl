@@ -8,12 +8,12 @@ amqp==5.2.0               # via kombu
 appdirs==1.4.4            # via fs
 argcomplete==3.2.2        # via cwltool
 attrs==23.2.0             # via jsonschema
-backports-zoneinfo[tzdata]==0.2.1  # via backports-zoneinfo, kombu
+backports-zoneinfo[tzdata]==0.2.1  # via kombu
 bagit==1.8.1              # via cwltool
 bracex==2.4               # via wcmatch
 bravado==10.3.2           # via reana-commons
 bravado-core==6.1.0       # via bravado, reana-commons
-cachecontrol[filecache]==0.13.1  # via cachecontrol, schema-salad
+cachecontrol[filecache]==0.13.1  # via schema-salad
 certifi==2024.2.2         # via requests
 charset-normalizer==3.3.2  # via requests
 checksumdir==1.1.9        # via reana-commons
@@ -48,7 +48,7 @@ python-dateutil==2.9.0    # via bravado, bravado-core, prov
 pytz==2024.1              # via bravado-core
 pyyaml==6.0.1             # via bravado, bravado-core, reana-commons, swagger-spec-validator
 rdflib==5.0.0             # via cwltool, prov, schema-salad
-reana-commons[cwl]==0.9.9	# via reana-workflow-engine-cwl (setup.py)
+reana-commons[cwl]==0.9.11  # via reana-workflow-engine-cwl (setup.py)
 requests==2.31.0          # via bravado, bravado-core, cachecontrol, cwltool, schema-salad
 rfc3987==1.3.8            # via jsonschema
 ruamel-yaml==0.17.10      # via cwltool, schema-salad
