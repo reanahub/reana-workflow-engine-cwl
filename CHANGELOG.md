@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.9.5](https://github.com/reanahub/reana-workflow-engine-cwl/compare/0.9.4...0.9.5) (2025-04-25)
+
+
+### Features
+
+* **cwl_reana:** pass K8s requests/limits to job controller ([#292](https://github.com/reanahub/reana-workflow-engine-cwl/issues/292)) ([2170e33](https://github.com/reanahub/reana-workflow-engine-cwl/commit/2170e33658b34a795c14bd9cda40e6d00ebb84f0))
+
+
+### Continuous integration
+
+* **runners:** upgrade CI runners to Ubuntu 22.04 ([#294](https://github.com/reanahub/reana-workflow-engine-cwl/issues/294)) ([d308fd5](https://github.com/reanahub/reana-workflow-engine-cwl/commit/d308fd5e9e3eea4f5579f3489e8a27b076fa0b61))
+
 ## [0.9.4](https://github.com/reanahub/reana-workflow-engine-cwl/compare/0.9.3...0.9.4) (2024-11-29)
 
 
