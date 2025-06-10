@@ -54,7 +54,7 @@ pyyaml==6.0.2             # via bravado, bravado-core, reana-commons, swagger-sp
 rdflib==5.0.0             # via cwltool, prov, schema-salad
 reana-commons[cwl]==0.95.0a7  # via reana-workflow-engine-cwl (setup.py)
 referencing==0.36.2       # via jsonschema, jsonschema-specifications
-requests==2.32.3          # via bravado, bravado-core, cachecontrol, cwltool, schema-salad
+requests==2.32.4          # via bravado, bravado-core, cachecontrol, cwltool, schema-salad
 rfc3339-validator==0.1.4  # via jsonschema
 rfc3987==1.3.8            # via jsonschema
 rpds-py==0.22.3           # via jsonschema, referencing
