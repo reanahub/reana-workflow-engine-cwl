@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.5](https://github.com/reanahub/reana-workflow-engine-cwl/compare/0.9.4...0.9.5) (2025-06-27)
+
+
+### Continuous integration
+
+* **commitlint:** fix local running of commit linter on macOS ([#299](https://github.com/reanahub/reana-workflow-engine-cwl/issues/299)) ([381bdc7](https://github.com/reanahub/reana-workflow-engine-cwl/commit/381bdc79d13356ef18e278e4561ce4ab025ee06d))
+
 ## [0.9.4](https://github.com/reanahub/reana-workflow-engine-cwl/compare/0.9.3...0.9.4) (2024-11-29)
 
 
