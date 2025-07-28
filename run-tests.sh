@@ -9,7 +9,7 @@
 set -o errexit
 set -o nounset
 
-check_commitlint () {
+check_commitlint() {
     from=${2:-master}
     to=${3:-HEAD}
     pr=${4:-[0-9]+}
@@ -31,7 +31,7 @@ check_commitlint () {
         # (iii) check absence of merge commits in feature branches
         if [ "$commit_number_of_parents" -gt 1 ]; then
             if echo "$commit_title" | grep -qE "^chore\(.*\): merge "; then
-                break  # skip checking maint-to-master merge commits
+                break # skip checking maint-to-master merge commits
             else
                 echo "✖   Merge commits are not allowed in feature branches: $commit_title"
                 found=1
@@ -43,43 +43,47 @@ check_commitlint () {
     fi
 }
 
-check_shellcheck () {
+check_shellcheck() {
     find . -name "*.sh" -exec shellcheck {} \+
 }
 
-check_pydocstyle () {
+check_pydocstyle() {
     pydocstyle reana_workflow_engine_cwl
 }
 
-check_black () {
+check_black() {
     black --check .
 }
 
-check_flake8 () {
+check_flake8() {
     flake8 .
 }
 
-check_manifest () {
+check_manifest() {
     check-manifest
 }
 
-check_sphinx () {
+check_sphinx() {
     sphinx-build -qnNW docs docs/_build/html
 }
 
-check_pytest () {
+check_pytest() {
     pytest
 }
 
-check_dockerfile () {
-    docker run -i --rm docker.io/hadolint/hadolint:v2.12.0 < Dockerfile
+check_dockerfile() {
+    docker run -i --rm docker.io/hadolint/hadolint:v2.12.0 <Dockerfile
 }
 
-check_docker_build () {
+check_docker_build() {
     docker build -t docker.io/reanahub/reana-workflow-engine-cwl .
 }
 
-check_all () {
+check_shfmt() {
+    shfmt -d .
+}
+
+check_all() {
     check_commitlint
     check_shellcheck
     check_pydocstyle
@@ -90,6 +94,7 @@ check_all () {
     check_pytest
     check_dockerfile
     check_docker_build
+    check_shfmt
 }
 
 if [ $# -eq 0 ]; then
@@ -99,15 +104,17 @@ fi
 
 arg="$1"
 case $arg in
-    --check-commitlint) check_commitlint "$@";;
-    --check-shellcheck) check_shellcheck;;
-    --check-pydocstyle) check_pydocstyle;;
-    --check-black) check_black;;
-    --check-flake8) check_flake8;;
-    --check-manifest) check_manifest;;
-    --check-sphinx) check_sphinx;;
-    --check-pytest) check_pytest;;
-    --check-dockerfile) check_dockerfile;;
-    --check-docker-build) check_docker_build;;
-    *) echo "[ERROR] Invalid argument '$arg'. Exiting." && exit 1;;
+--check-commitlint) check_commitlint "$@" ;;
+--check-shellcheck) check_shellcheck ;;
+--check-pydocstyle) check_pydocstyle ;;
+--check-black) check_black ;;
+--check-flake8) check_flake8 ;;
+--check-manifest) check_manifest ;;
+--check-sphinx) check_sphinx ;;
+--check-pytest) check_pytest ;;
+--check-dockerfile) check_dockerfile ;;
+--check-docker-build) check_docker_build ;;
+--check-shfmt) check_shfmt ;;
+--check-all) check_all ;;
+*) echo "[ERROR] Invalid argument '$arg'. Exiting." && exit 1 ;;
 esac

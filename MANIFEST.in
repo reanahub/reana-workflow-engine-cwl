@@ -18,6 +18,7 @@ include docs/requirements.txt
 include pytest.ini
 include scripts/*.py
 exclude .readthedocs.yaml
+exclude .editorconfig
 prune docs/_build
 recursive-include badges *.json
 recursive-include docs *.py

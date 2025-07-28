@@ -114,6 +114,17 @@ jobs:
           pip install check-manifest
           ./run-tests.sh --check-manifest
 
+  format-shfmt:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check shell script code formatting
+        run: |
+          sudo apt-get install shfmt
+          ./run-tests.sh --check-shfmt
+
   docs-sphinx:
     runs-on: ubuntu-24.04
     steps:
