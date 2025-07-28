@@ -139,6 +139,24 @@ jobs:
           sudo apt-get install shfmt
           ./run-tests.sh --check-shfmt
 
+  lint-yamllint:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Lint YAML files
+        run: |
+          pip install yamllint
+          ./run-tests.sh --check-yamllint
+
   docs-sphinx:
     runs-on: ubuntu-24.04
     steps:
@@ -211,8 +229,7 @@ jobs:
   release-docker:
     runs-on: ubuntu-24.04
     if: >
-      vars.RELEASE_DOCKER == 'true' &&
-      github.event_name == 'push' &&
+      vars.RELEASE_DOCKER == 'true' && github.event_name == 'push' &&
       startsWith(github.ref, 'refs/tags/')
     needs:
       - docs-sphinx

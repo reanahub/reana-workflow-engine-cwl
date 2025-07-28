@@ -83,6 +83,10 @@ check_jsonlint() {
     find . -name "*.json" -exec jsonlint -q {} \+
 }
 
+check_yamllint() {
+    yamllint .
+}
+
 check_shfmt() {
     shfmt -d .
 }
@@ -99,6 +103,7 @@ check_all() {
     check_dockerfile
     check_docker_build
     check_jsonlint
+    check_yamllint
     check_shfmt
 }
 
@@ -120,6 +125,7 @@ case $arg in
 --check-dockerfile) check_dockerfile ;;
 --check-docker-build) check_docker_build ;;
 --check-jsonlint) check_jsonlint ;;
+--check-yamllint) check_yamllint ;;
 --check-shfmt) check_shfmt ;;
 --check-all) check_all ;;
 *) echo "[ERROR] Invalid argument '$arg'. Exiting." && exit 1 ;;
