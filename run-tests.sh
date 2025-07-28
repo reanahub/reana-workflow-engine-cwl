@@ -79,6 +79,10 @@ check_docker_build() {
     docker build -t docker.io/reanahub/reana-workflow-engine-cwl .
 }
 
+check_jsonlint() {
+    find . -name "*.json" -exec jsonlint -q {} \+
+}
+
 check_shfmt() {
     shfmt -d .
 }
@@ -94,6 +98,7 @@ check_all() {
     check_pytest
     check_dockerfile
     check_docker_build
+    check_jsonlint
     check_shfmt
 }
 
@@ -114,6 +119,7 @@ case $arg in
 --check-pytest) check_pytest ;;
 --check-dockerfile) check_dockerfile ;;
 --check-docker-build) check_docker_build ;;
+--check-jsonlint) check_jsonlint ;;
 --check-shfmt) check_shfmt ;;
 --check-all) check_all ;;
 *) echo "[ERROR] Invalid argument '$arg'. Exiting." && exit 1 ;;
