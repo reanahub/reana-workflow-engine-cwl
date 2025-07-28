@@ -19,6 +19,8 @@ include pytest.ini
 include scripts/*.py
 exclude .readthedocs.yaml
 exclude .editorconfig
+exclude .prettierrc.yaml
+exclude .prettierignore
 prune docs/_build
 recursive-include badges *.json
 recursive-include docs *.py
