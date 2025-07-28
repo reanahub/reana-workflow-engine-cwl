@@ -9,10 +9,11 @@
 
 ## About
 
-REANA-Workflow-Engine-CWL is a component of the [REANA](http://www.reana.io/) reusable
-and reproducible research data analysis platform. It takes care of instantiating,
-executing and managing [Common Workflow Language (CWL)](http://www.commonwl.org/) based
-computational workflows.
+REANA-Workflow-Engine-CWL is a component of the [REANA](http://www.reana.io/)
+reusable and reproducible research data analysis platform. It takes care of
+instantiating, executing and managing
+[Common Workflow Language (CWL)](http://www.commonwl.org/) based computational
+workflows.
 
 ## Features
 

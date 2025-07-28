@@ -91,6 +91,10 @@ check_shfmt() {
     shfmt -d .
 }
 
+check_markdownlint() {
+    markdownlint-cli2 "**/*.md"
+}
+
 check_all() {
     check_commitlint
     check_shellcheck
@@ -105,6 +109,7 @@ check_all() {
     check_jsonlint
     check_yamllint
     check_shfmt
+    check_markdownlint
 }
 
 if [ $# -eq 0 ]; then
@@ -127,6 +132,7 @@ case $arg in
 --check-jsonlint) check_jsonlint ;;
 --check-yamllint) check_yamllint ;;
 --check-shfmt) check_shfmt ;;
+--check-markdownlint) check_markdownlint ;;
 --check-all) check_all ;;
 *) echo "[ERROR] Invalid argument '$arg'. Exiting." && exit 1 ;;
 esac
