@@ -15,9 +15,9 @@ import logging
 import os
 import sys
 from io import StringIO
+from importlib.metadata import version, PackageNotFoundError
 
 import cwltool.main
-import pkg_resources
 from cwltool.context import LoadingContext
 from reana_commons.config import REANA_LOG_FORMAT, REANA_LOG_LEVEL, REANA_WORKFLOW_UMASK
 
@@ -35,10 +35,9 @@ log.addHandler(console)
 
 def versionstring():
     """Return string with cwltool version."""
-    pkg = pkg_resources.require("cwltool")
-    if pkg:
-        cwltool_ver = pkg[0].version
-    else:
+    try:
+        cwltool_ver = version("cwltool")
+    except PackageNotFoundError:
         cwltool_ver = "unknown"
     return f"{sys.argv[0]} {__version__} with cwltool {cwltool_ver}"
 
