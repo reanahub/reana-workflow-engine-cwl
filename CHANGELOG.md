@@ -2,6 +2,23 @@
 
 # Changelog
 
+## [0.9.5](https://github.com/reanahub/reana-workflow-engine-cwl/compare/0.9.4...0.9.5) (2025-09-26)
+
+
+### Code refactoring
+
+* **main:** replace deprecated pkg_resources ([#302](https://github.com/reanahub/reana-workflow-engine-cwl/issues/302)) ([a565875](https://github.com/reanahub/reana-workflow-engine-cwl/commit/a56587501ac39c07c9e7ae883d16bbb74f8dc422))
+
+
+### Continuous integration
+
+* **commitlint:** fix local running of commit linter on macOS ([#299](https://github.com/reanahub/reana-workflow-engine-cwl/issues/299)) ([381bdc7](https://github.com/reanahub/reana-workflow-engine-cwl/commit/381bdc79d13356ef18e278e4561ce4ab025ee06d))
+* **jsonlint:** add JSON linting ([#301](https://github.com/reanahub/reana-workflow-engine-cwl/issues/301)) ([835a0b6](https://github.com/reanahub/reana-workflow-engine-cwl/commit/835a0b692153991cc1b8eaf54fd8eac6e56e0c16))
+* **markdownlint:** add Markdown linting ([#301](https://github.com/reanahub/reana-workflow-engine-cwl/issues/301)) ([a928a99](https://github.com/reanahub/reana-workflow-engine-cwl/commit/a928a99c6032a952883eb0497efcfbec6928fdb7))
+* **prettier:** add Prettier code formatting checks ([#301](https://github.com/reanahub/reana-workflow-engine-cwl/issues/301)) ([4b6dbb7](https://github.com/reanahub/reana-workflow-engine-cwl/commit/4b6dbb71c9e93a58f38a49044c75680ed9b488fc))
+* **shfmt:** add shell script formatting checks ([#301](https://github.com/reanahub/reana-workflow-engine-cwl/issues/301)) ([d4dabaa](https://github.com/reanahub/reana-workflow-engine-cwl/commit/d4dabaa50a0e52a3edc3688893c906f84f41f9c6))
+* **yamllint:** add YAML linting ([#301](https://github.com/reanahub/reana-workflow-engine-cwl/issues/301)) ([6655b33](https://github.com/reanahub/reana-workflow-engine-cwl/commit/6655b33188d7af42bd040e0607e589abc569e501))
+
 ## [0.9.4](https://github.com/reanahub/reana-workflow-engine-cwl/compare/0.9.3...0.9.4) (2024-11-29)
 
 ### Build
