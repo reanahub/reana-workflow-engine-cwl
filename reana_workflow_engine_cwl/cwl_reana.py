@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of REANA.
-# Copyright (C) 2018, 2019, 2020, 2021, 2022 CERN.
+# Copyright (C) 2018, 2019, 2020, 2021, 2022, 2025 CERN.
 #
 # REANA is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -268,6 +268,9 @@ class ReanaPipelineJob(JobBase):
         slurm_partition = self._get_hint("slurm_partition")
         slurm_time = self._get_hint("slurm_time")
         kubernetes_uid = self._get_hint("kubernetes_uid")
+        kubernetes_cpu_request = self._get_hint("kubernetes_cpu_request")
+        kubernetes_cpu_limit = self._get_hint("kubernetes_cpu_limit")
+        kubernetes_memory_request = self._get_hint("kubernetes_memory_request")
         kubernetes_memory_limit = self._get_hint("kubernetes_memory_limit")
         kubernetes_job_timeout = self._get_hint("kubernetes_job_timeout")
         c4p_cpu_cores = self._get_hint("c4p_cpu_cores")
@@ -289,6 +292,9 @@ class ReanaPipelineJob(JobBase):
             "htcondor_max_runtime": htcondor_max_runtime,
             "htcondor_accounting_group": htcondor_accounting_group,
             "kubernetes_uid": kubernetes_uid,
+            "kubernetes_cpu_request": kubernetes_cpu_request,
+            "kubernetes_cpu_limit": kubernetes_cpu_limit,
+            "kubernetes_memory_request": kubernetes_memory_request,
             "kubernetes_memory_limit": kubernetes_memory_limit,
             "kubernetes_job_timeout": kubernetes_job_timeout,
             "slurm_partition": slurm_partition,
