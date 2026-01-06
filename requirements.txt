@@ -52,7 +52,7 @@ python-dateutil==2.9.0.post0  # via arrow, bravado, bravado-core, prov
 pytz==2025.1              # via bravado-core
 pyyaml==6.0.2             # via bravado, bravado-core, reana-commons, swagger-spec-validator
 rdflib==5.0.0             # via cwltool, prov, schema-salad
-reana-commons[cwl]==0.95.0a7  # via reana-workflow-engine-cwl (setup.py)
+reana-commons[cwl]==0.95.0a12	# via reana-workflow-engine-cwl (setup.py)
 referencing==0.36.2       # via jsonschema, jsonschema-specifications
 requests==2.32.3          # via bravado, bravado-core, cachecontrol, cwltool, schema-salad
 rfc3339-validator==0.1.4  # via jsonschema
