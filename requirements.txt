@@ -6,73 +6,73 @@
 #
 amqp==5.3.1               # via kombu
 appdirs==1.4.4            # via fs
-argcomplete==3.5.3        # via cwltool
-arrow==1.3.0              # via isoduration
-attrs==25.1.0             # via jsonschema, referencing
-bagit==1.8.1              # via cwltool
-bracex==2.5.post1         # via wcmatch
+argcomplete==3.6.3        # via cwltool
+arrow==1.4.0              # via isoduration
+attrs==25.4.0             # via jsonschema, referencing
+bagit==1.9.0              # via cwltool
+bracex==2.6               # via wcmatch
 bravado==10.3.2           # via reana-commons
 bravado-core==6.1.0       # via bravado, reana-commons
-cachecontrol[filecache]==0.14.2  # via cachecontrol, schema-salad
-certifi==2025.1.31        # via requests
-charset-normalizer==3.4.1  # via requests
+cachecontrol[filecache]==0.14.4  # via cachecontrol, schema-salad
+certifi==2026.1.4         # via requests
+charset-normalizer==3.4.4  # via requests
 checksumdir==1.1.9        # via reana-commons
-click==8.1.8              # via reana-commons
+click==8.3.1              # via reana-commons
 coloredlogs==15.0.1       # via cwltool
 cwltool==3.1.20210628163208  # via reana-commons
-filelock==3.17.0          # via cachecontrol
+filelock==3.20.2          # via cachecontrol
 fqdn==1.5.1               # via jsonschema
 fs==2.4.16                # via reana-commons
-gherkin-official==31.0.0  # via reana-commons
+gherkin-official==37.0.1  # via reana-commons
 humanfriendly==10.0       # via coloredlogs
-idna==3.10                # via jsonschema, requests
+idna==3.11                # via jsonschema, requests
 importlib-resources==6.5.2  # via swagger-spec-validator
 isodate==0.7.2            # via rdflib
 isoduration==20.11.0      # via jsonschema
 jsonpointer==3.0.0        # via jsonschema
 jsonref==1.1.0            # via bravado-core
-jsonschema[format]==4.23.0  # via bravado-core, reana-commons, swagger-spec-validator
-jsonschema-specifications==2024.10.1  # via jsonschema
-kombu==5.4.2              # via reana-commons
-lxml==5.3.0               # via prov
-markupsafe==3.0.2         # via werkzeug
-mistune==3.0.2            # via schema-salad
+jsonschema[format]==4.25.1  # via bravado-core, reana-commons, swagger-spec-validator
+jsonschema-specifications==2025.9.1  # via jsonschema
+kombu==5.6.2              # via reana-commons
+lxml==6.0.2               # via prov
+markupsafe==3.0.3         # via werkzeug
+mistune==3.1.4            # via schema-salad
 mock==3.0.5               # via reana-commons
 monotonic==1.6            # via bravado
-msgpack==1.1.0            # via bravado-core, cachecontrol
+msgpack==1.1.2            # via bravado-core, cachecontrol
 msgpack-python==0.5.6     # via bravado
-mypy-extensions==1.0.0    # via cwltool, schema-salad
-networkx==3.4.2           # via prov
+mypy-extensions==1.1.0    # via cwltool, schema-salad
+networkx==3.6.1           # via prov
+packaging==25.0           # via kombu
 parse==1.20.2             # via reana-commons
 prov==1.5.1               # via cwltool
-psutil==6.1.1             # via cwltool
-pydot==3.0.4              # via cwltool
-pyparsing==3.2.1          # via pydot, rdflib
+psutil==7.2.1             # via cwltool
+pydot==4.0.1              # via cwltool
+pyparsing==3.3.1          # via pydot, rdflib
 python-dateutil==2.9.0.post0  # via arrow, bravado, bravado-core, prov
-pytz==2025.1              # via bravado-core
-pyyaml==6.0.2             # via bravado, bravado-core, reana-commons, swagger-spec-validator
+pytz==2025.2              # via bravado-core
+pyyaml==6.0.3             # via bravado, bravado-core, reana-commons, swagger-spec-validator
 rdflib==5.0.0             # via cwltool, prov, schema-salad
-reana-commons[cwl]==0.95.0a12	# via reana-workflow-engine-cwl (setup.py)
-referencing==0.36.2       # via jsonschema, jsonschema-specifications
-requests==2.32.3          # via bravado, bravado-core, cachecontrol, cwltool, schema-salad
+reana-commons[cwl]==0.95.0a12  # via reana-workflow-engine-cwl (setup.py)
+referencing==0.37.0       # via jsonschema, jsonschema-specifications
+requests==2.32.5          # via bravado, bravado-core, cachecontrol, cwltool, schema-salad
 rfc3339-validator==0.1.4  # via jsonschema
 rfc3987==1.3.8            # via jsonschema
-rpds-py==0.22.3           # via jsonschema, referencing
+rpds-py==0.30.0           # via jsonschema, referencing
 ruamel-yaml==0.17.10      # via cwltool, schema-salad
-schema-salad==8.8.20241206093842  # via cwltool
+schema-salad==8.9.20251102115403  # via cwltool
 shellescape==3.8.1        # via cwltool
-simplejson==3.19.3        # via bravado, bravado-core
+simplejson==3.20.2        # via bravado, bravado-core
 six==1.17.0               # via bravado, bravado-core, fs, mock, prov, python-dateutil, rdflib, rfc3339-validator
 swagger-spec-validator==3.0.4  # via bravado-core
-types-python-dateutil==2.9.0.20241206  # via arrow
-typing-extensions==4.12.2  # via bravado, cwltool, gherkin-official, referencing, swagger-spec-validator
-tzdata==2025.1            # via kombu
+typing-extensions==4.15.0  # via bravado, cwltool, gherkin-official, referencing, swagger-spec-validator
+tzdata==2025.3            # via arrow, kombu
 uri-template==1.3.0       # via jsonschema
-urllib3==2.3.0            # via requests
+urllib3==2.6.2            # via requests
 vine==5.1.0               # via amqp, kombu
 wcmatch==8.4.1            # via reana-commons
-webcolors==24.11.1        # via jsonschema
-werkzeug==3.1.3           # via reana-commons
+webcolors==25.10.0        # via jsonschema
+werkzeug==3.1.4           # via reana-commons
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
