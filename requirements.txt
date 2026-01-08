@@ -68,7 +68,7 @@ swagger-spec-validator==3.0.4  # via bravado-core
 typing-extensions==4.15.0  # via bravado, cwltool, gherkin-official, referencing, swagger-spec-validator
 tzdata==2025.3            # via arrow, kombu
 uri-template==1.3.0       # via jsonschema
-urllib3==2.6.2            # via requests
+urllib3==2.6.3            # via requests
 vine==5.1.0               # via amqp, kombu
 wcmatch==8.4.1            # via reana-commons
 webcolors==25.10.0        # via jsonschema
