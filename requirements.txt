@@ -72,7 +72,7 @@ urllib3==2.6.2            # via requests
 vine==5.1.0               # via amqp, kombu
 wcmatch==8.4.1            # via reana-commons
 webcolors==25.10.0        # via jsonschema
-werkzeug==3.1.4           # via reana-commons
+werkzeug==3.1.5           # via reana-commons
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
