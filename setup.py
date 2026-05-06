@@ -26,7 +26,8 @@ extras_require = {
     ],
     "docs": ["myst-parser", "Sphinx>=1.4.4", "sphinx-rtd-theme>=0.1.9", "Jinja2<3.1"],
     "tests": [
-        "pytest-reana>=0.95.0a2,<0.96.0",
+        "pytest>=7.0.0,<9.0.0",
+        "pytest-cov>=3.0.0,<4.0",
     ],
 }
 
@@ -37,7 +38,7 @@ for key, reqs in extras_require.items():
     extras_require["all"].extend(reqs)
 
 install_requires = [
-    "reana-commons[cwl]>=0.95.0a14,<0.96.0",
+    "reana-commons[cwl]>=0.95.0a16,<0.96.0",
 ]
 
 packages = find_packages()
