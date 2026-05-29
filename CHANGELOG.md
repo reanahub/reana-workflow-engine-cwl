@@ -3,6 +3,44 @@
 
 # Changelog
 
+## [0.9.5](https://github.com/reanahub/reana-workflow-engine-cwl/compare/0.9.4...0.9.5) (2026-05-12)
+
+
+### Build
+
+* **python:** pin setuptools below 81 ([#310](https://github.com/reanahub/reana-workflow-engine-cwl/issues/310)) ([95066f9](https://github.com/reanahub/reana-workflow-engine-cwl/commit/95066f954ff47dd6cd0fd9134d1c2145ac15b49a))
+
+
+### Features
+
+* **cwl_reana:** pass K8s requests/limits to job controller ([#292](https://github.com/reanahub/reana-workflow-engine-cwl/issues/292)) ([556fbef](https://github.com/reanahub/reana-workflow-engine-cwl/commit/556fbef9287b84c557bcf1b89401fca0f62f4825))
+* **cwl_reana:** pass K8s requests/limits to job controller ([#292](https://github.com/reanahub/reana-workflow-engine-cwl/issues/292)) ([2170e33](https://github.com/reanahub/reana-workflow-engine-cwl/commit/2170e33658b34a795c14bd9cda40e6d00ebb84f0))
+
+
+### Code refactoring
+
+* **main:** replace deprecated pkg_resources ([#302](https://github.com/reanahub/reana-workflow-engine-cwl/issues/302)) ([a565875](https://github.com/reanahub/reana-workflow-engine-cwl/commit/a56587501ac39c07c9e7ae883d16bbb74f8dc422))
+* **pytest:** drop pytest-reana and use pytest directly ([#313](https://github.com/reanahub/reana-workflow-engine-cwl/issues/313)) ([927fab1](https://github.com/reanahub/reana-workflow-engine-cwl/commit/927fab13984b90d6a6e4a04322befdeff3508863))
+
+
+### Code style
+
+* **python:** adapt code base to the new black version ([#310](https://github.com/reanahub/reana-workflow-engine-cwl/issues/310)) ([27b1883](https://github.com/reanahub/reana-workflow-engine-cwl/commit/27b188329bfbda5299e4fa7caf679df428df4887))
+
+
+### Continuous integration
+
+* **commitlint:** fix local running of commit linter on macOS ([#299](https://github.com/reanahub/reana-workflow-engine-cwl/issues/299)) ([381bdc7](https://github.com/reanahub/reana-workflow-engine-cwl/commit/381bdc79d13356ef18e278e4561ce4ab025ee06d))
+* **jsonlint:** add JSON linting ([#301](https://github.com/reanahub/reana-workflow-engine-cwl/issues/301)) ([835a0b6](https://github.com/reanahub/reana-workflow-engine-cwl/commit/835a0b692153991cc1b8eaf54fd8eac6e56e0c16))
+* **markdownlint:** add Markdown linting ([#301](https://github.com/reanahub/reana-workflow-engine-cwl/issues/301)) ([a928a99](https://github.com/reanahub/reana-workflow-engine-cwl/commit/a928a99c6032a952883eb0497efcfbec6928fdb7))
+* **markdownlint:** less permissive global configuration ([#311](https://github.com/reanahub/reana-workflow-engine-cwl/issues/311)) ([d260fcf](https://github.com/reanahub/reana-workflow-engine-cwl/commit/d260fcfbe54455964f8cc68445375ff8a5187b3a))
+* **prettier:** add Prettier code formatting checks ([#301](https://github.com/reanahub/reana-workflow-engine-cwl/issues/301)) ([4b6dbb7](https://github.com/reanahub/reana-workflow-engine-cwl/commit/4b6dbb71c9e93a58f38a49044c75680ed9b488fc))
+* **run-tests:** add usage help and refactor options ([#311](https://github.com/reanahub/reana-workflow-engine-cwl/issues/311)) ([104d810](https://github.com/reanahub/reana-workflow-engine-cwl/commit/104d8105f120e5ff0ffe59edbfa136c3becc57ee))
+* **runners:** upgrade CI runners to Ubuntu 22.04 ([#294](https://github.com/reanahub/reana-workflow-engine-cwl/issues/294)) ([556fbef](https://github.com/reanahub/reana-workflow-engine-cwl/commit/556fbef9287b84c557bcf1b89401fca0f62f4825))
+* **runners:** upgrade CI runners to Ubuntu 22.04 ([#294](https://github.com/reanahub/reana-workflow-engine-cwl/issues/294)) ([d308fd5](https://github.com/reanahub/reana-workflow-engine-cwl/commit/d308fd5e9e3eea4f5579f3489e8a27b076fa0b61))
+* **shfmt:** add shell script formatting checks ([#301](https://github.com/reanahub/reana-workflow-engine-cwl/issues/301)) ([d4dabaa](https://github.com/reanahub/reana-workflow-engine-cwl/commit/d4dabaa50a0e52a3edc3688893c906f84f41f9c6))
+* **yamllint:** add YAML linting ([#301](https://github.com/reanahub/reana-workflow-engine-cwl/issues/301)) ([6655b33](https://github.com/reanahub/reana-workflow-engine-cwl/commit/6655b33188d7af42bd040e0607e589abc569e501))
+
 ## [0.9.4](https://github.com/reanahub/reana-workflow-engine-cwl/compare/0.9.3...0.9.4) (2024-11-29)
 
 ### Build
