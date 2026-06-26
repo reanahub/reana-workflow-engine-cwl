@@ -47,6 +47,7 @@ def main(
     rjc_api_client,
     workflow_uuid,
     workflow_spec,
+    workflow_resources,
     workflow_inputs,
     operational_options,
     working_dir,
@@ -127,7 +128,9 @@ def main(
     if parsed_args.debug:
         log.setLevel(logging.DEBUG)
 
-    pipeline = ReanaPipeline(rjc_api_client=rjc_api_client)
+    pipeline = ReanaPipeline(
+        rjc_api_client=rjc_api_client, workflow_resources=workflow_resources
+    )
     log.info("starting the run..")
     db_log_writer = SQLiteHandler(workflow_uuid, publisher)
 
