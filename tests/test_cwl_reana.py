@@ -16,16 +16,20 @@ import shellescape
 from reana_workflow_engine_cwl.cwl_reana import ReanaPipelineJob
 
 
-def test_initial_workdir_input_is_not_overwritten_during_copy(tmp_path):
-    """Unlink a staged input before copying an output with the same name."""
+def test_initial_workdir_cleanup_preserves_inplace_update_symlinks(tmp_path):
+    """Unlink staged inputs while preserving intentional writable symlinks."""
     uploaded_input = tmp_path / "workspace" / "gendata.C"
     uploaded_input.parent.mkdir()
     uploaded_input.write_text("uploaded input")
+    writable_input = uploaded_input.parent / "writable.txt"
+    writable_input.write_text("writable input")
 
     outdir = tmp_path / "cwl" / "outdir"
     outdir.mkdir(parents=True)
     staged_input = outdir / uploaded_input.name
     staged_input.symlink_to(uploaded_input)
+    staged_writable_input = outdir / writable_input.name
+    staged_writable_input.symlink_to(writable_input)
 
     container_outdir = "/var/lib/cwl/job"
     job = object.__new__(ReanaPipelineJob)
@@ -36,9 +40,15 @@ def test_initial_workdir_input_is_not_overwritten_during_copy(tmp_path):
             type="File",
             resolved=str(uploaded_input),
             target=f"{container_outdir}/{uploaded_input.name}",
-        )
+        ),
+        "writable_input": SimpleNamespace(
+            staged=True,
+            type="WritableFile",
+            resolved=str(writable_input),
+            target=f"{container_outdir}/{writable_input.name}",
+        ),
     }
-    job.inplace_update = False
+    job.inplace_update = True
     job.outdir = str(outdir)
 
     generated_output = tmp_path / "job-output"
@@ -56,3 +66,5 @@ def test_initial_workdir_input_is_not_overwritten_during_copy(tmp_path):
     assert uploaded_input.read_text() == "uploaded input"
     assert not staged_input.is_symlink()
     assert staged_input.read_text() == "generated output"
+    assert staged_writable_input.is_symlink()
+    assert staged_writable_input.read_text() == "writable input"

@@ -171,13 +171,9 @@ class ReanaPipelineJob(JobBase):
         host_outdir = os.path.abspath(self.outdir)
         cleanup_command = ""
         for _, volume in generatemapper.items():
-            is_linked_type = volume.type in ("File", "Directory") or (
-                self.inplace_update
-                and volume.type in ("WritableFile", "WritableDirectory")
-            )
             if (
                 not volume.staged
-                or not is_linked_type
+                or volume.type not in ("File", "Directory")
                 or volume.resolved.startswith("_:")
                 or not volume.target.startswith(target_prefix)
             ):
