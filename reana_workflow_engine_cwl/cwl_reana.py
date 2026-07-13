@@ -160,6 +160,39 @@ class ReanaPipelineJob(JobBase):
                     with os.fdopen(fd, "wb") as f:
                         f.write(vol.resolved.encode("utf-8"))
 
+    def _initial_workdir_symlink_cleanup_command(self):
+        """Build a command that unlinks staged inputs before copying outputs."""
+        generatemapper = getattr(self, "generatemapper", None)
+        if not generatemapper:
+            return ""
+
+        container_outdir = self.builder.outdir.rstrip("/")
+        target_prefix = container_outdir + "/"
+        host_outdir = os.path.abspath(self.outdir)
+        cleanup_command = ""
+        for _, volume in generatemapper.items():
+            is_linked_type = volume.type in ("File", "Directory") or (
+                self.inplace_update
+                and volume.type in ("WritableFile", "WritableDirectory")
+            )
+            if (
+                not volume.staged
+                or not is_linked_type
+                or volume.resolved.startswith("_:")
+                or not volume.target.startswith(target_prefix)
+            ):
+                continue
+
+            relative_target = volume.target[len(target_prefix) :]
+            host_target = os.path.abspath(os.path.join(host_outdir, relative_target))
+            if os.path.commonpath([host_outdir, host_target]) != host_outdir:
+                continue
+            quoted_target = shellescape.quote(host_target)
+            cleanup_command += f"; if [ -L {quoted_target} ]; then "
+            cleanup_command += f"rm -f {quoted_target}; fi"
+
+        return cleanup_command
+
     def create_task_msg(self, working_dir, workflow_uuid):  # noqa: C901
         """Create job message spec to be sent to REANA-Job-Controller."""
         job_name = self.name
@@ -247,6 +280,7 @@ class ReanaPipelineJob(JobBase):
         docker_req, _ = self.get_requirement("DockerRequirement")
         if docker_req:
             docker_output_dir = docker_req.get("dockerOutputDirectory", None)
+        wf_space_cmd += self._initial_workdir_symlink_cleanup_command()
         if docker_output_dir:
             wf_space_cmd = (
                 f"mkdir -p {docker_output_dir} && {wf_space_cmd}"
