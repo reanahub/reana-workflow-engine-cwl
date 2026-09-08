@@ -68,3 +68,38 @@ def test_initial_workdir_cleanup_preserves_inplace_update_symlinks(tmp_path):
     assert staged_input.read_text() == "generated output"
     assert staged_writable_input.is_symlink()
     assert staged_writable_input.read_text() == "writable input"
+
+
+def test_c4p_included_in_create_body():
+    """Include Compute4PUNCH CPU cores, GPU count and notification."""
+    job = object.__new__(ReanaPipelineJob)
+
+    job.name = "test-job"
+    job.environment = {"HOME": "/tmp/job"}
+    job.volumes = []
+    job.outdir = "/tmp/outdir"
+    job.stdin = None
+    job.stdout = None
+    job.stderr = None
+    job.command_line = ["true"]
+    job.hints = [
+        {"c4p_cpu_cores": 4},
+        {"c4p_gpu_count": 2},
+        {"c4p_notification": "Complete"},
+    ]
+    job.builder = SimpleNamespace(bindings=[])
+
+    job.get_requirement = lambda requirement: (
+        ({"dockerPull": "test-image"} if requirement == "DockerRequirement" else None),
+        None,
+    )
+    job._initial_workdir_symlink_cleanup_command = lambda: ""
+
+    create_body = job.create_task_msg(
+        working_dir="/tmp/workspace",
+        workflow_uuid="test-workflow-uuid",
+    )
+
+    assert create_body["c4p_cpu_cores"] == 4
+    assert create_body["c4p_gpu_count"] == 2
+    assert create_body["c4p_notification"] == "Complete"
