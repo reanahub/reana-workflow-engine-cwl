@@ -12,8 +12,10 @@ import subprocess
 from types import SimpleNamespace
 
 import shellescape
+from mock import Mock
 
 from reana_workflow_engine_cwl.cwl_reana import ReanaPipelineJob
+from reana_commons.api_client import JobControllerAPIClient
 
 
 def test_initial_workdir_cleanup_preserves_inplace_update_symlinks(tmp_path):
@@ -70,10 +72,10 @@ def test_initial_workdir_cleanup_preserves_inplace_update_symlinks(tmp_path):
     assert staged_writable_input.read_text() == "writable input"
 
 
-def test_c4p_included_in_create_body():
-    """Include Compute4PUNCH CPU cores, GPU count and notification."""
-    job = object.__new__(ReanaPipelineJob)
+def test_c4p_payload_match_submission_contract():
+    """Check that the C4P payload matches the submission contract."""
 
+    job = object.__new__(ReanaPipelineJob)
     job.name = "test-job"
     job.environment = {"HOME": "/tmp/job"}
     job.volumes = []
@@ -83,12 +85,11 @@ def test_c4p_included_in_create_body():
     job.stderr = None
     job.command_line = ["true"]
     job.hints = [
-        {"c4p_cpu_cores": 4},
-        {"c4p_gpu_count": 2},
+        {"c4p_cpu_cores": "4"},
+        {"c4p_gpu_count": "2"},
         {"c4p_notification": "Complete"},
     ]
     job.builder = SimpleNamespace(bindings=[])
-
     job.get_requirement = lambda requirement: (
         ({"dockerPull": "test-image"} if requirement == "DockerRequirement" else None),
         None,
@@ -100,6 +101,16 @@ def test_c4p_included_in_create_body():
         workflow_uuid="test-workflow-uuid",
     )
 
-    assert create_body["c4p_cpu_cores"] == 4
-    assert create_body["c4p_gpu_count"] == 2
+    assert create_body["c4p_cpu_cores"] == "4"
+    assert create_body["c4p_gpu_count"] == "2"
     assert create_body["c4p_notification"] == "Complete"
+
+    http_client_mock = Mock()
+    http_client_mock.request.return_value.result.return_value = ({}, None)
+
+    api_client = JobControllerAPIClient(
+        "reana-job-controller",
+        http_client=http_client_mock,
+    )
+
+    api_client.submit(**create_body)
