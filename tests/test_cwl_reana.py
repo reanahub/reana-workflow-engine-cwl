@@ -114,3 +114,32 @@ def test_c4p_payload_match_submission_contract():
     )
 
     api_client.submit(**create_body)
+
+
+def test_c4p_gpu_zero_is_preserved():
+    """Preserve a zero GPU value in the C4P payload."""
+    job = object.__new__(ReanaPipelineJob)
+    job.name = "test-job"
+    job.environment = {"HOME": "/tmp/job"}
+    job.volumes = []
+    job.outdir = "/tmp/outdir"
+    job.stdin = None
+    job.stdout = None
+    job.stderr = None
+    job.command_line = ["true"]
+    job.hints = [
+        {"c4p_gpu_count": "0"},
+    ]
+    job.builder = SimpleNamespace(bindings=[])
+    job.get_requirement = lambda requirement: (
+        ({"dockerPull": "test-image"} if requirement == "DockerRequirement" else None),
+        None,
+    )
+    job._initial_workdir_symlink_cleanup_command = lambda: ""
+
+    create_body = job.create_task_msg(
+        working_dir="/tmp/workspace",
+        workflow_uuid="test-workflow-uuid",
+    )
+
+    assert create_body["c4p_gpu_count"] == "0"
