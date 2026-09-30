@@ -38,7 +38,7 @@ for key, reqs in extras_require.items():
     extras_require["all"].extend(reqs)
 
 install_requires = [
-    "reana-commons[cwl]>=0.95.0a20,<0.96.0",
+    "reana-commons[cwl]>=0.95.0a24,<0.96.0",
 ]
 
 packages = find_packages()
