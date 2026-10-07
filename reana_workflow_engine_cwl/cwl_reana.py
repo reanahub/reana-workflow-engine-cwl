@@ -33,6 +33,9 @@ from cwltool.workflow import default_make_tool
 from reana_commons.api_client import JobControllerAPIClient as rjc_api_client
 from reana_commons.config import REANA_WORKFLOW_UMASK
 
+from reana_commons.k8s.secrets import resolve_secret_names
+
+
 from reana_workflow_engine_cwl.config import LOGGING_MODULE, MOUNT_CVMFS
 from reana_workflow_engine_cwl.pipeline import Pipeline
 from reana_workflow_engine_cwl.poll import PollThread
@@ -51,6 +54,7 @@ class ReanaPipeline(Pipeline):
         self.service = kwargs.get(
             "rjc_api_client", rjc_api_client("reana-job-controller")
         )
+        self.workflow_resources = kwargs.get("workflow_resources") or {}
         if kwargs.get("basedir") is not None:
             self.basedir = kwargs.get("basedir")
         else:
@@ -310,6 +314,9 @@ class ReanaPipelineJob(JobBase):
         c4p_cpu_cores = self._get_hint("c4p_cpu_cores")
         c4p_memory_limit = self._get_hint("c4p_memory_limit")
         c4p_additional_requirements = self._get_hint("c4p_additional_requirements")
+        secret_names = resolve_secret_names(
+            self._get_hint("secret_names"), getattr(self, "workflow_resources", {})
+        )
         create_body = {
             "image": container,
             "cmd": wrapped_cmd,
@@ -323,6 +330,7 @@ class ReanaPipelineJob(JobBase):
             "unpacked_img": unpacked_img,
             "voms_proxy": voms_proxy,
             "rucio": rucio,
+            "secret_names": secret_names,
             "htcondor_max_runtime": htcondor_max_runtime,
             "htcondor_accounting_group": htcondor_accounting_group,
             "htcondor_request_cpus": htcondor_request_cpus,
@@ -362,6 +370,7 @@ class ReanaPipelineJob(JobBase):
     def run(self, runtimeContext):  # noqa: C901
         """Run a job."""
         self._setup(runtimeContext)
+        self.workflow_resources = runtimeContext.pipeline.workflow_resources
 
         env = self.environment
         if not os.path.exists(self.tmpdir):
