@@ -306,6 +306,7 @@ class ReanaPipelineJob(JobBase):
         kubernetes_cpu_limit = self._get_hint("kubernetes_cpu_limit")
         kubernetes_memory_request = self._get_hint("kubernetes_memory_request")
         kubernetes_memory_limit = self._get_hint("kubernetes_memory_limit")
+        kubernetes_queue = self._get_hint("kubernetes_queue")
         kubernetes_job_timeout = self._get_hint("kubernetes_job_timeout")
         c4p_cpu_cores = self._get_hint("c4p_cpu_cores")
         c4p_memory_limit = self._get_hint("c4p_memory_limit")
@@ -334,6 +335,7 @@ class ReanaPipelineJob(JobBase):
             "kubernetes_cpu_limit": kubernetes_cpu_limit,
             "kubernetes_memory_request": kubernetes_memory_request,
             "kubernetes_memory_limit": kubernetes_memory_limit,
+            "kubernetes_queue": kubernetes_queue,
             "kubernetes_job_timeout": kubernetes_job_timeout,
             "slurm_partition": slurm_partition,
             "slurm_time": slurm_time,
