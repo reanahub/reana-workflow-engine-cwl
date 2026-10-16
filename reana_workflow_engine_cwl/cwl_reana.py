@@ -36,6 +36,7 @@ from reana_commons.config import REANA_WORKFLOW_UMASK
 from reana_workflow_engine_cwl.config import LOGGING_MODULE, MOUNT_CVMFS
 from reana_workflow_engine_cwl.pipeline import Pipeline
 from reana_workflow_engine_cwl.poll import PollThread
+from reana_workflow_engine_cwl.utils import share_tree_with_group
 
 from .config import WORKFLOW_KERBEROS
 
@@ -359,6 +360,55 @@ class ReanaPipelineJob(JobBase):
                     return hint.get(hint_name)
         return None
 
+    def _get_private_copies(self):
+        """Yield the copies that the engine staged only for this job.
+
+        These are the literals that the tool uses, and both copies of each
+        writable input: the one that the tool changes, and the one that the job
+        overwrites with its output. Inputs that are updated in place are the
+        original files, so they are not included.
+        """
+        container_outdir = self.builder.outdir + "/"
+        for pathmapper in (self.pathmapper, getattr(self, "generatemapper", None)):
+            for _, volume in pathmapper.items() if pathmapper else ():
+                if not volume.staged:
+                    continue
+                if volume.type in ("CreateFile", "CreateWritableFile"):
+                    yield volume.target
+                elif (
+                    volume.type in ("WritableFile", "WritableDirectory")
+                    and not self.inplace_update
+                ):
+                    yield volume.target
+                    if volume.target.startswith(container_outdir):
+                        relative_target = volume.target[len(container_outdir) :]
+                        yield os.path.join(self.outdir, relative_target)
+
+    def _share_staged_files(self, runtimeContext):
+        """Give the workspace group access to the files staged for the job.
+
+        cwltool makes literals readable and writable inputs writable only for
+        their owner, the engine user. Jobs with a custom ``kubernetes_uid``
+        share only the group with the engine user.
+
+        Copies outside of the directories allocated for the workflow are left as
+        they are, because a ``dockerOutputDirectory`` can be any directory.
+        """
+        allocated_directories = [
+            os.path.abspath(directory)
+            for directory in (
+                self.outdir,
+                runtimeContext.docker_outdir,
+                runtimeContext.docker_stagedir,
+            )
+        ]
+        for copy in map(os.path.abspath, self._get_private_copies()):
+            if any(
+                os.path.commonpath([directory, copy]) == directory
+                for directory in allocated_directories
+            ):
+                share_tree_with_group(runtimeContext.working_dir, copy)
+
     def run(self, runtimeContext):  # noqa: C901
         """Run a job."""
         self._setup(runtimeContext)
@@ -401,6 +451,7 @@ class ReanaPipelineJob(JobBase):
         self.add_volumes(self.pathmapper)
         if getattr(self, "generatemapper", ""):
             self.add_volumes(self.generatemapper)
+        self._share_staged_files(runtimeContext)
 
         # useful for debugging
         log.debug(f"[job {self.name}] self.__dict__ in run() ---------------")

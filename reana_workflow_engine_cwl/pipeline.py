@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of REANA.
-# Copyright (C) 2017, 2018, 2019, 2020, 2021 CERN.
+# Copyright (C) 2017, 2018, 2019, 2020, 2021, 2026 CERN.
 #
 # REANA is free software; you can redistribute it and/or modify it
 # under the terms of the MIT License; see LICENSE file for more details.
@@ -22,6 +22,7 @@ from cwltool.mutation import MutationManager
 from cwltool.process import cleanIntermediate, relocateOutputs
 
 from reana_workflow_engine_cwl.config import LOGGING_MODULE
+from reana_workflow_engine_cwl.utils import share_with_group
 
 log = logging.getLogger(LOGGING_MODULE)
 
@@ -55,6 +56,8 @@ class Pipeline(object):
             runtimeContext.outdir = tempfile.mkdtemp(
                 prefix=runtimeContext.tmp_outdir_prefix
             )
+            # the jobs use it as their working directory, possibly with another UID
+            share_with_group(runtimeContext.working_dir, runtimeContext.outdir)
         else:
             runtimeContext.outdir = tempfile.mkdtemp()
 
