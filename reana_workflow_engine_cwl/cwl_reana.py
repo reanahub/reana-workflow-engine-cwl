@@ -359,6 +359,18 @@ class ReanaPipelineJob(JobBase):
                     return hint.get(hint_name)
         return None
 
+    def _share_job_directories(self):
+        """Give the workspace group access to the directories of the job.
+
+        cwltool creates these directories with ``tempfile.mkdtemp()``, which
+        only the engine user can open. Jobs with a custom ``kubernetes_uid``
+        share only the group with the engine user.
+        """
+        directories = (self.outdir, self.builder.outdir, self.tmpdir, self.stagedir)
+        for directory in directories:
+            if directory and os.path.isdir(directory):
+                os.chmod(directory, 0o777 & ~REANA_WORKFLOW_UMASK)
+
     def run(self, runtimeContext):  # noqa: C901
         """Run a job."""
         self._setup(runtimeContext)
@@ -401,6 +413,7 @@ class ReanaPipelineJob(JobBase):
         self.add_volumes(self.pathmapper)
         if getattr(self, "generatemapper", ""):
             self.add_volumes(self.generatemapper)
+        self._share_job_directories()
 
         # useful for debugging
         log.debug(f"[job {self.name}] self.__dict__ in run() ---------------")

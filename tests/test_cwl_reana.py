@@ -8,6 +8,7 @@
 
 """REANA CWL job tests."""
 
+import stat
 import subprocess
 from types import SimpleNamespace
 
@@ -68,3 +69,32 @@ def test_initial_workdir_cleanup_preserves_inplace_update_symlinks(tmp_path):
     assert staged_input.read_text() == "generated output"
     assert staged_writable_input.is_symlink()
     assert staged_writable_input.read_text() == "writable input"
+
+
+def test_share_job_directories(tmp_path):
+    """Give the workspace group access to the job directories."""
+    job = object.__new__(ReanaPipelineJob)
+    directories = [tmp_path / name for name in ("out", "job", "tmp", "stage")]
+    for directory in directories:
+        directory.mkdir(mode=0o700)
+    job.outdir, builder_outdir, job.tmpdir, job.stagedir = map(str, directories)
+    job.builder = SimpleNamespace(outdir=builder_outdir)
+
+    job._share_job_directories()
+
+    for directory in directories:
+        assert stat.S_IMODE(directory.stat().st_mode) == 0o775
+
+
+def test_share_job_directories_skips_missing(tmp_path):
+    """Skip job directories that do not exist."""
+    job = object.__new__(ReanaPipelineJob)
+    job.outdir = str(tmp_path / "outdir")
+    job.tmpdir = str(tmp_path / "missing")
+    job.stagedir = None
+    job.builder = SimpleNamespace(outdir=str(tmp_path / "missing"))
+    (tmp_path / "outdir").mkdir(mode=0o700)
+
+    job._share_job_directories()
+
+    assert stat.S_IMODE((tmp_path / "outdir").stat().st_mode) == 0o775
