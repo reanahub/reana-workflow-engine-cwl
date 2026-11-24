@@ -190,6 +190,26 @@ class ReanaPipelineJob(JobBase):
 
         return cleanup_command
 
+    def _exit_code_command(self):
+        """Build a command that exits with the result of the tool and the copy.
+
+        The codes declared by the tool only decide whether the job has succeeded
+        or failed. If the tool succeeds, the job still fails when its output
+        cannot be copied.
+        """
+        failure_codes = {*self.temporaryFailCodes, *self.permanentFailCodes}
+        success_codes = {0} - failure_codes | set(self.successCodes)
+
+        patterns = "|".join(str(int(code)) for code in sorted(success_codes - {0}))
+        cases = f" {patterns}) tool_exit_code=0 ;;" if patterns else ""
+        if 0 not in success_codes:
+            cases += " 0) tool_exit_code=1 ;;"
+
+        command = f"; case $tool_exit_code in{cases} esac" if cases else ""
+        command += "; if [ $tool_exit_code -ne 0 ]; then exit $tool_exit_code; fi"
+        command += "; exit $copy_exit_code"
+        return command
+
     def create_task_msg(self, working_dir, workflow_uuid):  # noqa: C901
         """Create job message spec to be sent to REANA-Job-Controller."""
         job_name = self.name
@@ -222,12 +242,6 @@ class ReanaPipelineJob(JobBase):
             self.command_line = self.command_line[2:]
         else:
             shouldquote = needs_shell_quoting_re.search
-        shellQuote = True
-        for b in self.builder.bindings:
-            if "shellQuote" in b:
-                shellQuote = b.get("shellQuote")
-                break
-
         command_line = " ".join(
             [
                 shellescape.quote(arg) if shouldquote(arg) else arg
@@ -241,35 +255,37 @@ class ReanaPipelineJob(JobBase):
             command_line,
         )
         command_line = re.sub("/tmp/.*?/.*?/", working_dir + "/", command_line)
+        redirections = ""
         if self.stdin:
             path = self.stdin.split("/")
             if os.path.isabs(self.stdin):
-                command_line += f" < {self.stdin}"
+                redirections += f" < {self.stdin}"
             else:
                 if len(path) > 1:
                     parent_dir = "/".join(mounted_outdir.split("/")[:-1])
-                    command_line += f" < {os.path.join(parent_dir, path[-1])}"
+                    redirections += f" < {os.path.join(parent_dir, path[-1])}"
                 else:
-                    command_line += f" < {os.path.join(mounted_outdir, path)}"
+                    redirections += f" < {os.path.join(mounted_outdir, path)}"
         if self.stdout:
             if os.path.isabs(self.stdout):
-                command_line += f" > {self.stdout}"
+                redirections += f" > {self.stdout}"
             else:
                 _cmd = os.path.join(self.environment["HOME"], self.stdout)
-                command_line += f" > {_cmd}"
+                redirections += f" > {_cmd}"
         if self.stderr:
             if os.path.isabs(self.stderr):
                 stderr = self.stderr
             else:
                 stderr = os.path.join(mounted_outdir, self.stderr)
-            command_line += " 2> " + stderr
-            if scr and not shellQuote:
-                command_line = command_line.replace("&2", stderr)
+            redirections += " 2> " + stderr
 
+        # The tool runs in a subshell, so that it cannot exit before its output is
+        # copied. The redirections apply to the whole tool, which can be a script
+        # that ends with a new line, a comment or a here-document.
         wf_space_cmd = (
-            f"mkdir -p {self.environment['HOME']} "
+            f"(mkdir -p {self.environment['HOME']} "
             f"&& cd {self.environment['HOME']} "
-            f"&& {command_line}"
+            f"&& {{ {command_line}\n}}{redirections}); tool_exit_code=$?"
         )
         wf_space_cmd = requirements_command_line + wf_space_cmd
 
@@ -283,7 +299,14 @@ class ReanaPipelineJob(JobBase):
                 f"mkdir -p {docker_output_dir} && {wf_space_cmd}"
                 f" ; cp -r {docker_output_dir} {mounted_outdir}"
             )
-        wf_space_cmd += f"; cp -r {self.environment['HOME']}/* " f"{mounted_outdir}"
+        # A tool does not have to write any files. The copy can be skipped only if
+        # its directory can be listed and searched, and if nothing was found there.
+        home = self.environment["HOME"]
+        wf_space_cmd += f"; set -- {home}/*; [ -d {home} ] "
+        wf_space_cmd += f"&& [ -r {home} ] && [ -x {home} ] "
+        wf_space_cmd += f'&& [ "$*" = "{home}/*" ] && [ ! -e "$1" ] && [ ! -L "$1" ] '
+        wf_space_cmd += f'|| cp -r "$@" {mounted_outdir}; copy_exit_code=$?'
+        wf_space_cmd += self._exit_code_command()
         wrapped_cmd = f"/bin/sh -c {pipes.quote(wf_space_cmd)} "
         compute_backend = self._get_hint("compute_backend")
 
